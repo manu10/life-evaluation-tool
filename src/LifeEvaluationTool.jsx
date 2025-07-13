@@ -2,12 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Play, Pause, RotateCcw, CheckCircle, ExternalLink, Sun, Moon, Check } from 'lucide-react';
 
 const LifeEvaluationTool = () => {
-  const [activeTab, setActiveTab] = useState('morning');
-  const [timeLeft, setTimeLeft] = useState(120);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
-  const [eveningDone, setEveningDone] = useState(false);
-  const [hasUsedExtraTime, setHasUsedExtraTime] = useState(false);
+  // Load from localStorage or use default
+  const getInitial = (key, fallback) => {
+    try {
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState(() => getInitial('activeTab', 'morning'));
+  const [timeLeft, setTimeLeft] = useState(() => getInitial('timeLeft', 120));
+  const [isRunning, setIsRunning] = useState(() => getInitial('isRunning', false));
+  const [isComplete, setIsComplete] = useState(() => getInitial('isComplete', false));
+  const [eveningDone, setEveningDone] = useState(() => getInitial('eveningDone', false));
+  const [hasUsedExtraTime, setHasUsedExtraTime] = useState(() => getInitial('hasUsedExtraTime', false));
   
   const lifeAreas = [
     'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -22,27 +32,38 @@ const LifeEvaluationTool = () => {
     { value: 'stuck', label: 'Stuck 😰', color: 'bg-red-500' }
   ];
 
-  const [morningResponses, setMorningResponses] = useState(
-    lifeAreas.reduce((acc, area) => ({ ...acc, [area]: { feeling: '', notes: '' } }), {})
+  const [morningResponses, setMorningResponses] = useState(() =>
+    getInitial('morningResponses', lifeAreas.reduce((acc, area) => ({ ...acc, [area]: { feeling: '', notes: '' } }), {}))
   );
 
-  const [eveningResponses, setEveningResponses] = useState({
-    goal1: '', goal2: '', goal3: '', dayThoughts: ''
-  });
+  const [eveningResponses, setEveningResponses] = useState(() =>
+    getInitial('eveningResponses', { goal1: '', goal2: '', goal3: '', dayThoughts: '' })
+  );
 
-  const [todaysGoals, setTodaysGoals] = useState({
-    goal1: { text: '', completed: false },
-    goal2: { text: '', completed: false },
-    goal3: { text: '', completed: false }
-  });
+  const [todaysGoals, setTodaysGoals] = useState(() =>
+    getInitial('todaysGoals', { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } })
+  );
 
-  const [yesterdaysGoals, setYesterdaysGoals] = useState({
-    goal1: { text: '', completed: false },
-    goal2: { text: '', completed: false },
-    goal3: { text: '', completed: false }
-  });
+  const [yesterdaysGoals, setYesterdaysGoals] = useState(() =>
+    getInitial('yesterdaysGoals', { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } })
+  );
 
-  const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = useState('');
+  const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = useState(() =>
+    getInitial('yesterdaysDayThoughts', '')
+  );
+
+  // Persist state to localStorage on change
+  useEffect(() => { localStorage.setItem('activeTab', JSON.stringify(activeTab)); }, [activeTab]);
+  useEffect(() => { localStorage.setItem('timeLeft', JSON.stringify(timeLeft)); }, [timeLeft]);
+  useEffect(() => { localStorage.setItem('isRunning', JSON.stringify(isRunning)); }, [isRunning]);
+  useEffect(() => { localStorage.setItem('isComplete', JSON.stringify(isComplete)); }, [isComplete]);
+  useEffect(() => { localStorage.setItem('eveningDone', JSON.stringify(eveningDone)); }, [eveningDone]);
+  useEffect(() => { localStorage.setItem('hasUsedExtraTime', JSON.stringify(hasUsedExtraTime)); }, [hasUsedExtraTime]);
+  useEffect(() => { localStorage.setItem('morningResponses', JSON.stringify(morningResponses)); }, [morningResponses]);
+  useEffect(() => { localStorage.setItem('eveningResponses', JSON.stringify(eveningResponses)); }, [eveningResponses]);
+  useEffect(() => { localStorage.setItem('todaysGoals', JSON.stringify(todaysGoals)); }, [todaysGoals]);
+  useEffect(() => { localStorage.setItem('yesterdaysGoals', JSON.stringify(yesterdaysGoals)); }, [yesterdaysGoals]);
+  useEffect(() => { localStorage.setItem('yesterdaysDayThoughts', JSON.stringify(yesterdaysDayThoughts)); }, [yesterdaysDayThoughts]);
 
   useEffect(() => {
     let interval = null;
@@ -73,6 +94,7 @@ const LifeEvaluationTool = () => {
   }, [isRunning, timeLeft, activeTab, eveningDone, hasUsedExtraTime]);
 
   const markEveningDone = () => {
+    setYesterdaysDayThoughts(eveningResponses.dayThoughts);
     setEveningDone(true);
     setIsComplete(true);
   };
