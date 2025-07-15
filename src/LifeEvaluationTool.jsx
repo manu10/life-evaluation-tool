@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { usePersistentState } from './hooks/usePersistentState';
 import { formatTime } from './utils/formatTime';
 import { generateExportText } from './utils/generateExportText';
+import { AlarmClock } from 'lucide-react';
 import Timer from './components/Timer';
 import Tabs from './components/Tabs';
 import GoalsList from './components/GoalsList';
@@ -24,7 +25,7 @@ const feelingOptions = [
 ];
 
 const defaultMorningResponses = lifeAreas.reduce((acc, area) => ({ ...acc, [area]: { feeling: '', notes: '' } }), {});
-const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '' };
+const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '', firstHour: '' };
 const defaultGoals = { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } };
 
 export default function LifeEvaluationTool() {
@@ -126,6 +127,10 @@ export default function LifeEvaluationTool() {
       ...prev, [`goal${goalNumber}`]: { text: value, completed: prev[`goal${goalNumber}`].completed }
     }));
   }
+  function handleFirstHourChange(value) {
+    if (eveningDone) return;
+    setEveningResponses(prev => ({ ...prev, firstHour: value }));
+  }
   function handleEveningThoughtsChange(value) {
     if (eveningDone) return;
     setEveningResponses(prev => ({ ...prev, dayThoughts: value }));
@@ -211,6 +216,18 @@ export default function LifeEvaluationTool() {
           {yesterdaysDayThoughts.trim() !== '' && (
             <DayThoughtsPanel value={yesterdaysDayThoughts} editable={false} label="Yesterday's Day Thoughts" colorClass="bg-gray-50" />
           )}
+          {/* First Hour Activity Display */}
+          {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
+            <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
+              <AlarmClock className="w-6 h-6 text-blue-600" />
+              <div className="flex-1">
+                <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
+                <div className="p-3 border border-blue-300 rounded-lg text-base bg-white">
+                  {eveningResponses.firstHour}
+                </div>
+              </div>
+            </div>
+          )}
           <GoalsList goals={todaysGoals} onToggle={handleGoalToggle} editable={true} title="Today's Goals" colorClass="bg-blue-50" />
           <LifeAreasGrid
             lifeAreas={lifeAreas}
@@ -252,6 +269,7 @@ export default function LifeEvaluationTool() {
           <EveningGoalsInput
             eveningResponses={eveningResponses}
             onGoalChange={handleEveningGoalChange}
+            onFirstHourChange={handleFirstHourChange}
             editable={!eveningDone}
           />
           <DayThoughtsPanel
