@@ -35,6 +35,12 @@ export function generateExportText({
     });
     exportText += `\n`;
 
+    if (eveningResponses.firstHour && eveningResponses.firstHour.trim()) {
+      exportText += `🕒 First Hour Activity/Task:\n${eveningResponses.firstHour}\n\n`;
+    }
+
+    exportText += `\n`;
+
     if (eveningResponses.dayThoughts && eveningResponses.dayThoughts.trim()) {
       exportText += `💭 Day Thoughts:\n${eveningResponses.dayThoughts}\n\n`;
     }
@@ -58,6 +64,14 @@ export function generateExportText({
     }
 
     // Today's goals
+
+
+    if (eveningResponses.firstHour && eveningResponses.firstHour.trim()) {
+      exportText += `🕒 First Hour Activity/Task:\n${eveningResponses.firstHour}\n\n`;
+    }
+
+    exportText += `\n`;
+
     const hasTodayGoals = Object.values(todaysGoals).some(goal => goal.text && goal.text.trim() !== '');
     if (hasTodayGoals) {
       exportText += `📋 Today's Goals:\n`;
