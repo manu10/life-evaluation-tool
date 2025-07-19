@@ -157,7 +157,9 @@ export default function LifeEvaluationTool() {
       eveningResponses?.goal3 || ''
     ].filter(goal => goal.trim() !== '').length;
     const thoughtsCount = (eveningResponses?.dayThoughts || '').trim() !== '' ? 1 : 0;
-    const phoneCount = (eveningResponses?.phoneUsage || '').trim() !== '' ? 1 : 0;
+    // Phone usage is valid if it's not empty and not "0m" (which means no time selected)
+    const phoneUsage = (eveningResponses?.phoneUsage || '').trim();
+    const phoneCount = phoneUsage !== '' && phoneUsage !== '0m' ? 1 : 0;
     return goalCount + thoughtsCount + phoneCount;
   }
   function copyToClipboard(isEvening = false) {
@@ -212,7 +214,7 @@ export default function LifeEvaluationTool() {
         onReset={handleReset}
         onMarkEveningDone={markEveningDone}
         canResume={!isRunning && timeLeft < 120 && !eveningDone}
-        canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() > 0}
+        canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 5}
       />
       <div className="text-sm text-gray-600 mb-8">
         {activeTab === 'morning' ? (

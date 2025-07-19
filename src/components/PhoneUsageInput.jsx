@@ -5,22 +5,46 @@ import { Smartphone } from 'lucide-react';
 function parseTimeToMinutes(timeStr) {
   if (!timeStr || typeof timeStr !== 'string') return 0;
   
-  const str = timeStr.toLowerCase().trim();
+  // Handle the new format "Xh Ym" from our time selector
+  const parts = timeStr.split(' ');
   let totalMinutes = 0;
   
-  // Match patterns like "2h 30m", "2.5h", "150m", "2 hours 30 minutes"
-  const hourMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:h|hour|hours)/);
-  const minuteMatch = str.match(/(\d+)\s*(?:m|min|minute|minutes)/);
-  
-  if (hourMatch) {
-    totalMinutes += parseFloat(hourMatch[1]) * 60;
-  }
-  
-  if (minuteMatch) {
-    totalMinutes += parseInt(minuteMatch[1]);
+  for (const part of parts) {
+    if (part.endsWith('h')) {
+      totalMinutes += parseInt(part.slice(0, -1)) * 60;
+    } else if (part.endsWith('m')) {
+      totalMinutes += parseInt(part.slice(0, -1));
+    }
   }
   
   return totalMinutes;
+}
+
+// Function to parse time string into hours and minutes
+function parseTimeToHoursMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return { hours: 0, minutes: 0 };
+  
+  const parts = timeStr.split(' ');
+  let hours = 0;
+  let minutes = 0;
+  
+  for (const part of parts) {
+    if (part.endsWith('h')) {
+      hours = parseInt(part.slice(0, -1));
+    } else if (part.endsWith('m')) {
+      minutes = parseInt(part.slice(0, -1));
+    }
+  }
+  
+  return { hours, minutes };
+}
+
+// Function to format hours and minutes into time string
+function formatTimeString(hours, minutes) {
+  const parts = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  return parts.join(' ') || '0m';
 }
 
 // Function to get color classes based on usage time
@@ -64,6 +88,20 @@ export default function PhoneUsageInput({ value, onChange, editable = true, labe
   const finalColorClass = isYesterday ? colorClasses.bgColor : colorClass;
   const finalBorderColor = isYesterday ? colorClasses.borderColor : 'border-gray-200';
   
+  const { hours, minutes } = parseTimeToHoursMinutes(value);
+  
+  const handleHoursChange = (newHours) => {
+    if (!editable) return;
+    const newTimeString = formatTimeString(parseInt(newHours), minutes);
+    onChange(newTimeString);
+  };
+  
+  const handleMinutesChange = (newMinutes) => {
+    if (!editable) return;
+    const newTimeString = formatTimeString(hours, parseInt(newMinutes));
+    onChange(newTimeString);
+  };
+  
   return (
     <div className={`${finalColorClass} border ${finalBorderColor} rounded-lg p-6 shadow-sm`}>
       <h3 className={`text-lg font-semibold ${colorClasses.titleColor} mb-4`}>📱 {label}</h3>
@@ -71,16 +109,33 @@ export default function PhoneUsageInput({ value, onChange, editable = true, labe
         <label className="block text-sm font-medium text-gray-700 mb-2">How much time did you spend on your phone today?</label>
         <div className="flex items-center gap-3">
           <Smartphone className="w-5 h-5 text-gray-600" />
-          <input
-            type="text"
-            value={value}
-            onChange={e => editable && onChange(e.target.value)}
-            disabled={!editable}
-            placeholder={placeholder}
-            className={`flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-          />
+          <div className="flex items-center gap-2">
+            <select
+              value={hours}
+              onChange={e => handleHoursChange(e.target.value)}
+              disabled={!editable}
+              className={`p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            >
+              {Array.from({ length: 13 }, (_, i) => (
+                <option key={i} value={i}>{i}</option>
+              ))}
+            </select>
+            <span className="text-sm text-gray-600">hours</span>
+            
+            <select
+              value={minutes}
+              onChange={e => handleMinutesChange(e.target.value)}
+              disabled={!editable}
+              className={`p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            >
+              {Array.from({ length: 60 }, (_, i) => (
+                <option key={i} value={i}>{i}</option>
+              ))}
+            </select>
+            <span className="text-sm text-gray-600">minutes</span>
+          </div>
         </div>
-        <p className="text-xs text-gray-500 mt-1">Enter time in any format (e.g., 2h 30m, 2.5h, 150m)</p>
+        <p className="text-xs text-gray-500 mt-1">Select hours and minutes using the dropdowns above</p>
         {isYesterday && colorClasses.message && (
           <div className={`mt-3 p-3 rounded-lg border ${colorClasses.borderColor} ${colorClasses.bgColor}`}>
             <p className={`text-sm font-medium ${colorClasses.messageColor}`}>
