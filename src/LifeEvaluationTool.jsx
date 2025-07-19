@@ -11,6 +11,7 @@ import SummaryPanel from './components/SummaryPanel';
 import DayThoughtsPanel from './components/DayThoughtsPanel';
 import EveningGoalsInput from './components/EveningGoalsInput';
 import PhoneUsageInput from './components/PhoneUsageInput';
+import DailyRoutineInput from './components/DailyRoutineInput';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -28,6 +29,7 @@ const feelingOptions = [
 const defaultMorningResponses = lifeAreas.reduce((acc, area) => ({ ...acc, [area]: { feeling: '', notes: '' } }), {});
 const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '', firstHour: '', phoneUsage: '' };
 const defaultGoals = { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } };
+const defaultDailyRoutines = Array(5).fill(null).map(() => ({ text: '', completed: false }));
 
 export default function LifeEvaluationTool() {
   const [activeTab, setActiveTab] = usePersistentState('activeTab', 'morning');
@@ -42,6 +44,8 @@ export default function LifeEvaluationTool() {
   const [yesterdaysGoals, setYesterdaysGoals] = usePersistentState('yesterdaysGoals', defaultGoals);
   const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = usePersistentState('yesterdaysDayThoughts', '');
   const [yesterdaysPhoneUsage, setYesterdaysPhoneUsage] = usePersistentState('yesterdaysPhoneUsage', '');
+  const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
+  const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
 
   // Timer effect
   useEffect(() => {
@@ -75,6 +79,7 @@ export default function LifeEvaluationTool() {
   function markEveningDone() {
     setYesterdaysDayThoughts(eveningResponses.dayThoughts);
     setYesterdaysPhoneUsage(eveningResponses.phoneUsage);
+    setYesterdaysRoutines(dailyRoutines.map(routine => ({ ...routine, completed: false })));
     setEveningDone(true);
     setIsComplete(true);
   }
@@ -142,6 +147,17 @@ export default function LifeEvaluationTool() {
     if (eveningDone) return;
     setEveningResponses(prev => ({ ...prev, phoneUsage: value }));
   }
+  function handleDailyRoutineChange(newRoutines) {
+    if (eveningDone) return;
+    setDailyRoutines(newRoutines);
+  }
+  function handleYesterdaysRoutineToggle(index) {
+    setYesterdaysRoutines(prev => {
+      const newRoutines = [...prev];
+      newRoutines[index] = { ...newRoutines[index], completed: !newRoutines[index].completed };
+      return newRoutines;
+    });
+  }
   function handleGoalToggle(goalNumber) {
     setTodaysGoals(prev => ({
       ...prev, [`goal${goalNumber}`]: { ...prev[`goal${goalNumber}`], completed: !prev[`goal${goalNumber}`].completed }
@@ -169,6 +185,8 @@ export default function LifeEvaluationTool() {
       yesterdaysGoals,
       yesterdaysDayThoughts,
       yesterdaysPhoneUsage,
+      yesterdaysRoutines,
+      dailyRoutines,
       todaysGoals,
       lifeAreas,
       morningResponses,
@@ -226,26 +244,47 @@ export default function LifeEvaluationTool() {
       {/* Morning Tab Content */}
       {activeTab === 'morning' && (
         <>
-          <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
-          {yesterdaysDayThoughts.trim() !== '' && (
-            <DayThoughtsPanel value={yesterdaysDayThoughts} editable={false} label="Yesterday's Day Thoughts" colorClass="bg-gray-50" />
-          )}
-          {yesterdaysPhoneUsage.trim() !== '' && (
-            <PhoneUsageInput value={yesterdaysPhoneUsage} editable={false} label="Yesterday's Phone Usage" colorClass="bg-gray-50" />
-          )}
-          {/* First Hour Activity Display */}
-          {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
-            <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
-              <AlarmClock className="w-6 h-6 text-blue-600" />
-              <div className="flex-1">
-                <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
-                <div className="p-3 border border-blue-300 rounded-lg text-base bg-white">
-                  {eveningResponses.firstHour}
+          {/* Yesterday's Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              📅 Yesterday's Review
+            </h2>
+            <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
+            {yesterdaysDayThoughts.trim() !== '' && (
+              <DayThoughtsPanel value={yesterdaysDayThoughts} editable={false} label="Yesterday's Day Thoughts" colorClass="bg-gray-50" />
+            )}
+            {yesterdaysPhoneUsage.trim() !== '' && (
+              <PhoneUsageInput value={yesterdaysPhoneUsage} editable={false} label="Yesterday's Phone Usage" colorClass="bg-gray-50" />
+            )}
+            <DailyRoutineInput
+              routines={yesterdaysRoutines}
+              onRoutineToggle={handleYesterdaysRoutineToggle}
+              editable={false}
+              showCheckboxes={true}
+              title="Yesterday's Daily Routines"
+              colorClass="bg-gray-50"
+            />
+          </div>
+
+          {/* Today's Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              🌟 Today's Focus
+            </h2>
+            {/* First Hour Activity Display */}
+            {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
+              <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
+                <AlarmClock className="w-6 h-6 text-blue-600" />
+                <div className="flex-1">
+                  <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
+                  <div className="p-3 border border-blue-300 rounded-lg text-base bg-white">
+                    {eveningResponses.firstHour}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <GoalsList goals={todaysGoals} onToggle={handleGoalToggle} editable={true} title="Today's Goals" colorClass="bg-blue-50" />
+            )}
+            <GoalsList goals={todaysGoals} onToggle={handleGoalToggle} editable={true} title="Today's Goals" colorClass="bg-blue-50" />
+          </div>
           <LifeAreasGrid
             lifeAreas={lifeAreas}
             morningResponses={morningResponses}
@@ -262,6 +301,8 @@ export default function LifeEvaluationTool() {
                 yesterdaysGoals,
                 yesterdaysDayThoughts,
                 yesterdaysPhoneUsage,
+                yesterdaysRoutines,
+                dailyRoutines,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
@@ -305,6 +346,13 @@ export default function LifeEvaluationTool() {
             colorClass="bg-white"
             placeholder="Reflect on your day... wins, challenges, insights, or anything on your mind"
           />
+          <DailyRoutineInput
+            routines={dailyRoutines}
+            onRoutineChange={handleDailyRoutineChange}
+            editable={!eveningDone}
+            title="Daily Routines Setup"
+            colorClass="bg-purple-50"
+          />
           {getEveningCompletionCount() > 0 && (
             <SummaryPanel
               title="Evening Summary"
@@ -314,6 +362,8 @@ export default function LifeEvaluationTool() {
                 yesterdaysGoals,
                 yesterdaysDayThoughts,
                 yesterdaysPhoneUsage,
+                yesterdaysRoutines,
+                dailyRoutines,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
@@ -340,7 +390,9 @@ export default function LifeEvaluationTool() {
               'todaysGoals',
               'yesterdaysGoals',
               'yesterdaysDayThoughts',
-              'yesterdaysPhoneUsage'
+              'yesterdaysPhoneUsage',
+              'dailyRoutines',
+              'yesterdaysRoutines'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

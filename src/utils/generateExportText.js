@@ -5,6 +5,9 @@
  * @param {Object} params.eveningResponses
  * @param {Object} params.yesterdaysGoals
  * @param {string} params.yesterdaysDayThoughts
+ * @param {string} params.yesterdaysPhoneUsage
+ * @param {Array} params.yesterdaysRoutines
+ * @param {Array} params.dailyRoutines
  * @param {Object} params.todaysGoals
  * @param {Array} params.lifeAreas
  * @param {Object} params.morningResponses
@@ -16,6 +19,9 @@ export function generateExportText({
   eveningResponses = {},
   yesterdaysGoals = {},
   yesterdaysDayThoughts = '',
+  yesterdaysPhoneUsage = '',
+  yesterdaysRoutines = [],
+  dailyRoutines = [],
   todaysGoals = {},
   lifeAreas = [],
   morningResponses = {},
@@ -44,6 +50,23 @@ export function generateExportText({
     if (eveningResponses.dayThoughts && eveningResponses.dayThoughts.trim()) {
       exportText += `💭 Day Thoughts:\n${eveningResponses.dayThoughts}\n\n`;
     }
+
+    // Phone usage for evening
+    if (eveningResponses.phoneUsage && eveningResponses.phoneUsage.trim() && eveningResponses.phoneUsage !== '0m') {
+      exportText += `📱 Phone Usage Today:\n${eveningResponses.phoneUsage}\n\n`;
+    }
+
+    // Daily routines setup for evening
+    const hasRoutines = dailyRoutines.some(routine => routine.text && routine.text.trim() !== '');
+    if (hasRoutines) {
+      exportText += `📋 Daily Routines Setup:\n`;
+      dailyRoutines.forEach((routine, index) => {
+        if (routine.text && routine.text.trim()) {
+          exportText += `   ${index + 1}. ${routine.text}\n`;
+        }
+      });
+      exportText += `\n`;
+    }
   } else {
     // Yesterday's goals if available
     const hasYesterdayGoals = Object.values(yesterdaysGoals).some(goal => goal.text && goal.text.trim() !== '');
@@ -61,6 +84,24 @@ export function generateExportText({
     // Yesterday's day thoughts if available
     if (yesterdaysDayThoughts && yesterdaysDayThoughts.trim()) {
       exportText += `💭 Yesterday's Day Thoughts:\n${yesterdaysDayThoughts}\n\n`;
+    }
+
+    // Yesterday's phone usage if available
+    if (yesterdaysPhoneUsage && yesterdaysPhoneUsage.trim() && yesterdaysPhoneUsage !== '0m') {
+      exportText += `📱 Yesterday's Phone Usage:\n${yesterdaysPhoneUsage}\n\n`;
+    }
+
+    // Yesterday's daily routines if available
+    const hasYesterdayRoutines = yesterdaysRoutines.some(routine => routine.text && routine.text.trim() !== '');
+    if (hasYesterdayRoutines) {
+      exportText += `📋 Yesterday's Daily Routines:\n`;
+      yesterdaysRoutines.forEach((routine, index) => {
+        if (routine.text && routine.text.trim()) {
+          const status = routine.completed ? '✅' : '❌';
+          exportText += `   ${status} ${routine.text}\n`;
+        }
+      });
+      exportText += `\n`;
     }
 
     // Today's goals
