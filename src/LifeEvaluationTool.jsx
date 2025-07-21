@@ -14,6 +14,7 @@ import PhoneUsageInput from './components/PhoneUsageInput';
 import DailyRoutineInput from './components/DailyRoutineInput';
 import DistractionTracker from './components/DistractionTracker';
 import DistractionInsights from './components/DistractionInsights';
+import CollapsibleSection from './components/CollapsibleSection';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -249,6 +250,33 @@ export default function LifeEvaluationTool() {
     }
   }
 
+  function getYesterdaysSummary() {
+    const items = [];
+    
+    // Count goals
+    const goalCount = Object.values(yesterdaysGoals).filter(goal => goal.text && goal.text.trim() !== '').length;
+    if (goalCount > 0) items.push(`${goalCount} goal${goalCount !== 1 ? 's' : ''}`);
+    
+    // Count routines
+    const routineCount = yesterdaysRoutines.filter(routine => routine.text && routine.text.trim() !== '').length;
+    if (routineCount > 0) items.push(`${routineCount} routine${routineCount !== 1 ? 's' : ''}`);
+    
+    // Count distractions
+    const distractionCount = yesterdaysDistractions.length;
+    if (distractionCount > 0) items.push(`${distractionCount} distraction${distractionCount !== 1 ? 's' : ''}`);
+    
+    // Add thoughts and phone usage
+    if (yesterdaysDayThoughts && yesterdaysDayThoughts.trim() !== '') items.push('day thoughts');
+    if (yesterdaysPhoneUsage && yesterdaysPhoneUsage.trim() !== '' && yesterdaysPhoneUsage !== '0m') items.push('phone usage');
+    
+    if (items.length === 0) return "No data from yesterday";
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return `${items[0]} and ${items[1]}`;
+    
+    const lastItem = items.pop();
+    return `${items.join(', ')}, and ${lastItem}`;
+  }
+
   // UI
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
@@ -286,11 +314,13 @@ export default function LifeEvaluationTool() {
       {/* Morning Tab Content */}
       {activeTab === 'morning' && (
         <>
-          {/* Yesterday's Section */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              📅 Yesterday's Review
-            </h2>
+          {/* Yesterday's Section - Now Collapsible */}
+          <CollapsibleSection
+            title="Yesterday's Review"
+            icon="📅"
+            summary={getYesterdaysSummary()}
+            defaultExpanded={false}
+          >
             <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
             {yesterdaysDayThoughts.trim() !== '' && (
               <DayThoughtsPanel value={yesterdaysDayThoughts} editable={false} label="Yesterday's Day Thoughts" colorClass="bg-gray-50" />
@@ -317,16 +347,16 @@ export default function LifeEvaluationTool() {
                 />
               </div>
             )}
-          </div>
+          </CollapsibleSection>
 
           {/* Today's Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b-2 border-blue-200 pb-2">
               🌟 Today's Focus
             </h2>
             {/* First Hour Activity Display */}
             {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
-              <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
+              <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded-lg flex items-center gap-4">
                 <AlarmClock className="w-6 h-6 text-blue-600" />
                 <div className="flex-1">
                   <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
