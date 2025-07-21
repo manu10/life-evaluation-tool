@@ -12,6 +12,7 @@ import DayThoughtsPanel from './components/DayThoughtsPanel';
 import EveningGoalsInput from './components/EveningGoalsInput';
 import PhoneUsageInput from './components/PhoneUsageInput';
 import DailyRoutineInput from './components/DailyRoutineInput';
+import DistractionTracker from './components/DistractionTracker';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -46,6 +47,7 @@ export default function LifeEvaluationTool() {
   const [yesterdaysPhoneUsage, setYesterdaysPhoneUsage] = usePersistentState('yesterdaysPhoneUsage', '');
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
   const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
+  const [distractions, setDistractions] = usePersistentState('distractions', []);
 
   // Timer effect
   useEffect(() => {
@@ -158,6 +160,17 @@ export default function LifeEvaluationTool() {
       return newRoutines;
     });
   }
+  function handleAddDistraction(distraction) {
+    setDistractions(prev => [...prev, distraction]);
+  }
+  function handleRemoveDistraction(id) {
+    setDistractions(prev => prev.filter(d => d.id !== id));
+  }
+  function handleClearAllDistractions() {
+    if (window.confirm('Are you sure you want to clear all distractions? This cannot be undone.')) {
+      setDistractions([]);
+    }
+  }
   function handleGoalToggle(goalNumber) {
     setTodaysGoals(prev => ({
       ...prev, [`goal${goalNumber}`]: { ...prev[`goal${goalNumber}`], completed: !prev[`goal${goalNumber}`].completed }
@@ -220,7 +233,7 @@ export default function LifeEvaluationTool() {
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
         <p className="text-gray-600">Track your feelings and set intentions</p>
       </div>
-      <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} />
+      <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
       <Timer
         timeLeft={timeLeft} // pass the raw number
         isRunning={isRunning}
@@ -376,6 +389,15 @@ export default function LifeEvaluationTool() {
           )}
         </>
       )}
+      {/* Distractions Tab Content */}
+      {activeTab === 'distractions' && (
+        <DistractionTracker
+          distractions={distractions}
+          onAddDistraction={handleAddDistraction}
+          onRemoveDistraction={handleRemoveDistraction}
+          onClearAll={handleClearAllDistractions}
+        />
+      )}
       {/* Reset All Data Button */}
       <button
         className="mt-8 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -392,7 +414,8 @@ export default function LifeEvaluationTool() {
               'yesterdaysDayThoughts',
               'yesterdaysPhoneUsage',
               'dailyRoutines',
-              'yesterdaysRoutines'
+              'yesterdaysRoutines',
+              'distractions'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }
