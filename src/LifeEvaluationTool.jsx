@@ -49,6 +49,7 @@ export default function LifeEvaluationTool() {
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
   const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
   const [distractions, setDistractions] = usePersistentState('distractions', []);
+  const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
 
   // Timer effect
   useEffect(() => {
@@ -83,6 +84,7 @@ export default function LifeEvaluationTool() {
     setYesterdaysDayThoughts(eveningResponses.dayThoughts);
     setYesterdaysPhoneUsage(eveningResponses.phoneUsage);
     setYesterdaysRoutines(dailyRoutines.map(routine => ({ ...routine, completed: false })));
+    setYesterdaysDistractions(distractions); // Save current distractions as yesterday's
     setEveningDone(true);
     setIsComplete(true);
   }
@@ -226,6 +228,7 @@ export default function LifeEvaluationTool() {
       yesterdaysRoutines,
       dailyRoutines,
       distractions,
+      yesterdaysDistractions,
       todaysGoals,
       lifeAreas,
       morningResponses,
@@ -303,6 +306,17 @@ export default function LifeEvaluationTool() {
               title="Yesterday's Daily Routines"
               colorClass="bg-gray-50"
             />
+            {/* Yesterday's Focus & Distraction Reflection */}
+            {yesterdaysDistractions.length > 0 && (
+              <div className="mb-6">
+                <DistractionInsights
+                  distractions={yesterdaysDistractions}
+                  title="Yesterday's Focus & Distraction Reflection"
+                  showFullDetails={true}
+                  colorTheme="gray"
+                />
+              </div>
+            )}
           </div>
 
           {/* Today's Section */}
@@ -343,6 +357,7 @@ export default function LifeEvaluationTool() {
                 yesterdaysRoutines,
                 dailyRoutines,
                 distractions,
+                yesterdaysDistractions,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
@@ -414,6 +429,7 @@ export default function LifeEvaluationTool() {
                 yesterdaysRoutines,
                 dailyRoutines,
                 distractions,
+                yesterdaysDistractions,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
@@ -452,7 +468,8 @@ export default function LifeEvaluationTool() {
               'yesterdaysPhoneUsage',
               'dailyRoutines',
               'yesterdaysRoutines',
-              'distractions'
+              'distractions',
+              'yesterdaysDistractions'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

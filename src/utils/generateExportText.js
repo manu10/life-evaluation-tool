@@ -51,6 +51,7 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {Array} params.yesterdaysRoutines
  * @param {Array} params.dailyRoutines
  * @param {Array} params.distractions
+ * @param {Array} params.yesterdaysDistractions
  * @param {Object} params.todaysGoals
  * @param {Array} params.lifeAreas
  * @param {Object} params.morningResponses
@@ -66,6 +67,7 @@ export function generateExportText({
   yesterdaysRoutines = [],
   dailyRoutines = [],
   distractions = [],
+  yesterdaysDistractions = [],
   todaysGoals = {},
   lifeAreas = [],
   morningResponses = {},
@@ -156,6 +158,13 @@ export function generateExportText({
         }
       });
       exportText += `\n`;
+    }
+
+    // Yesterday's distractions if available
+    const yesterdayDistractionExport = formatDistractionsForExport(yesterdaysDistractions);
+    if (yesterdayDistractionExport) {
+      exportText += `📊 Yesterday's Focus & Distractions:\n`;
+      exportText += yesterdayDistractionExport;
     }
 
     // Today's goals
