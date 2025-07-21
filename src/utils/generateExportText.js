@@ -1,3 +1,5 @@
+import { formatDistractionsForExport } from './distractionUtils';
+
 // Function to parse time string and convert to minutes (reused from PhoneUsageInput)
 function parseTimeToMinutes(timeStr) {
   if (!timeStr || typeof timeStr !== 'string') return 0;
@@ -48,6 +50,7 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {string} params.yesterdaysPhoneUsage
  * @param {Array} params.yesterdaysRoutines
  * @param {Array} params.dailyRoutines
+ * @param {Array} params.distractions
  * @param {Object} params.todaysGoals
  * @param {Array} params.lifeAreas
  * @param {Object} params.morningResponses
@@ -62,6 +65,7 @@ export function generateExportText({
   yesterdaysPhoneUsage = '',
   yesterdaysRoutines = [],
   dailyRoutines = [],
+  distractions = [],
   todaysGoals = {},
   lifeAreas = [],
   morningResponses = {},
@@ -108,6 +112,12 @@ export function generateExportText({
         }
       });
       exportText += `\n`;
+    }
+
+    // Distractions for evening
+    const distractionExport = formatDistractionsForExport(distractions);
+    if (distractionExport) {
+      exportText += distractionExport;
     }
   } else {
     // Yesterday's goals if available

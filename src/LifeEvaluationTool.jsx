@@ -13,6 +13,7 @@ import EveningGoalsInput from './components/EveningGoalsInput';
 import PhoneUsageInput from './components/PhoneUsageInput';
 import DailyRoutineInput from './components/DailyRoutineInput';
 import DistractionTracker from './components/DistractionTracker';
+import DistractionInsights from './components/DistractionInsights';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -200,6 +201,7 @@ export default function LifeEvaluationTool() {
       yesterdaysPhoneUsage,
       yesterdaysRoutines,
       dailyRoutines,
+      distractions,
       todaysGoals,
       lifeAreas,
       morningResponses,
@@ -316,6 +318,7 @@ export default function LifeEvaluationTool() {
                 yesterdaysPhoneUsage,
                 yesterdaysRoutines,
                 dailyRoutines,
+                distractions,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
@@ -366,6 +369,12 @@ export default function LifeEvaluationTool() {
             title="Daily Routines Setup"
             colorClass="bg-purple-50"
           />
+          <DistractionInsights
+            distractions={distractions}
+            title="Today's Focus & Distraction Reflection"
+            showFullDetails={true}
+            colorTheme="purple"
+          />
           {getEveningCompletionCount() > 0 && (
             <SummaryPanel
               title="Evening Summary"
@@ -377,6 +386,7 @@ export default function LifeEvaluationTool() {
                 yesterdaysPhoneUsage,
                 yesterdaysRoutines,
                 dailyRoutines,
+                distractions,
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
