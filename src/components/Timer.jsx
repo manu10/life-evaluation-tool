@@ -44,7 +44,11 @@ export default function Timer({
               <Check className="w-4 h-4" />Done
             </button>
           )}
-          <button onClick={onReset} className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+          <button 
+            onClick={onReset} 
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            title={activeTab === 'evening' ? 'Reset evening reflection and clear all distractions' : 'Reset session'}
+          >
             <RotateCcw className="w-4 h-4" />Reset
           </button>
         </div>

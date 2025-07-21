@@ -90,6 +90,23 @@ export default function LifeEvaluationTool() {
   function handleStart() { setIsRunning(true); }
   function handlePause() { setIsRunning(false); }
   function handleReset() {
+    // Show confirmation dialog for evening reset
+    if (activeTab === 'evening') {
+      const hasDistractions = distractions.length > 0;
+      const confirmMessage = hasDistractions 
+        ? 'Reset evening reflection?\n\n' +
+          'This will reset your evening responses and clear all tracked distractions for today. ' +
+          'Distractions are meant to be daily, so this helps you start fresh each day.\n\n' +
+          'This action cannot be undone.'
+        : 'Reset evening reflection?\n\n' +
+          'This will reset your evening responses.\n\n' +
+          'This action cannot be undone.';
+      
+      if (!window.confirm(confirmMessage)) {
+        return; // User cancelled
+      }
+    }
+
     try {
       setIsRunning(false);
       setTimeLeft(120);
@@ -108,13 +125,19 @@ export default function LifeEvaluationTool() {
         setTodaysGoals(defaultGoals);
         setEveningResponses(defaultEveningResponses);
         setEveningDone(false);
+        // Reset distractions when resetting evening tab since they are daily
+        setDistractions([]);
       }
     } catch (error) {
       setIsRunning(false);
       setTimeLeft(120);
       setIsComplete(false);
       setHasUsedExtraTime(false);
-      if (activeTab === 'evening') setEveningDone(false);
+      if (activeTab === 'evening') {
+        setEveningDone(false);
+        // Also reset distractions in error case
+        setDistractions([]);
+      }
     }
   }
   function handleTabChange(tab) {
@@ -172,6 +195,7 @@ export default function LifeEvaluationTool() {
       setDistractions([]);
     }
   }
+  
   function handleGoalToggle(goalNumber) {
     setTodaysGoals(prev => ({
       ...prev, [`goal${goalNumber}`]: { ...prev[`goal${goalNumber}`], completed: !prev[`goal${goalNumber}`].completed }
@@ -369,12 +393,15 @@ export default function LifeEvaluationTool() {
             title="Daily Routines Setup"
             colorClass="bg-purple-50"
           />
+          
+          {/* Distraction Insights - removed separate reset button */}
           <DistractionInsights
             distractions={distractions}
             title="Today's Focus & Distraction Reflection"
             showFullDetails={true}
             colorTheme="purple"
           />
+
           {getEveningCompletionCount() > 0 && (
             <SummaryPanel
               title="Evening Summary"
