@@ -1,3 +1,43 @@
+// Function to parse time string and convert to minutes (reused from PhoneUsageInput)
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  
+  const parts = timeStr.split(' ');
+  let totalMinutes = 0;
+  
+  for (const part of parts) {
+    if (part.endsWith('h')) {
+      totalMinutes += parseInt(part.slice(0, -1)) * 60;
+    } else if (part.endsWith('m')) {
+      totalMinutes += parseInt(part.slice(0, -1));
+    }
+  }
+  
+  return totalMinutes;
+}
+
+// Function to get phone usage feedback for export
+function getPhoneUsageFeedback(timeStr) {
+  const minutes = parseTimeToMinutes(timeStr);
+  
+  if (minutes < 45) {
+    return {
+      emoji: '💚',
+      message: '🎉✨ Great job! Your phone usage is in a healthy range. 📱💚'
+    };
+  } else if (minutes <= 90) {
+    return {
+      emoji: '⚠️',
+      message: '⚠️📊 Moderate usage. Consider reducing screen time for better balance. 🧘‍♂️⏰'
+    };
+  } else {
+    return {
+      emoji: '🚨',
+      message: '🚨📱 High usage detected. Consider setting phone usage limits. 🔒💪'
+    };
+  }
+}
+
 /**
  * Generates the export text for morning or evening summary.
  * @param {Object} params
@@ -53,7 +93,9 @@ export function generateExportText({
 
     // Phone usage for evening
     if (eveningResponses.phoneUsage && eveningResponses.phoneUsage.trim() && eveningResponses.phoneUsage !== '0m') {
-      exportText += `📱 Phone Usage Today:\n${eveningResponses.phoneUsage}\n\n`;
+      const feedback = getPhoneUsageFeedback(eveningResponses.phoneUsage);
+      exportText += `📱 Phone Usage Today: ${feedback.emoji} **${eveningResponses.phoneUsage}**\n`;
+      exportText += `   ${feedback.message}\n\n`;
     }
 
     // Daily routines setup for evening
@@ -88,7 +130,9 @@ export function generateExportText({
 
     // Yesterday's phone usage if available
     if (yesterdaysPhoneUsage && yesterdaysPhoneUsage.trim() && yesterdaysPhoneUsage !== '0m') {
-      exportText += `📱 Yesterday's Phone Usage:\n${yesterdaysPhoneUsage}\n\n`;
+      const feedback = getPhoneUsageFeedback(yesterdaysPhoneUsage);
+      exportText += `📱 Yesterday's Phone Usage: ${feedback.emoji} **${yesterdaysPhoneUsage}**\n`;
+      exportText += `   ${feedback.message}\n\n`;
     }
 
     // Yesterday's daily routines if available
