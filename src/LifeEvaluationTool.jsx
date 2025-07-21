@@ -15,6 +15,7 @@ import DailyRoutineInput from './components/DailyRoutineInput';
 import DistractionTracker from './components/DistractionTracker';
 import DistractionInsights from './components/DistractionInsights';
 import CollapsibleSection from './components/CollapsibleSection';
+import Settings from './components/Settings';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -367,6 +368,20 @@ export default function LifeEvaluationTool() {
               </div>
             )}
             <GoalsList goals={todaysGoals} onToggle={handleGoalToggle} editable={true} title="Today's Goals" colorClass="bg-blue-50" />
+            
+            {/* Daily Routines Tracking (setup is in Settings) */}
+            <DailyRoutineInput
+              routines={dailyRoutines}
+              onRoutineToggle={(index) => {
+                const newRoutines = [...dailyRoutines];
+                newRoutines[index] = { ...newRoutines[index], completed: !newRoutines[index].completed };
+                setDailyRoutines(newRoutines);
+              }}
+              editable={false}
+              showCheckboxes={true}
+              title="Today's Daily Routines"
+              colorClass="bg-green-50"
+            />
           </div>
           <LifeAreasGrid
             lifeAreas={lifeAreas}
@@ -431,15 +446,10 @@ export default function LifeEvaluationTool() {
             colorClass="bg-white"
             placeholder="Reflect on your day... wins, challenges, insights, or anything on your mind"
           />
-          <DailyRoutineInput
-            routines={dailyRoutines}
-            onRoutineChange={handleDailyRoutineChange}
-            editable={!eveningDone}
-            title="Daily Routines Setup"
-            colorClass="bg-purple-50"
-          />
           
-          {/* Distraction Insights - removed separate reset button */}
+          {/* Daily Routines Setup removed - now in Settings tab */}
+          
+          {/* Distraction Insights */}
           <DistractionInsights
             distractions={distractions}
             title="Today's Focus & Distraction Reflection"
@@ -471,6 +481,13 @@ export default function LifeEvaluationTool() {
             />
           )}
         </>
+      )}
+      {/* Settings Tab Content */}
+      {activeTab === 'settings' && (
+        <Settings
+          dailyRoutines={dailyRoutines}
+          onDailyRoutineChange={handleDailyRoutineChange}
+        />
       )}
       {/* Distractions Tab Content */}
       {activeTab === 'distractions' && (

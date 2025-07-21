@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, CheckCircle, Brain } from 'lucide-react';
+import { Sun, Moon, CheckCircle, Brain, Settings } from 'lucide-react';
 
 export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount }) {
   return (
@@ -36,6 +36,15 @@ export default function Tabs({ activeTab, setActiveTab, eveningDone, distraction
             {distractionCount}
           </span>
         )}
+      </button>
+      <button
+        onClick={() => setActiveTab('settings')}
+        className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+          activeTab === 'settings' ? 'bg-white text-gray-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+        }`}
+      >
+        <Settings className="w-5 h-5" />
+        Settings
       </button>
     </div>
   );
