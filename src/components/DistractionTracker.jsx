@@ -15,7 +15,7 @@ const COMMON_TRIGGERS = [
 ];
 
 const COMMON_DISTRACTIONS = [
-  'Social Media', 'YouTube', 'Crypto Prices', 'WhatsApp', 'Marketplace Pages', 
+  'AI tools', 'Social Media', 'YouTube', 'Crypto Prices', 'WhatsApp', 'Marketplace Pages', 
   'News Websites', 'Email', 'Gaming', 'Online Shopping', 'Reddit'
 ];
 
