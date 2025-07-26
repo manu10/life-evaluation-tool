@@ -42,6 +42,7 @@ export default function LifeEvaluationTool() {
   const [isComplete, setIsComplete] = usePersistentState('isComplete', false);
   const [eveningDone, setEveningDone] = usePersistentState('eveningDone', false);
   const [hasUsedExtraTime, setHasUsedExtraTime] = useState(false);
+  const [morningCopied, setMorningCopied] = usePersistentState('morningCopied', false);
   const [morningResponses, setMorningResponses] = usePersistentState('morningResponses', defaultMorningResponses);
   const [eveningResponses, setEveningResponses] = usePersistentState('eveningResponses', defaultEveningResponses);
   const [todaysGoals, setTodaysGoals] = usePersistentState('todaysGoals', defaultGoals);
@@ -93,6 +94,13 @@ export default function LifeEvaluationTool() {
 
   function handleStart() { setIsRunning(true); }
   function handlePause() { setIsRunning(false); }
+  function autoStartTimer() {
+    // Auto-start timer when making changes in morning tab if not already running and timer not at 0
+    if (activeTab === 'morning' && !isRunning && timeLeft > 0) {
+      setIsRunning(true);
+      setMorningCopied(false); // Reset copied status when making new changes
+    }
+  }
   function handleReset() {
     // Show confirmation dialog for evening reset
     if (activeTab === 'evening') {
@@ -204,6 +212,7 @@ export default function LifeEvaluationTool() {
     setTodaysGoals(prev => ({
       ...prev, [`goal${goalNumber}`]: { ...prev[`goal${goalNumber}`], completed: !prev[`goal${goalNumber}`].completed }
     }));
+    autoStartTimer();
   }
   function getMorningCompletionCount() {
     return Object.values(morningResponses).filter(r => r.feeling !== '').length;
@@ -237,6 +246,7 @@ export default function LifeEvaluationTool() {
       feelingOptions
     });
     if (isEvening) markEveningDone();
+    else setMorningCopied(true); // Mark morning content as copied
     try {
       navigator.clipboard.writeText(exportText);
       alert('✅ Summary copied to clipboard! Ready to paste into your Google Doc.');
@@ -285,6 +295,21 @@ export default function LifeEvaluationTool() {
       <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
         <div className="flex items-center gap-2">
           <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
+          {/* Copy button when timer is complete and in morning tab */}
+          {timeLeft === 0 && activeTab === 'morning' && getMorningCompletionCount() > 0 && (
+            <button
+              onClick={() => copyToClipboard(false)}
+              className={`flex items-center gap-1 px-2 py-1 text-xs rounded-lg transition-colors ${
+                !morningCopied 
+                  ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200' 
+                  : 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
+              }`}
+              title={!morningCopied ? 'Copy morning summary - not copied yet!' : 'Copy morning summary'}
+            >
+              📋
+              {!morningCopied && <span className="text-red-600">⚠️</span>}
+            </button>
+          )}
         </div>
       </div>
       <div className="mb-8">
@@ -376,6 +401,7 @@ export default function LifeEvaluationTool() {
                 const newRoutines = [...dailyRoutines];
                 newRoutines[index] = { ...newRoutines[index], completed: !newRoutines[index].completed };
                 setDailyRoutines(newRoutines);
+                autoStartTimer();
               }}
               editable={false}
               showCheckboxes={true}
@@ -389,6 +415,7 @@ export default function LifeEvaluationTool() {
             setMorningResponses={setMorningResponses}
             feelingOptions={feelingOptions}
             editable={true}
+            onAnyChange={autoStartTimer}
           />
           {getMorningCompletionCount() > 0 && (
             <SummaryPanel

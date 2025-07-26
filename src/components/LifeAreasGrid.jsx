@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LifeAreasGrid({ lifeAreas, morningResponses, setMorningResponses, feelingOptions, editable = true }) {
+export default function LifeAreasGrid({ lifeAreas, morningResponses, setMorningResponses, feelingOptions, editable = true, onAnyChange }) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {lifeAreas.map((area) => (
@@ -12,9 +12,14 @@ export default function LifeAreasGrid({ lifeAreas, morningResponses, setMorningR
               {feelingOptions.map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => editable && setMorningResponses(prev => ({
-                    ...prev, [area]: { ...prev[area], feeling: option.value }
-                  }))}
+                  onClick={() => {
+                    if (editable) {
+                      setMorningResponses(prev => ({
+                        ...prev, [area]: { ...prev[area], feeling: option.value }
+                      }));
+                      onAnyChange && onAnyChange();
+                    }
+                  }}
                   className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
                     morningResponses[area].feeling === option.value
                       ? `${option.color} text-white shadow-md`
@@ -31,9 +36,14 @@ export default function LifeAreasGrid({ lifeAreas, morningResponses, setMorningR
             <label className="block text-sm font-medium text-gray-700 mb-2">Quick thoughts (optional)</label>
             <textarea
               value={morningResponses[area].notes}
-              onChange={e => editable && setMorningResponses(prev => ({
-                ...prev, [area]: { ...prev[area], notes: e.target.value }
-              }))}
+              onChange={e => {
+                if (editable) {
+                  setMorningResponses(prev => ({
+                    ...prev, [area]: { ...prev[area], notes: e.target.value }
+                  }));
+                  onAnyChange && onAnyChange();
+                }
+              }}
               placeholder="What's on your mind about this area?"
               className="w-full p-3 border border-gray-300 rounded-lg resize-none h-20 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={!editable}
