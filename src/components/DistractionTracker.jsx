@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Brain, Plus, Trash2, AlertCircle, TrendingUp } from 'lucide-react';
 
 const COMMON_TRIGGERS = [
@@ -31,6 +31,7 @@ export default function DistractionTracker({
   const [newDistraction, setNewDistraction] = useState('');
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [customTrigger, setCustomTrigger] = useState('');
+  const [breathPrompt, setBreathPrompt] = useState({ isVisible: false, triggerValue: '', triggerLabel: '' });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,7 +58,7 @@ export default function DistractionTracker({
     };
     onAddDistraction(created);
 
-    // Suggest ABC and quick interrupt
+    // Suggest ABC and show breathing prompt (do not auto-log)
     if (typeof onSuggestABC === 'function') {
       onSuggestABC({
         setting: '',
@@ -68,7 +69,7 @@ export default function DistractionTracker({
       });
     }
     if (typeof onQuickInterrupt === 'function') {
-      onQuickInterrupt('breaths', 'distraction', triggerInfo.value);
+      setBreathPrompt({ isVisible: true, triggerValue: triggerInfo.value, triggerLabel: triggerInfo.label });
     }
 
     // Reset form
@@ -113,6 +114,20 @@ export default function DistractionTracker({
           )}
         </div>
       </div>
+
+      {breathPrompt.isVisible && (
+        <BreathingPrompt
+          triggerLabel={breathPrompt.triggerLabel}
+          onStart={() => {/* no-op, handled inside component */}}
+          onComplete={() => {
+            if (typeof onQuickInterrupt === 'function') {
+              onQuickInterrupt('breaths', 'distraction', breathPrompt.triggerValue);
+            }
+            setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '' });
+          }}
+          onDismiss={() => setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '' })}
+        />
+      )}
 
       {/* Stats Section */}
       {topTriggers.length > 0 && (
@@ -287,3 +302,78 @@ export default function DistractionTracker({
     </div>
   );
 } 
+
+function BreathingPrompt({ triggerLabel, onComplete, onDismiss }) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [phase, setPhase] = useState('Ready'); // Ready | Inhale | Exhale | Done
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const totalBreaths = 3;
+  const inhaleSeconds = 4;
+  const exhaleSeconds = 4;
+  const [breathCount, setBreathCount] = useState(0);
+
+  useEffect(() => {
+    if (!isRunning) return;
+    if (phase === 'Done') return;
+
+    let timerId;
+    if (phase === 'Ready') {
+      setPhase('Inhale');
+      setSecondsLeft(inhaleSeconds);
+    } else if (phase === 'Inhale') {
+      if (secondsLeft <= 0) {
+        setPhase('Exhale');
+        setSecondsLeft(exhaleSeconds);
+      }
+    } else if (phase === 'Exhale') {
+      if (secondsLeft <= 0) {
+        const nextCount = breathCount + 1;
+        setBreathCount(nextCount);
+        if (nextCount >= totalBreaths) {
+          setPhase('Done');
+          setIsRunning(false);
+          if (typeof onComplete === 'function') onComplete();
+        } else {
+          setPhase('Inhale');
+          setSecondsLeft(inhaleSeconds);
+        }
+      }
+    }
+
+    timerId = setInterval(() => {
+      setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [isRunning, phase, secondsLeft, breathCount, onComplete]);
+
+  const phaseText = phase === 'Ready' ? 'Tap start to begin' : phase === 'Inhale' ? 'Inhale' : phase === 'Exhale' ? 'Exhale' : 'Done';
+
+  return (
+    <div className="mb-6 p-4 rounded-lg border-2 border-blue-300 bg-blue-50">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-semibold text-blue-900">Try 3 deep breaths</div>
+          <div className="text-sm text-blue-800">Trigger noticed: {triggerLabel}</div>
+        </div>
+        <button
+          onClick={onDismiss}
+          className="text-blue-700 hover:text-blue-900 px-2 py-1 text-sm"
+        >
+          Dismiss
+        </button>
+      </div>
+      <div className="mt-3 flex items-center justify-between">
+        <div className="text-blue-900 font-medium">{phaseText}{phase !== 'Done' && isRunning ? ` — ${secondsLeft}s` : ''}</div>
+        <div className="text-sm text-blue-800">Breaths: {breathCount}/{totalBreaths}</div>
+      </div>
+      <div className="mt-3">
+        <button
+          onClick={() => { setIsRunning(true); setPhase('Ready'); setSecondsLeft(0); setBreathCount(0); }}
+          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          {isRunning ? 'Restart' : 'Start 3 breaths'}
+        </button>
+      </div>
+    </div>
+  );
+}

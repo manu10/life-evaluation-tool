@@ -1,10 +1,22 @@
 import React from 'react';
 
-export default function DayThoughtsPanel({ value, onChange, editable = true, label = "Day Thoughts", placeholder = "Reflect on your day...", colorClass = "bg-white" }) {
+export default function DayThoughtsPanel({ value, onChange, editable = true, label = "Day Thoughts", placeholder = "Reflect on your day...", colorClass = "bg-white", onAddABC }) {
   if (!editable && !value.trim()) return null;
   return (
     <div className={`${colorClass} border border-gray-200 rounded-lg p-6 shadow-sm`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">💭 {label}</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">💭 {label}</h3>
+        {editable && typeof onAddABC === 'function' && (
+          <button
+            type="button"
+            onClick={() => onAddABC()}
+            className="text-xs px-2 py-1 rounded-md border border-blue-300 text-blue-700 hover:bg-blue-50"
+            title="Open ABC logger"
+          >
+            + Add ABC
+          </button>
+        )}
+      </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">How did today go? What are you thinking about?</label>
         <textarea

@@ -88,6 +88,7 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [x] Distraction prompt: “Log ABC” + quick interrupt (auto 3 breaths)
 - [x] Settings: `mindfulnessSettings` with prompts and durations
 - [x] Export: show protocol counts and recent ABC highlights (morning)
+- [x] ABCHighlights in Morning/Evening tabs with quick "+ Add ABC" button
 
 #### M2 — Replacement actions, environment designer, protocol stepper, richer export
 - [ ] `src/components/ReplacementActions.jsx`
@@ -153,6 +154,6 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 ### Progress log
 - [2025‑08‑09] Created living plan and drafted 5‑Step protocol. Pending: exact phrasing sync from source post if needed.
 - [2025‑08‑09] Revised plan to align with final 5‑Step wording and ABC framework; added ABC Logger, Replacement Actions, Environment Designer, anxiety scale, and Weekly Review.
-- [2025‑08‑09] Implemented M1: Toolkit, ABC Logger, prompts, settings, and export updates. Pending: add ABC open button in Morning/Evening tabs.
+- [2025‑08‑09] Implemented M1: Toolkit, ABC Logger, prompts, settings, and export updates. Added ABC entry points in DayThoughtsPanel and ABCHighlights; added guided Breathing Prompt.
 
 

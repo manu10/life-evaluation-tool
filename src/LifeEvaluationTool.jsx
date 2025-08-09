@@ -19,6 +19,7 @@ import Settings from './components/Settings';
 import GratitudeInput from './components/GratitudeInput';
 import MindfulnessToolkit from './components/MindfulnessToolkit';
 import ABCLogger from './components/ABCLogger';
+import ABCHighlights from './components/ABCHighlights';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -471,6 +472,8 @@ export default function LifeEvaluationTool() {
             editable={true}
             onAnyChange={autoStartTimer}
           />
+          {/* ABC Highlights (today) */}
+          <ABCHighlights logs={abcLogs} onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }} />
           {getMorningCompletionCount() > 0 && (
             <SummaryPanel
               title="Morning Summary"
@@ -530,7 +533,10 @@ export default function LifeEvaluationTool() {
             label="Day Thoughts"
             colorClass="bg-white"
             placeholder="Reflect on your day... wins, challenges, insights, or anything on your mind"
+            onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }}
           />
+          {/* ABC Highlights (today) */}
+          <ABCHighlights logs={abcLogs} onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }} />
           
           {/* Daily Routines Setup removed - now in Settings tab */}
           
