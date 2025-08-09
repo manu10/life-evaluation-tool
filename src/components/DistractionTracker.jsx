@@ -23,7 +23,9 @@ export default function DistractionTracker({
   distractions, 
   onAddDistraction, 
   onRemoveDistraction, 
-  onClearAll 
+  onClearAll,
+  onSuggestABC, // new: suggest opening ABC logger
+  onQuickInterrupt // new: quick micro-practice
 }) {
   const [isAddingDistraction, setIsAddingDistraction] = useState(false);
   const [newDistraction, setNewDistraction] = useState('');
@@ -44,7 +46,7 @@ export default function DistractionTracker({
       color: 'bg-gray-500'
     };
 
-    onAddDistraction({
+    const created = {
       id: Date.now(),
       distraction: newDistraction.trim(),
       trigger: triggerInfo,
@@ -52,7 +54,22 @@ export default function DistractionTracker({
         hour: '2-digit', 
         minute: '2-digit' 
       })
-    });
+    };
+    onAddDistraction(created);
+
+    // Suggest ABC and quick interrupt
+    if (typeof onSuggestABC === 'function') {
+      onSuggestABC({
+        setting: '',
+        antecedent: `${triggerInfo.label} just before`,
+        behavior: `Got distracted by ${created.distraction}`,
+        consequence: '',
+        effect: ''
+      });
+    }
+    if (typeof onQuickInterrupt === 'function') {
+      onQuickInterrupt('breaths', 'distraction', triggerInfo.value);
+    }
 
     // Reset form
     setNewDistraction('');

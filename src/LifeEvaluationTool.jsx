@@ -16,6 +16,9 @@ import DistractionTracker from './components/DistractionTracker';
 import DistractionInsights from './components/DistractionInsights';
 import CollapsibleSection from './components/CollapsibleSection';
 import Settings from './components/Settings';
+import GratitudeInput from './components/GratitudeInput';
+import MindfulnessToolkit from './components/MindfulnessToolkit';
+import ABCLogger from './components/ABCLogger';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -34,6 +37,7 @@ const defaultMorningResponses = lifeAreas.reduce((acc, area) => ({ ...acc, [area
 const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '', firstHour: '', phoneUsage: '' };
 const defaultGoals = { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } };
 const defaultDailyRoutines = Array(5).fill(null).map(() => ({ text: '', completed: false }));
+const defaultGratitude = { item1: '', item2: '', item3: '' };
 
 export default function LifeEvaluationTool() {
   const [activeTab, setActiveTab] = usePersistentState('activeTab', 'morning');
@@ -53,6 +57,19 @@ export default function LifeEvaluationTool() {
   const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
   const [distractions, setDistractions] = usePersistentState('distractions', []);
   const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
+  const [gratitude, setGratitude] = usePersistentState('gratitude', defaultGratitude);
+  // Mindfulness & ABC (M1)
+  const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
+    enablePrompts: true,
+    anchorSec: 30,
+    pauseSec: 90,
+    enableFiveStep: true
+  });
+  const [microPracticeLogs, setMicroPracticeLogs] = usePersistentState('microPracticeLogs', []);
+  const [abcLogs, setAbcLogs] = usePersistentState('abcLogs', []);
+  const [isToolkitOpen, setIsToolkitOpen] = useState(false);
+  const [isABCOpen, setIsABCOpen] = useState(false);
+  const [abcInitial, setAbcInitial] = useState({});
 
   // Timer effect
   useEffect(() => {
@@ -126,6 +143,7 @@ export default function LifeEvaluationTool() {
       setHasUsedExtraTime(false);
       if (activeTab === 'morning') {
         setMorningResponses(defaultMorningResponses);
+        setGratitude(defaultGratitude);
         setTodaysGoals(prev => ({
           goal1: { text: prev.goal1.text, completed: false },
           goal2: { text: prev.goal2.text, completed: false },
@@ -207,6 +225,17 @@ export default function LifeEvaluationTool() {
       setDistractions([]);
     }
   }
+  // Micro-practice logging
+  function handleLogMicroPractice(type, source = 'manual', trigger) {
+    const entry = { id: Date.now(), ts: Date.now(), type, source, trigger };
+    setMicroPracticeLogs(prev => [...prev, entry]);
+  }
+  // ABC save
+  function handleSaveABC(form) {
+    const entry = { id: Date.now(), ts: Date.now(), ...form };
+    setAbcLogs(prev => [entry, ...prev]);
+    setIsABCOpen(false);
+  }
   
   function handleGoalToggle(goalNumber) {
     setTodaysGoals(prev => ({
@@ -214,8 +243,14 @@ export default function LifeEvaluationTool() {
     }));
     autoStartTimer();
   }
+  function handleGratitudeChange(newGratitude) {
+    setGratitude(newGratitude);
+    autoStartTimer();
+  }
   function getMorningCompletionCount() {
-    return Object.values(morningResponses).filter(r => r.feeling !== '').length;
+    const lifeAreasCount = Object.values(morningResponses).filter(r => r.feeling !== '').length;
+    const gratitudeCount = Object.values(gratitude).filter(item => item.trim() !== '').length;
+    return lifeAreasCount + gratitudeCount;
   }
   function getEveningCompletionCount() {
     const goalCount = [
@@ -243,7 +278,11 @@ export default function LifeEvaluationTool() {
       todaysGoals,
       lifeAreas,
       morningResponses,
-      feelingOptions
+      feelingOptions,
+      gratitude,
+      microPracticeLogs,
+      abcLogs,
+      mindfulnessSettings
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -295,6 +334,13 @@ export default function LifeEvaluationTool() {
       <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
         <div className="flex items-center gap-2">
           <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
+          <button
+            onClick={() => setIsToolkitOpen(true)}
+            className="px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200"
+            title="Open Mindfulness Toolkit"
+          >
+            🧘
+          </button>
           {/* Copy button when timer is complete and in morning tab */}
           {timeLeft === 0 && activeTab === 'morning' && getMorningCompletionCount() > 0 && (
             <button
@@ -332,7 +378,7 @@ export default function LifeEvaluationTool() {
       />
       <div className="text-sm text-gray-600 mb-8">
         {activeTab === 'morning' ? (
-          <>Progress: {getMorningCompletionCount()}/{lifeAreas.length} areas evaluated</>
+          <>Progress: {getMorningCompletionCount()}/{lifeAreas.length + 3} items completed</>
         ) : (
           <>Progress: {getEveningCompletionCount()}/5 items completed {eveningDone && <span className="text-green-600 font-semibold">✓ Locked</span>}</>
         )}
@@ -409,6 +455,14 @@ export default function LifeEvaluationTool() {
               colorClass="bg-green-50"
             />
           </div>
+          
+          {/* Daily Gratitude */}
+          <GratitudeInput
+            gratitude={gratitude}
+            onGratitudeChange={handleGratitudeChange}
+            editable={true}
+          />
+          
           <LifeAreasGrid
             lifeAreas={lifeAreas}
             morningResponses={morningResponses}
@@ -433,7 +487,11 @@ export default function LifeEvaluationTool() {
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
-                feelingOptions
+                feelingOptions,
+                gratitude,
+                microPracticeLogs,
+                abcLogs,
+                mindfulnessSettings
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -500,7 +558,11 @@ export default function LifeEvaluationTool() {
                 todaysGoals,
                 lifeAreas,
                 morningResponses,
-                feelingOptions
+                feelingOptions,
+                gratitude,
+                microPracticeLogs,
+                abcLogs,
+                mindfulnessSettings
               })}
               onCopy={() => copyToClipboard(true)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -514,6 +576,8 @@ export default function LifeEvaluationTool() {
         <Settings
           dailyRoutines={dailyRoutines}
           onDailyRoutineChange={handleDailyRoutineChange}
+          mindfulnessSettings={mindfulnessSettings}
+          onMindfulnessSettingsChange={setMindfulnessSettings}
         />
       )}
       {/* Distractions Tab Content */}
@@ -523,6 +587,8 @@ export default function LifeEvaluationTool() {
           onAddDistraction={handleAddDistraction}
           onRemoveDistraction={handleRemoveDistraction}
           onClearAll={handleClearAllDistractions}
+          onSuggestABC={(initial) => { if (mindfulnessSettings.enablePrompts) { setAbcInitial(initial); setIsABCOpen(true); } }}
+          onQuickInterrupt={(type, source, trigger) => { if (mindfulnessSettings.enablePrompts) handleLogMicroPractice(type, source, trigger); }}
         />
       )}
       {/* Reset All Data Button */}
@@ -543,7 +609,11 @@ export default function LifeEvaluationTool() {
               'dailyRoutines',
               'yesterdaysRoutines',
               'distractions',
-              'yesterdaysDistractions'
+              'yesterdaysDistractions',
+              'gratitude',
+              'mindfulnessSettings',
+              'microPracticeLogs',
+              'abcLogs'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }
@@ -551,6 +621,19 @@ export default function LifeEvaluationTool() {
       >
         Reset All Data
       </button>
+      {/* Overlays */}
+      <MindfulnessToolkit
+        isOpen={isToolkitOpen}
+        onClose={() => setIsToolkitOpen(false)}
+        settings={mindfulnessSettings}
+        onLogMicro={(type) => handleLogMicroPractice(type)}
+      />
+      <ABCLogger
+        isOpen={isABCOpen}
+        onClose={() => setIsABCOpen(false)}
+        onSave={handleSaveABC}
+        initial={abcInitial}
+      />
     </div>
   );
 }

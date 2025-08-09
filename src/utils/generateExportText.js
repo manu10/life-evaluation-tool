@@ -56,6 +56,10 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {Array} params.lifeAreas
  * @param {Object} params.morningResponses
  * @param {Array} params.feelingOptions
+ * @param {Object} params.gratitude
+ * @param {Array} params.microPracticeLogs
+ * @param {Array} params.abcLogs
+ * @param {Object} params.mindfulnessSettings
  * @returns {string}
  */
 export function generateExportText({
@@ -71,7 +75,11 @@ export function generateExportText({
   todaysGoals = {},
   lifeAreas = [],
   morningResponses = {},
-  feelingOptions = []
+  feelingOptions = [],
+  gratitude = {},
+  microPracticeLogs = [],
+  abcLogs = [],
+  mindfulnessSettings = {}
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -122,6 +130,28 @@ export function generateExportText({
       exportText += distractionExport;
     }
   } else {
+    // Protocol activity summary (morning export)
+    if (microPracticeLogs && microPracticeLogs.length > 0) {
+      const counts = microPracticeLogs.reduce((acc, m) => { acc[m.type] = (acc[m.type]||0)+1; return acc; }, {});
+      const parts = [];
+      if (counts.breaths) parts.push(`breaths: ${counts.breaths}`);
+      if (counts.posture) parts.push(`posture: ${counts.posture}`);
+      if (counts.anchor) parts.push(`anchors: ${counts.anchor}`);
+      if (counts.pause) parts.push(`pauses: ${counts.pause}`);
+      if (parts.length > 0) {
+        exportText += `🧩 Protocol Activity: ${parts.join(', ')}\n\n`;
+      }
+    }
+
+    // ABC highlights (show last up to 3 entries compact)
+    if (abcLogs && abcLogs.length > 0) {
+      exportText += `📋 ABC Highlights (recent):\n`;
+      abcLogs.slice(0, 3).forEach((log, idx) => {
+        const when = new Date(log.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        exportText += `   ${idx+1}. [${when}] Setting: ${log.setting || '-'} | Antecedent: ${log.antecedent || '-'} | Behavior: ${log.behavior || '-'}\n`;
+      });
+      exportText += `\n`;
+    }
     // Yesterday's goals if available
     const hasYesterdayGoals = Object.values(yesterdaysGoals).some(goal => goal.text && goal.text.trim() !== '');
     if (hasYesterdayGoals) {
@@ -167,14 +197,21 @@ export function generateExportText({
       exportText += yesterdayDistractionExport;
     }
 
-    // Today's goals
-
+    // Today's gratitude
+    const hasGratitude = Object.values(gratitude).some(item => item && item.trim() !== '');
+    if (hasGratitude) {
+      exportText += `🙏 Daily Gratitude:\n`;
+      Object.entries(gratitude).forEach(([key, item], index) => {
+        if (item && item.trim()) {
+          exportText += `   ${index + 1}. ${item}\n`;
+        }
+      });
+      exportText += `\n`;
+    }
 
     if (eveningResponses.firstHour && eveningResponses.firstHour.trim()) {
       exportText += `🕒 First Hour Activity/Task:\n${eveningResponses.firstHour}\n\n`;
     }
-
-    exportText += `\n`;
 
     const hasTodayGoals = Object.values(todaysGoals).some(goal => goal.text && goal.text.trim() !== '');
     if (hasTodayGoals) {

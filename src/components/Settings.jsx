@@ -2,7 +2,7 @@ import React from 'react';
 import { Settings as SettingsIcon, Calendar, Info } from 'lucide-react';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -37,6 +37,31 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange }) {
         </div>
       </div>
 
+      {/* Mindfulness & Protocol Settings */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-800">Mindfulness & Protocol</h3>
+          <p className="text-sm text-gray-600 mt-1">Configure prompts and durations for micro‑interrupts.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <Toggle
+            label="Enable prompts after tracking a distraction"
+            checked={!!mindfulnessSettings?.enablePrompts}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, enablePrompts: v })}
+          />
+          <NumberField
+            label="Anchor duration (seconds)"
+            value={mindfulnessSettings?.anchorSec ?? 30}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, anchorSec: v })}
+          />
+          <NumberField
+            label="Pause duration (seconds)"
+            value={mindfulnessSettings?.pauseSec ?? 90}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, pauseSec: v })}
+          />
+        </div>
+      </div>
+
       {/* Future Settings Placeholder */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-3">
@@ -58,3 +83,33 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange }) {
     </div>
   );
 } 
+
+function Toggle({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center justify-between gap-4">
+      <span className="text-sm text-gray-700">{label}</span>
+      <input
+        type="checkbox"
+        checked={!!checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-5 w-5"
+      />
+    </label>
+  );
+}
+
+function NumberField({ label, value, onChange }) {
+  return (
+    <label className="block">
+      <span className="text-sm text-gray-700">{label}</span>
+      <input
+        type="number"
+        value={value}
+        min={5}
+        max={600}
+        onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
+        className="mt-1 p-2 border border-gray-300 rounded-md w-32"
+      />
+    </label>
+  );
+}
