@@ -1,9 +1,10 @@
 import React from 'react';
 import { Settings as SettingsIcon, Calendar, Info } from 'lucide-react';
 import ReplacementActions from './ReplacementActions';
+import EnvironmentDesigner from './EnvironmentDesigner';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -69,6 +70,12 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         onAdd={onAddReplacementAction}
         onRemove={onRemoveReplacementAction}
         onToggleEasy={onToggleReplacementEasy}
+      />
+
+      {/* Environment Designer */}
+      <EnvironmentDesigner
+        profile={environmentProfile}
+        onProfileChange={onEnvironmentProfileChange}
       />
 
       {/* Future Settings Placeholder */}

@@ -95,9 +95,13 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
   - [x] CRUD list of replacement actions; mark “easy” and reward text
   - [x] One‑tap start with 2‑min timer via `ReplacementAttempt`
 - [x] Link replacement execution to Distractions tab (top 3 quick actions; breathing prompt offers top action)
-- [ ] `src/components/EnvironmentDesigner.jsx`
-  - [ ] Removals checklist (cues) and additions (anchors)
-  - [ ] Choice‑architecture presets
+- [x] `src/components/EnvironmentDesigner.jsx`
+  - [x] Removals checklist (cues) and additions (anchors) with presets
+  - [x] Persist `environmentProfile`
+- [x] Actionability in UI
+  - [x] Morning `EnvironmentChecklist` with “Mark applied” and daily adherence log
+  - [x] Distractions breathing prompt adds an “Apply env” CTA
+- [x] Export updates: Evening includes Environment Updates section
 - [ ] `src/components/FiveStepProtocol.jsx` (stepper that sequences: Identify Triggers → Break Chain → Replace → Engineer Environment → Track/Adjust)
 - [ ] Export updates: ABC entries (top 3 patterns), replacements attempted/completed, environment checklist highlights
 
@@ -156,5 +160,6 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [2025‑08‑09] Revised plan to align with final 5‑Step wording and ABC framework; added ABC Logger, Replacement Actions, Environment Designer, anxiety scale, and Weekly Review.
 - [2025‑08‑09] Implemented M1: Toolkit, ABC Logger, prompts, settings, and export updates. Added ABC entry points in DayThoughtsPanel and ABCHighlights; added guided Breathing Prompt.
  - [2025‑08‑09] M2 (part): Replacement Actions completed — editor in Settings, quick execution in Distractions, 2‑min attempt modal wired; breathing prompt integrates a “Do replacement” CTA.
+ - [2025‑08‑09] M2 (part): Environment Designer completed — settings presets, Morning checklist with adherence logging, Distractions “Apply env” CTA, export updates.
 
 

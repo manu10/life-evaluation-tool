@@ -60,6 +60,7 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {Array} params.microPracticeLogs
  * @param {Array} params.abcLogs
  * @param {Object} params.mindfulnessSettings
+ * @param {Object} params.environmentProfile
  * @returns {string}
  */
 export function generateExportText({
@@ -79,7 +80,8 @@ export function generateExportText({
   gratitude = {},
   microPracticeLogs = [],
   abcLogs = [],
-  mindfulnessSettings = {}
+  mindfulnessSettings = {},
+  environmentProfile = { removals: [], additions: [] }
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -121,6 +123,19 @@ export function generateExportText({
           exportText += `   ${index + 1}. ${routine.text}\n`;
         }
       });
+      exportText += `\n`;
+    }
+
+    // Environment updates
+    const hasEnv = (environmentProfile?.removals?.length || 0) + (environmentProfile?.additions?.length || 0) > 0;
+    if (hasEnv) {
+      exportText += `🏡 Environment Updates:\n`;
+      if (environmentProfile.removals?.length) {
+        exportText += `   Removed cues: ${environmentProfile.removals.join(', ')}\n`;
+      }
+      if (environmentProfile.additions?.length) {
+        exportText += `   Added anchors: ${environmentProfile.additions.join(', ')}\n`;
+      }
       exportText += `\n`;
     }
 

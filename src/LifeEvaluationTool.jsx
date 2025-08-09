@@ -22,6 +22,8 @@ import ABCLogger from './components/ABCLogger';
 import ABCHighlights from './components/ABCHighlights';
 import ReplacementActions from './components/ReplacementActions';
 import ReplacementAttempt from './components/ReplacementAttempt';
+import EnvironmentDesigner from './components/EnvironmentDesigner';
+import EnvironmentChecklist from './components/EnvironmentChecklist';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -75,6 +77,8 @@ export default function LifeEvaluationTool() {
   const [abcInitial, setAbcInitial] = useState({});
   const [replacementActions, setReplacementActions] = usePersistentState('replacementActions', []);
   const [attemptAction, setAttemptAction] = useState(null);
+  const [environmentProfile, setEnvironmentProfile] = usePersistentState('environmentProfile', { removals: [], additions: [] });
+  const [environmentApplications, setEnvironmentApplications] = usePersistentState('environmentApplications', []);
 
   // Timer effect
   useEffect(() => {
@@ -241,6 +245,10 @@ export default function LifeEvaluationTool() {
     setAbcLogs(prev => [entry, ...prev]);
     setIsABCOpen(false);
   }
+  // Environment applied
+  function handleApplyEnvironment(item) {
+    setEnvironmentApplications(prev => [{ id: Date.now(), ts: Date.now(), ...item }, ...prev]);
+  }
   // Replacement actions CRUD
   function handleAddReplacementAction({ title, isEasy, rewardText }) {
     setReplacementActions(prev => [{ id: Date.now(), title, isEasy, rewardText }, ...prev]);
@@ -297,7 +305,8 @@ export default function LifeEvaluationTool() {
       gratitude,
       microPracticeLogs,
       abcLogs,
-      mindfulnessSettings
+        mindfulnessSettings,
+        environmentProfile
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -488,6 +497,15 @@ export default function LifeEvaluationTool() {
           />
           {/* ABC Highlights (today) */}
           <ABCHighlights logs={abcLogs} onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }} />
+          {/* Environment Checklist Today */}
+          <EnvironmentChecklist
+            profile={environmentProfile}
+            appliedToday={environmentApplications.filter(a => {
+              const d = new Date(a.ts); const t = new Date();
+              return d.toDateString() === t.toDateString();
+            })}
+            onApply={handleApplyEnvironment}
+          />
           {getMorningCompletionCount() > 0 && (
             <SummaryPanel
               title="Morning Summary"
@@ -508,7 +526,8 @@ export default function LifeEvaluationTool() {
                 gratitude,
                 microPracticeLogs,
                 abcLogs,
-                mindfulnessSettings
+                mindfulnessSettings,
+                environmentProfile
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -583,7 +602,8 @@ export default function LifeEvaluationTool() {
                 gratitude,
                 microPracticeLogs,
                 abcLogs,
-                mindfulnessSettings
+                mindfulnessSettings,
+                environmentProfile
               })}
               onCopy={() => copyToClipboard(true)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -603,6 +623,8 @@ export default function LifeEvaluationTool() {
           onAddReplacementAction={handleAddReplacementAction}
           onRemoveReplacementAction={handleRemoveReplacementAction}
           onToggleReplacementEasy={handleToggleEasy}
+          environmentProfile={environmentProfile}
+          onEnvironmentProfileChange={setEnvironmentProfile}
         />
       )}
       {/* Distractions Tab Content */}
@@ -616,6 +638,8 @@ export default function LifeEvaluationTool() {
           onQuickInterrupt={(type, source, trigger) => { if (mindfulnessSettings.enablePrompts) handleLogMicroPractice(type, source, trigger); }}
           replacementActions={replacementActions}
           onStartReplacement={(a) => setAttemptAction(a)}
+          environmentProfile={environmentProfile}
+          onApplyEnvironment={handleApplyEnvironment}
         />
       )}
       {/* Reset All Data Button */}
@@ -641,6 +665,9 @@ export default function LifeEvaluationTool() {
               'mindfulnessSettings',
               'microPracticeLogs',
               'abcLogs'
+              ,'replacementActions'
+              ,'environmentProfile'
+              ,'environmentApplications'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

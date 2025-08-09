@@ -27,7 +27,9 @@ export default function DistractionTracker({
   onSuggestABC, // new: suggest opening ABC logger
   onQuickInterrupt, // new: quick micro-practice
   replacementActions = [], // M2: show actions here
-  onStartReplacement // start attempt modal upstream
+  onStartReplacement, // start attempt modal upstream
+  environmentProfile = {},
+  onApplyEnvironment // mark an environment item applied
 }) {
   const [isAddingDistraction, setIsAddingDistraction] = useState(false);
   const [newDistraction, setNewDistraction] = useState('');
@@ -159,6 +161,8 @@ export default function DistractionTracker({
           onDismiss={() => setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null })}
           topAction={breathPrompt.topAction}
           onStartReplacement={onStartReplacement}
+          environmentProfile={environmentProfile}
+          onApplyEnvironment={onApplyEnvironment}
         />
       )}
 
@@ -336,7 +340,7 @@ export default function DistractionTracker({
   );
 } 
 
-function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onStartReplacement }) {
+function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onStartReplacement, environmentProfile, onApplyEnvironment }) {
   const [isRunning, setIsRunning] = useState(false);
   const [phase, setPhase] = useState('Ready'); // Ready | Inhale | Exhale | Done
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -381,6 +385,12 @@ function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onSta
 
   const phaseText = phase === 'Ready' ? 'Tap start to begin' : phase === 'Inhale' ? 'Inhale' : phase === 'Exhale' ? 'Exhale' : 'Done';
 
+  const envItems = [
+    ...(environmentProfile?.removals || []).map((t) => ({ type: 'removal', text: t })),
+    ...(environmentProfile?.additions || []).map((t) => ({ type: 'addition', text: t })),
+  ];
+  const envTop = envItems[0];
+
   return (
     <div className="mb-6 p-4 rounded-lg border-2 border-blue-300 bg-blue-50">
       <div className="flex items-center justify-between">
@@ -413,6 +423,15 @@ function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onSta
             title={topAction.rewardText ? `Reward: ${topAction.rewardText}` : ''}
           >
             Do replacement: {topAction.title}
+          </button>
+        )}
+        {envTop && (
+          <button
+            onClick={() => onApplyEnvironment && onApplyEnvironment(envTop)}
+            className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm"
+            title={envTop.type === 'removal' ? 'Remove this cue now' : 'Add this anchor now'}
+          >
+            Apply env: {envTop.type === 'removal' ? 'Remove' : 'Add'} {envTop.text}
           </button>
         )}
       </div>
