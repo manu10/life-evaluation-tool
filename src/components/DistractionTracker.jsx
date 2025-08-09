@@ -25,13 +25,15 @@ export default function DistractionTracker({
   onRemoveDistraction, 
   onClearAll,
   onSuggestABC, // new: suggest opening ABC logger
-  onQuickInterrupt // new: quick micro-practice
+  onQuickInterrupt, // new: quick micro-practice
+  replacementActions = [], // M2: show actions here
+  onStartReplacement // start attempt modal upstream
 }) {
   const [isAddingDistraction, setIsAddingDistraction] = useState(false);
   const [newDistraction, setNewDistraction] = useState('');
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [customTrigger, setCustomTrigger] = useState('');
-  const [breathPrompt, setBreathPrompt] = useState({ isVisible: false, triggerValue: '', triggerLabel: '' });
+  const [breathPrompt, setBreathPrompt] = useState({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -69,7 +71,8 @@ export default function DistractionTracker({
       });
     }
     if (typeof onQuickInterrupt === 'function') {
-      setBreathPrompt({ isVisible: true, triggerValue: triggerInfo.value, triggerLabel: triggerInfo.label });
+      const topAction = getTopAction();
+      setBreathPrompt({ isVisible: true, triggerValue: triggerInfo.value, triggerLabel: triggerInfo.label, topAction });
     }
 
     // Reset form
@@ -91,6 +94,15 @@ export default function DistractionTracker({
   };
 
   const topTriggers = getTriggerStats();
+  const topActionList = getTopActions();
+
+  function getTopActions() {
+    const easyFirst = [...replacementActions].sort((a, b) => Number(!!b.isEasy) - Number(!!a.isEasy));
+    return easyFirst.slice(0, 3);
+  }
+  function getTopAction() {
+    return getTopActions()[0] || null;
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -115,6 +127,25 @@ export default function DistractionTracker({
         </div>
       </div>
 
+      {/* Quick Replacement Actions (top 3) */}
+      {topActionList.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-green-800 mb-2">Quick Replacement Actions</h3>
+          <div className="flex flex-wrap gap-2">
+            {topActionList.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => onStartReplacement && onStartReplacement(a)}
+                className="px-3 py-2 text-xs rounded-lg border border-green-300 text-green-700 hover:bg-green-50"
+                title={a.rewardText ? `Reward: ${a.rewardText}` : ''}
+              >
+                Do now: {a.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {breathPrompt.isVisible && (
         <BreathingPrompt
           triggerLabel={breathPrompt.triggerLabel}
@@ -123,9 +154,11 @@ export default function DistractionTracker({
             if (typeof onQuickInterrupt === 'function') {
               onQuickInterrupt('breaths', 'distraction', breathPrompt.triggerValue);
             }
-            setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '' });
+            setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null });
           }}
-          onDismiss={() => setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '' })}
+          onDismiss={() => setBreathPrompt({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null })}
+          topAction={breathPrompt.topAction}
+          onStartReplacement={onStartReplacement}
         />
       )}
 
@@ -303,7 +336,7 @@ export default function DistractionTracker({
   );
 } 
 
-function BreathingPrompt({ triggerLabel, onComplete, onDismiss }) {
+function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onStartReplacement }) {
   const [isRunning, setIsRunning] = useState(false);
   const [phase, setPhase] = useState('Ready'); // Ready | Inhale | Exhale | Done
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -366,13 +399,22 @@ function BreathingPrompt({ triggerLabel, onComplete, onDismiss }) {
         <div className="text-blue-900 font-medium">{phaseText}{phase !== 'Done' && isRunning ? ` — ${secondsLeft}s` : ''}</div>
         <div className="text-sm text-blue-800">Breaths: {breathCount}/{totalBreaths}</div>
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex items-center gap-3">
         <button
           onClick={() => { setIsRunning(true); setPhase('Ready'); setSecondsLeft(0); setBreathCount(0); }}
           className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           {isRunning ? 'Restart' : 'Start 3 breaths'}
         </button>
+        {topAction && (
+          <button
+            onClick={() => onStartReplacement && onStartReplacement(topAction)}
+            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+            title={topAction.rewardText ? `Reward: ${topAction.rewardText}` : ''}
+          >
+            Do replacement: {topAction.title}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -91,10 +91,10 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [x] ABCHighlights in Morning/Evening tabs with quick "+ Add ABC" button
 
 #### M2 — Replacement actions, environment designer, protocol stepper, richer export
-- [ ] `src/components/ReplacementActions.jsx`
-  - [ ] CRUD list of replacement actions; mark “easy” and “reward” steps
-  - [ ] One‑tap start with small 2‑min timer and reward checkbox
-- [ ] Link replacement actions to distractions and ABC entries
+- [x] `src/components/ReplacementActions.jsx`
+  - [x] CRUD list of replacement actions; mark “easy” and reward text
+  - [x] One‑tap start with 2‑min timer via `ReplacementAttempt`
+- [x] Link replacement execution to Distractions tab (top 3 quick actions; breathing prompt offers top action)
 - [ ] `src/components/EnvironmentDesigner.jsx`
   - [ ] Removals checklist (cues) and additions (anchors)
   - [ ] Choice‑architecture presets
@@ -155,5 +155,6 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [2025‑08‑09] Created living plan and drafted 5‑Step protocol. Pending: exact phrasing sync from source post if needed.
 - [2025‑08‑09] Revised plan to align with final 5‑Step wording and ABC framework; added ABC Logger, Replacement Actions, Environment Designer, anxiety scale, and Weekly Review.
 - [2025‑08‑09] Implemented M1: Toolkit, ABC Logger, prompts, settings, and export updates. Added ABC entry points in DayThoughtsPanel and ABCHighlights; added guided Breathing Prompt.
+ - [2025‑08‑09] M2 (part): Replacement Actions completed — editor in Settings, quick execution in Distractions, 2‑min attempt modal wired; breathing prompt integrates a “Do replacement” CTA.
 
 

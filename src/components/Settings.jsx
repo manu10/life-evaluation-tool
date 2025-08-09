@@ -1,8 +1,9 @@
 import React from 'react';
 import { Settings as SettingsIcon, Calendar, Info } from 'lucide-react';
+import ReplacementActions from './ReplacementActions';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -61,6 +62,14 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
           />
         </div>
       </div>
+
+      {/* Replacement Actions Editor */}
+      <ReplacementActions
+        actions={replacementActions || []}
+        onAdd={onAddReplacementAction}
+        onRemove={onRemoveReplacementAction}
+        onToggleEasy={onToggleReplacementEasy}
+      />
 
       {/* Future Settings Placeholder */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">

@@ -20,6 +20,8 @@ import GratitudeInput from './components/GratitudeInput';
 import MindfulnessToolkit from './components/MindfulnessToolkit';
 import ABCLogger from './components/ABCLogger';
 import ABCHighlights from './components/ABCHighlights';
+import ReplacementActions from './components/ReplacementActions';
+import ReplacementAttempt from './components/ReplacementAttempt';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -71,6 +73,8 @@ export default function LifeEvaluationTool() {
   const [isToolkitOpen, setIsToolkitOpen] = useState(false);
   const [isABCOpen, setIsABCOpen] = useState(false);
   const [abcInitial, setAbcInitial] = useState({});
+  const [replacementActions, setReplacementActions] = usePersistentState('replacementActions', []);
+  const [attemptAction, setAttemptAction] = useState(null);
 
   // Timer effect
   useEffect(() => {
@@ -236,6 +240,16 @@ export default function LifeEvaluationTool() {
     const entry = { id: Date.now(), ts: Date.now(), ...form };
     setAbcLogs(prev => [entry, ...prev]);
     setIsABCOpen(false);
+  }
+  // Replacement actions CRUD
+  function handleAddReplacementAction({ title, isEasy, rewardText }) {
+    setReplacementActions(prev => [{ id: Date.now(), title, isEasy, rewardText }, ...prev]);
+  }
+  function handleRemoveReplacementAction(id) {
+    setReplacementActions(prev => prev.filter(a => a.id !== id));
+  }
+  function handleToggleEasy(id) {
+    setReplacementActions(prev => prev.map(a => a.id === id ? { ...a, isEasy: !a.isEasy } : a));
   }
   
   function handleGoalToggle(goalNumber) {
@@ -526,6 +540,7 @@ export default function LifeEvaluationTool() {
             onFirstHourChange={handleFirstHourChange}
             editable={!eveningDone}
           />
+          {/* Replacement Actions editor is moved primarily to Settings; leave out from Evening execution */}
           <DayThoughtsPanel
             value={eveningResponses.dayThoughts}
             onChange={handleEveningThoughtsChange}
@@ -584,6 +599,10 @@ export default function LifeEvaluationTool() {
           onDailyRoutineChange={handleDailyRoutineChange}
           mindfulnessSettings={mindfulnessSettings}
           onMindfulnessSettingsChange={setMindfulnessSettings}
+          replacementActions={replacementActions}
+          onAddReplacementAction={handleAddReplacementAction}
+          onRemoveReplacementAction={handleRemoveReplacementAction}
+          onToggleReplacementEasy={handleToggleEasy}
         />
       )}
       {/* Distractions Tab Content */}
@@ -595,6 +614,8 @@ export default function LifeEvaluationTool() {
           onClearAll={handleClearAllDistractions}
           onSuggestABC={(initial) => { if (mindfulnessSettings.enablePrompts) { setAbcInitial(initial); setIsABCOpen(true); } }}
           onQuickInterrupt={(type, source, trigger) => { if (mindfulnessSettings.enablePrompts) handleLogMicroPractice(type, source, trigger); }}
+          replacementActions={replacementActions}
+          onStartReplacement={(a) => setAttemptAction(a)}
         />
       )}
       {/* Reset All Data Button */}
@@ -640,6 +661,20 @@ export default function LifeEvaluationTool() {
         onSave={handleSaveABC}
         initial={abcInitial}
       />
+      {attemptAction && (
+        <ReplacementAttempt
+          action={attemptAction}
+          onComplete={({ rewardGiven }) => {
+            // minimal attempt logging; future: store replacementAttempts in state
+            setAttemptAction(null);
+            handleLogMicroPractice('replacement', 'manual');
+            if (rewardGiven) {
+              handleLogMicroPractice('reward', 'manual');
+            }
+          }}
+          onCancel={() => setAttemptAction(null)}
+        />
+      )}
     </div>
   );
 }
