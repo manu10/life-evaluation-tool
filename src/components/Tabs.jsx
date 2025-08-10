@@ -1,9 +1,18 @@
 import React from 'react';
-import { Sun, Moon, CheckCircle, Brain, Settings } from 'lucide-react';
+import { Sun, Moon, CheckCircle, Brain, Settings, Zap } from 'lucide-react';
 
 export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount }) {
   return (
     <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
+      <button
+        onClick={() => setActiveTab('today')}
+        className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+          activeTab === 'today' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+        }`}
+      >
+        <Zap className="w-5 h-5" />
+        During
+      </button>
       <button
         onClick={() => setActiveTab('morning')}
         className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${

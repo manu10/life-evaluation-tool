@@ -222,6 +222,7 @@ Rollout
  - [2025‑08‑09] M2 (part): Environment Designer completed — settings presets, Morning checklist with adherence logging, Distractions “Apply env” CTA, export updates.
 - [2025‑08‑09] Protocol stepper added — 5‑Step modal with confirmations for Step 2 (breaths/posture/anchor/pause), Step 3 (replacement) layering fix, Step 4 (env confirm). Shared modals created and reused by Toolkit.
 - [2025‑08‑09] What Worked Today card and Help modal (❓) added. Help content rewritten and styled; modal is scrollable.
+- [2025‑08‑09] M2.5 (start): Added "During" Action Hub tab with quick actions (breaths, posture, anchor, pause, 5‑Step), quick distraction log, replacement/environment pickers, environment checklist, ABC highlights, and "What worked today". Default tab set to During.
 
 ---
 

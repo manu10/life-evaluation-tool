@@ -28,6 +28,7 @@ import FiveStepProtocol from './components/FiveStepProtocol';
 import WhatWorkedToday from './components/WhatWorkedToday';
 import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
+import TodayActionHub from './components/TodayActionHub';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -49,7 +50,7 @@ const defaultDailyRoutines = Array(5).fill(null).map(() => ({ text: '', complete
 const defaultGratitude = { item1: '', item2: '', item3: '' };
 
 export default function LifeEvaluationTool() {
-  const [activeTab, setActiveTab] = usePersistentState('activeTab', 'morning');
+  const [activeTab, setActiveTab] = usePersistentState('activeTab', 'today');
   const [timeLeft, setTimeLeft] = useState(120);
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = usePersistentState('isComplete', false);
@@ -407,6 +408,23 @@ export default function LifeEvaluationTool() {
         <p className="text-gray-600">Track your feelings and set intentions</p>
       </div>
       <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
+      {activeTab === 'today' && (
+        <TodayActionHub
+          onAddDistraction={handleAddDistraction}
+          onOpenSettings={() => setActiveTab('settings')}
+          onStartProtocol={() => setIsProtocolOpen(true)}
+          onLogMicro={(type) => handleLogMicroPractice(type)}
+          replacementActions={replacementActions}
+          onStartReplacement={(a) => setAttemptAction(a)}
+          environmentProfile={environmentProfile}
+          onApplyEnvironment={handleApplyEnvironment}
+          microLogs={microPracticeLogs}
+          abcLogs={abcLogs}
+          environmentApplications={environmentApplications}
+          anchorSeconds={mindfulnessSettings.anchorSec}
+          pauseSeconds={mindfulnessSettings.pauseSec}
+        />
+      )}
       <Timer
         timeLeft={timeLeft} // pass the raw number
         isRunning={isRunning}
