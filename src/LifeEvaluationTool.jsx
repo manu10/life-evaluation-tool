@@ -30,6 +30,7 @@ import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
 import AnchorNudgeBar from './components/AnchorNudgeBar';
+import TodosList from './components/TodosList';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -62,6 +63,8 @@ export default function LifeEvaluationTool() {
   const [eveningResponses, setEveningResponses] = usePersistentState('eveningResponses', defaultEveningResponses);
   const [todaysGoals, setTodaysGoals] = usePersistentState('todaysGoals', defaultGoals);
   const [yesterdaysGoals, setYesterdaysGoals] = usePersistentState('yesterdaysGoals', defaultGoals);
+  const [todaysTodos, setTodaysTodos] = usePersistentState('todaysTodos', []);
+  const [yesterdaysTodos, setYesterdaysTodos] = usePersistentState('yesterdaysTodos', []);
   const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = usePersistentState('yesterdaysDayThoughts', '');
   const [yesterdaysPhoneUsage, setYesterdaysPhoneUsage] = usePersistentState('yesterdaysPhoneUsage', '');
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
@@ -272,6 +275,16 @@ export default function LifeEvaluationTool() {
       ...prev, [`goal${goalNumber}`]: { ...prev[`goal${goalNumber}`], completed: !prev[`goal${goalNumber}`].completed }
     }));
     autoStartTimer();
+  }
+  // Todos handlers
+  function handleAddTodo(text) {
+    setTodaysTodos(prev => [...prev, { id: Date.now(), text, completed: false }].slice(0, 5));
+  }
+  function handleToggleTodo(id) {
+    setTodaysTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  }
+  function handleRemoveTodo(id) {
+    setTodaysTodos(prev => prev.filter(t => t.id !== id));
   }
   function handleGratitudeChange(newGratitude) {
     setGratitude(newGratitude);
@@ -548,6 +561,15 @@ export default function LifeEvaluationTool() {
             editable={true}
             yesterdaysGratitude={yesterdaysGratitude}
           />
+
+          {/* Optional Todos */}
+          <TodosList
+            todos={todaysTodos}
+            onAdd={handleAddTodo}
+            onToggle={handleToggleTodo}
+            onRemove={handleRemoveTodo}
+            editable={true}
+          />
           
           <LifeAreasGrid
             lifeAreas={lifeAreas}
@@ -709,6 +731,7 @@ export default function LifeEvaluationTool() {
         isOpen={isResetConfirmOpen}
         onClose={() => setIsResetConfirmOpen(false)}
         todaysGoals={todaysGoals}
+        todaysTodos={todaysTodos}
         onConfirm={(localStatuses) => {
           setIsResetConfirmOpen(false);
           // apply completion statuses before reset
@@ -719,8 +742,12 @@ export default function LifeEvaluationTool() {
           };
           // reflect in yesterday's goals exactly as morning does
           setYesterdaysGoals(updatedGoals);
+          // reflect todos in yesterday's
+          const updatedTodos = (todaysTodos || []).map((t, idx) => ({ ...t, completed: !!(localStatuses.todos?.[idx]?.completed) }));
+          setYesterdaysTodos(updatedTodos);
           // also set today's goals state so UI reflects prior to reset
           setTodaysGoals(updatedGoals);
+          setTodaysTodos([]);
           // continue with reset flow
           try {
             setIsRunning(false);
@@ -791,6 +818,8 @@ export default function LifeEvaluationTool() {
               ,'environmentApplications'
               ,'replacementAttempts'
               ,'anxietyRatings'
+              ,'todaysTodos'
+              ,'yesterdaysTodos'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

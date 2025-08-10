@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
-export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, onConfirm }) {
+export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, todaysTodos = [], onConfirm }) {
   if (!isOpen) return null;
   const [local, setLocal] = useState({
     goal1: !!todaysGoals?.goal1?.completed,
     goal2: !!todaysGoals?.goal2?.completed,
     goal3: !!todaysGoals?.goal3?.completed,
+    todos: (todaysTodos || []).map(t => ({ id: t.id, completed: !!t.completed }))
   });
 
   function toggle(key) { setLocal(prev => ({ ...prev, [key]: !prev[key] })); }
@@ -35,6 +36,31 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, onCo
               );
             })}
           </div>
+          {todaysTodos && todaysTodos.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-800 mb-2">Today's Todos</h4>
+              <div className="space-y-2">
+                {todaysTodos.map((t, idx) => (
+                  <label key={t.id} className="flex items-center justify-between p-2 rounded-md border border-gray-200 bg-white">
+                    <span className="text-sm text-gray-800 truncate mr-3">{t.text}</span>
+                    <span className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!(local.todos?.[idx]?.completed)}
+                        onChange={() => setLocal(prev => {
+                          const copy = [...prev.todos];
+                          copy[idx] = { ...copy[idx], completed: !copy[idx].completed };
+                          return { ...prev, todos: copy };
+                        })}
+                      />
+                      Completed
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="text-xs text-gray-600">
             This will reset evening responses and clear all tracked distractions for today. You can always set tomorrow's goals again.
           </div>

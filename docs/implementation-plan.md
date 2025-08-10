@@ -243,6 +243,7 @@ Delivered
 - Help: improved, on‑demand modal
 - Evening reset: confirmation modal to mark today's 3 goals as completed before reset; updates `yesterdaysGoals` to mirror Morning behavior
 - Gratitude: shows yesterday's 3 items with a gentle prompt to pick different ones today
+- Optional daily Todos: up to 5 lightweight tasks (added dynamically), appear in Evening reset confirm and migrate to Yesterday like main goals
 - Distractions UX: unified action entry in the "Quick stabilizers" box (Start 3 breaths, Choose replacement…, Choose environment tweak…)
   - Replacement Picker modal lists all actions; Environment modal lists all tweaks (same UX as Step 4)
   - Removed top "Quick Replacement Actions" and "Quick Environment Tweaks" sections to reduce clutter
@@ -264,6 +265,10 @@ Planned (next)
 ---
 
 ## Feature guide — how to use and why it helps
+- Optional Todos (`TodosList`)
+  - How to use: In Morning, add up to 5 small tasks via the input and Add button; toggle completion during the day.
+  - Why it helps: Lightweight capture for minor tasks without crowding the 3 main goals.
+  - Test it: Add 2–3 todos, mark some complete, open Evening reset and confirm statuses; verify they appear under Yesterday after reset.
 
 - 5‑Step Protocol (`FiveStepProtocol`)
   - How to use: Tap 5️⃣ in the header. Follow steps: log an ABC, run a quick interrupt (breaths/posture/anchor), pick a replacement, apply one environment tweak, rate anxiety 1–10.
