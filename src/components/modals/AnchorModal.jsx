@@ -11,10 +11,10 @@ export default function AnchorModal({ seconds = 30, onClose, onConfirm, title = 
   }, [running, timeLeft]);
   const canConfirm = !running && timeLeft === 0;
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center">
+    <div className="fixed inset-0 z-60 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="anchor-title" onKeyDown={(e) => { if (e.key === 'Escape') onClose && onClose(); }}>
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-200 w-full max-w-sm">
-        <h4 className="text-base font-semibold text-gray-900 mb-2">{title}</h4>
+        <h4 id="anchor-title" className="text-base font-semibold text-gray-900 mb-2">{title}</h4>
         <p className="text-sm text-gray-700 mb-3">{description}</p>
         <div className="text-2xl font-bold text-blue-700 text-center mb-3">{timeLeft}s</div>
         <div className="flex items-center justify-between">

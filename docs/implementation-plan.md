@@ -225,6 +225,7 @@ Rollout
 - [2025‑08‑09] M2.5 (start): Added "During" Action Hub tab with quick actions (breaths, posture, anchor, pause, 5‑Step), quick distraction log, replacement/environment pickers, environment checklist, ABC highlights, and "What worked today". Default tab set to During.
   - Test steps: open During; run each quick action and Confirm; log a distraction; open pickers and choose one item; verify compact metrics update.
   - Added quick default-tab controls in Settings (open on During / open on Morning). Test: switch defaults and refresh to confirm behavior.
+  - A11y pass on modals: Escape closes, ARIA dialog semantics, labelled titles. Test: open any modal and press Esc.
 
 ---
 

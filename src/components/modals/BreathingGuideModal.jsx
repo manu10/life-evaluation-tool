@@ -28,10 +28,10 @@ export default function BreathingGuideModal({ onClose, onComplete, totalBreaths 
   const phaseText = phase === 'Ready' ? 'Tap start to begin' : phase;
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center">
+    <div className="fixed inset-0 z-60 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="breath-title" onKeyDown={(e) => { if (e.key === 'Escape') onClose && onClose(); }}>
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-200 w-full max-w-sm">
-        <h4 className="text-base font-semibold text-gray-900 mb-2">Guided breaths</h4>
+        <h4 id="breath-title" className="text-base font-semibold text-gray-900 mb-2">Guided breaths</h4>
         <div className="text-sm text-gray-700 mb-2">Follow the prompts. Inhale and exhale slowly.</div>
         <div className="flex items-center justify-between text-blue-900 mb-2">
           <div className="font-medium">{phaseText}{running && phase !== 'Ready' ? ` — ${secondsLeft}s` : ''}</div>
