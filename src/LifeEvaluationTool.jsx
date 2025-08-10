@@ -87,6 +87,7 @@ export default function LifeEvaluationTool() {
   const [isProtocolOpen, setIsProtocolOpen] = useState(false);
   const [replacementAttempts, setReplacementAttempts] = usePersistentState('replacementAttempts', []);
   const [anxietyRatings, setAnxietyRatings] = usePersistentState('anxietyRatings', []);
+  const [linkedDistractionId, setLinkedDistractionId] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
@@ -225,6 +226,8 @@ export default function LifeEvaluationTool() {
   }
   function handleAddDistraction(distraction) {
     setDistractions(prev => [...prev, distraction]);
+    // Link next replacement attempt to this distraction
+    setLinkedDistractionId(distraction?.id ?? null);
   }
   function handleRemoveDistraction(id) {
     setDistractions(prev => prev.filter(d => d.id !== id));
@@ -765,11 +768,15 @@ export default function LifeEvaluationTool() {
             // minimal attempt logging; future: store replacementAttempts in state
             setAttemptAction(null);
             const entry = { id: Date.now(), ts: Date.now(), actionId: attemptAction.id, title: attemptAction.title, durationSec: 120, completed: true, rewardGiven, helped };
+            if (linkedDistractionId) {
+              entry.linkedDistractionId = linkedDistractionId;
+            }
             setReplacementAttempts(prev => [entry, ...prev]);
             handleLogMicroPractice('replacement', 'manual', undefined, { helped, actionTitle });
             if (rewardGiven) {
               handleLogMicroPractice('reward', 'manual');
             }
+            setLinkedDistractionId(null);
           }}
           onCancel={() => setAttemptAction(null)}
         />

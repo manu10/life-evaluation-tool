@@ -240,6 +240,8 @@ Delivered
 - Distractions UX: unified action entry in the "Quick stabilizers" box (Start 3 breaths, Choose replacement…, Choose environment tweak…)
   - Replacement Picker modal lists all actions; Environment modal lists all tweaks (same UX as Step 4)
   - Removed top "Quick Replacement Actions" and "Quick Environment Tweaks" sections to reduce clutter
+ - Insights (live): shows Interruptions, Replacement helped (helped/total), and Env applied counts in Evening DistractionInsights
+ - Replacement→Distraction linking: each replacement attempt stores `linkedDistractionId` so we can learn which replacements help for specific triggers
 
 Pending (short‑term)
 - [x] Export: add explicit Replacement summary (attempts, helped rate, last rewards) + top action
@@ -248,7 +250,7 @@ Pending (short‑term)
 - [x] Attach `actionTitle` to replacement logs so “What worked today” can highlight it
 
 Planned (next)
-- M2.5 Action Hub (“During the day” tab) — see proposal above
+- M2.5 Action Hub (“During the day” tab) — see proposal above; add a `today` tab placed first with quick actions, pickers, quick log, env checklist and "what worked today"
 - M3 Weekly Review page (what worked/didn’t; adjustments & wins) and trend charts
 
 
