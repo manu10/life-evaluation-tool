@@ -29,6 +29,7 @@ import WhatWorkedToday from './components/WhatWorkedToday';
 import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
+import WeeklyReview from './components/WeeklyReview';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -88,9 +89,11 @@ export default function LifeEvaluationTool() {
   const [isProtocolOpen, setIsProtocolOpen] = useState(false);
   const [replacementAttempts, setReplacementAttempts] = usePersistentState('replacementAttempts', []);
   const [anxietyRatings, setAnxietyRatings] = usePersistentState('anxietyRatings', []);
+  const [weeklyAdjustments, setWeeklyAdjustments] = usePersistentState('weeklyAdjustments', []);
   const [linkedDistractionId, setLinkedDistractionId] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isWeeklyOpen, setIsWeeklyOpen] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -313,7 +316,8 @@ export default function LifeEvaluationTool() {
         environmentProfile,
         replacementAttempts,
         environmentApplications,
-        anxietyRatings
+        anxietyRatings,
+        weeklyAdjustments
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -408,6 +412,14 @@ export default function LifeEvaluationTool() {
         <p className="text-gray-600">Track your feelings and set intentions</p>
       </div>
       <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
+      {/* Weekly Review button when in Morning or Evening */}
+      {(activeTab === 'morning' || activeTab === 'evening') && (
+        <div className="mb-4 flex justify-end">
+          <button onClick={() => setIsWeeklyOpen(true)} className="px-3 py-2 text-xs rounded-md bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200">
+            Weekly Review
+          </button>
+        </div>
+      )}
       {activeTab === 'today' && (
         <TodayActionHub
           onAddDistraction={handleAddDistraction}
@@ -717,6 +729,19 @@ export default function LifeEvaluationTool() {
             setDistractions([]);
           }
         }}
+      />
+      <WeeklyReview
+        isOpen={isWeeklyOpen}
+        onClose={() => setIsWeeklyOpen(false)}
+        onSave={(payload) => {
+          const weekOfISO = getWeekStartISO(new Date());
+          const entry = { id: Date.now(), weekOfISO, ...payload };
+          setWeeklyAdjustments(prev => {
+            const other = prev.filter(e => e.weekOfISO !== weekOfISO);
+            return [entry, ...other];
+          });
+        }}
+        initial={weeklyAdjustments.find(e => e.weekOfISO === getWeekStartISO(new Date()))}
       />
       {/* Distractions Tab Content */}
       {activeTab === 'distractions' && (

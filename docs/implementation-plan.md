@@ -102,16 +102,17 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
   - [x] Morning `EnvironmentChecklist` with “Mark applied” and daily adherence log
   - [x] Distractions breathing prompt adds an “Apply env” CTA
 - [x] Export updates: Evening includes Environment Updates section
-- [ ] `src/components/FiveStepProtocol.jsx` (stepper that sequences: Identify Triggers → Break Chain → Replace → Engineer Environment → Track/Adjust)
-- [ ] Export updates: ABC entries (top 3 patterns), replacements attempted/completed, environment checklist highlights
+- [x] `src/components/FiveStepProtocol.jsx` (stepper that sequences: Identify Triggers → Break Chain → Replace → Engineer Environment → Track/Adjust)
+- [x] Export updates: ABC entries (top 3 patterns), replacements attempted/completed, environment checklist highlights
 
 #### M3 — Tracking & weekly review, insights, anchor bar, polish
-- [ ] Daily anxiety scale input (1–10) component; store per day
-- [ ] `src/components/WeeklyReview.jsx` to show what worked/didn’t and capture adjustments; celebrate wins
+- [x] Daily anxiety scale input (1–10) component; store per day
+- [x] `src/components/WeeklyReview.jsx` to show what worked/didn’t and capture adjustments; celebrate wins
 - [ ] Insights (`DistractionInsights.jsx`, `utils/distractionUtils.js`):
+  - [x] Interruption count and replacement helped/env applied surfaced in UI
   - [ ] Interruption rate = micro‑interrupts / distractions
   - [ ] Replacement success rate and environment adherence score
-  - [ ] Top antecedents and settings (from ABC)
+  - [ ] Top antecedents and settings (from ABC) – partially in export
   - [ ] Anxiety trend line and weekly deltas
 - [ ] Anchor frequency bar (nudges) below timer with settings: off/low/medium
 - [ ] A11y/mobile polish (buttons ≥ 44px, ARIA live for timers, contrast)

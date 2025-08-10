@@ -64,6 +64,7 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {Array} params.replacementAttempts
  * @param {Array} params.environmentApplications
  * @param {Array} params.anxietyRatings
+ * @param {Array} params.weeklyAdjustments
  * @returns {string}
  */
 export function generateExportText({
@@ -88,7 +89,8 @@ export function generateExportText({
   environmentProfile = { removals: [], additions: [] },
   replacementAttempts = [],
   environmentApplications = [],
-  anxietyRatings = []
+  anxietyRatings = [],
+  weeklyAdjustments = []
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -184,6 +186,17 @@ export function generateExportText({
         exportText += `   ${idx+1}. [${when}] Setting: ${log.setting || '-'} | Antecedent: ${log.antecedent || '-'} | Behavior: ${log.behavior || '-'}\n`;
       });
       exportText += `\n`;
+      const patterns = getTopAbcPatterns(abcLogs);
+      if (patterns.antecedents.length > 0 || patterns.settings.length > 0) {
+        exportText += `🔎 Top ABC Patterns:\n`;
+        if (patterns.antecedents.length > 0) {
+          exportText += `   Antecedents: ` + patterns.antecedents.map(p => `${p.value} (${p.count})`).join(', ') + `\n`;
+        }
+        if (patterns.settings.length > 0) {
+          exportText += `   Settings: ` + patterns.settings.map(p => `${p.value} (${p.count})`).join(', ') + `\n`;
+        }
+        exportText += `\n`;
+      }
     }
 
     // Replacement summary (morning)
@@ -214,6 +227,19 @@ export function generateExportText({
       const last = anxietyRatings[0];
       const when = new Date(last.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       exportText += `🧠 Anxiety Rating: ${last.rating}/10 at ${when}${last.notes ? ` — ${last.notes}` : ''}\n\n`;
+    }
+    // Weekly adjustments & wins (if current week entry exists)
+    if (weeklyAdjustments && weeklyAdjustments.length > 0) {
+      const thisWeekISO = getWeekStartISO(new Date());
+      const entry = weeklyAdjustments.find(e => e.weekOfISO === thisWeekISO);
+      if (entry) {
+        exportText += `🧪 Weekly Adjustments & Wins:\n`;
+        if (entry.whatWorked) exportText += `   ✅ Worked: ${entry.whatWorked}\n`;
+        if (entry.whatDidnt) exportText += `   ❌ Didn’t: ${entry.whatDidnt}\n`;
+        if (entry.adjustments?.length) exportText += `   🔧 Adjustments: ${entry.adjustments.join(', ')}\n`;
+        if (entry.wins?.length) exportText += `   🏆 Wins: ${entry.wins.join(', ')}\n`;
+        exportText += `\n`;
+      }
     }
     // Yesterday's goals if available
     const hasYesterdayGoals = Object.values(yesterdaysGoals).some(goal => goal.text && goal.text.trim() !== '');
@@ -316,4 +342,32 @@ function findTopHelpfulAction(attempts) {
   const arr = Object.values(map);
   arr.sort((a, b) => (b.helped / Math.max(1, b.total)) - (a.helped / Math.max(1, a.total)) || b.helped - a.helped);
   return arr[0];
+}
+
+function getWeekStartISO(d) {
+  const date = new Date(d);
+  const day = date.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1) - day; // make Monday the first day of the week
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date.toISOString().slice(0,10);
+}
+
+function getTopAbcPatterns(abcLogs) {
+  const countMap = (arr, key) => {
+    const map = {};
+    arr.forEach(l => {
+      const v = (l && l[key] && String(l[key]).trim()) || '';
+      if (!v) return;
+      map[v] = (map[v] || 0) + 1;
+    });
+    return Object.entries(map)
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  };
+  return {
+    antecedents: countMap(abcLogs, 'antecedent'),
+    settings: countMap(abcLogs, 'setting')
+  };
 }
