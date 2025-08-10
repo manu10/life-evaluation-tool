@@ -27,6 +27,7 @@ import EnvironmentChecklist from './components/EnvironmentChecklist';
 import FiveStepProtocol from './components/FiveStepProtocol';
 import WhatWorkedToday from './components/WhatWorkedToday';
 import HelpModal from './components/HelpModal';
+import EveningResetConfirm from './components/EveningResetConfirm';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -84,6 +85,7 @@ export default function LifeEvaluationTool() {
   const [environmentApplications, setEnvironmentApplications] = usePersistentState('environmentApplications', []);
   const [isProtocolOpen, setIsProtocolOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -135,19 +137,8 @@ export default function LifeEvaluationTool() {
   function handleReset() {
     // Show confirmation dialog for evening reset
     if (activeTab === 'evening') {
-      const hasDistractions = distractions.length > 0;
-      const confirmMessage = hasDistractions 
-        ? 'Reset evening reflection?\n\n' +
-          'This will reset your evening responses and clear all tracked distractions for today. ' +
-          'Distractions are meant to be daily, so this helps you start fresh each day.\n\n' +
-          'This action cannot be undone.'
-        : 'Reset evening reflection?\n\n' +
-          'This will reset your evening responses.\n\n' +
-          'This action cannot be undone.';
-      
-      if (!window.confirm(confirmMessage)) {
-        return; // User cancelled
-      }
+      setIsResetConfirmOpen(true);
+      return;
     }
 
     try {
@@ -649,6 +640,43 @@ export default function LifeEvaluationTool() {
         />
       )}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <EveningResetConfirm
+        isOpen={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        todaysGoals={todaysGoals}
+        onConfirm={(localStatuses) => {
+          setIsResetConfirmOpen(false);
+          // apply completion statuses before reset
+          const updatedGoals = {
+            goal1: { ...todaysGoals.goal1, completed: !!localStatuses.goal1 },
+            goal2: { ...todaysGoals.goal2, completed: !!localStatuses.goal2 },
+            goal3: { ...todaysGoals.goal3, completed: !!localStatuses.goal3 },
+          };
+          // reflect in yesterday's goals exactly as morning does
+          setYesterdaysGoals(updatedGoals);
+          // also set today's goals state so UI reflects prior to reset
+          setTodaysGoals(updatedGoals);
+          // continue with reset flow
+          try {
+            setIsRunning(false);
+            setTimeLeft(120);
+            setIsComplete(false);
+            setHasUsedExtraTime(false);
+            setYesterdaysDayThoughts(eveningResponses.dayThoughts);
+            setTodaysGoals(defaultGoals);
+            setEveningResponses(defaultEveningResponses);
+            setEveningDone(false);
+            setDistractions([]);
+          } catch (e) {
+            setIsRunning(false);
+            setTimeLeft(120);
+            setIsComplete(false);
+            setHasUsedExtraTime(false);
+            setEveningDone(false);
+            setDistractions([]);
+          }
+        }}
+      />
       {/* Distractions Tab Content */}
       {activeTab === 'distractions' && (
         <DistractionTracker

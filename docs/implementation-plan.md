@@ -235,6 +235,7 @@ Delivered
 - Protocol: 5‑Step guided flow with confirmation UX
 - Summaries: What Worked Today card; Morning export shows protocol activity & ABC highlights
 - Help: improved, on‑demand modal
+- Evening reset: confirmation modal to mark today's 3 goals as completed before reset; updates `yesterdaysGoals` to mirror Morning behavior
 
 Pending (short‑term)
 - Export: add explicit Replacement summary (attempts, helped rate, last rewards) beyond counts
