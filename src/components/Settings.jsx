@@ -61,6 +61,30 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             value={mindfulnessSettings?.pauseSec ?? 90}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, pauseSec: v })}
           />
+          <div className="pt-2 border-t border-gray-200">
+            <p className="text-sm text-gray-700 mb-2">Default tab</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  localStorage.setItem('activeTab', JSON.stringify('today'));
+                  window.location.reload();
+                }}
+                className="px-3 py-2 text-xs rounded-md bg-amber-600 text-white hover:bg-amber-700"
+              >
+                Open on "During" by default
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.setItem('activeTab', JSON.stringify('morning'));
+                  window.location.reload();
+                }}
+                className="px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Open on "Morning" by default
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">This sets your landing tab immediately and on next app load.</p>
+          </div>
         </div>
       </div>
 
