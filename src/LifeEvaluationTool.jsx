@@ -65,7 +65,6 @@ export default function LifeEvaluationTool() {
   const [yesterdaysGoals, setYesterdaysGoals] = usePersistentState('yesterdaysGoals', defaultGoals);
   const [todaysTodos, setTodaysTodos] = usePersistentState('todaysTodos', []);
   const [yesterdaysTodos, setYesterdaysTodos] = usePersistentState('yesterdaysTodos', []);
-  const [tomorrowsTodos, setTomorrowsTodos] = usePersistentState('tomorrowsTodos', []);
   const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = usePersistentState('yesterdaysDayThoughts', '');
   const [yesterdaysPhoneUsage, setYesterdaysPhoneUsage] = usePersistentState('yesterdaysPhoneUsage', '');
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
@@ -287,16 +286,6 @@ export default function LifeEvaluationTool() {
   function handleRemoveTodo(id) {
     setTodaysTodos(prev => prev.filter(t => t.id !== id));
   }
-  // Tomorrow's Todos handlers (Evening planning)
-  function handleAddTomorrowTodo(text) {
-    setTomorrowsTodos(prev => [...prev, { id: Date.now(), text, completed: false }].slice(0, 5));
-  }
-  function handleToggleTomorrowTodo(id) {
-    setTomorrowsTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  }
-  function handleRemoveTomorrowTodo(id) {
-    setTomorrowsTodos(prev => prev.filter(t => t.id !== id));
-  }
   function handleGratitudeChange(newGratitude) {
     setGratitude(newGratitude);
     autoStartTimer();
@@ -470,6 +459,13 @@ export default function LifeEvaluationTool() {
           anchorSeconds={mindfulnessSettings.anchorSec}
           pauseSeconds={mindfulnessSettings.pauseSec}
           distractions={distractions}
+          firstHour={eveningResponses.firstHour}
+          goals={todaysGoals}
+          onToggleGoal={handleGoalToggle}
+          todaysTodos={todaysTodos}
+          onAddTodo={handleAddTodo}
+          onToggleTodo={handleToggleTodo}
+          onRemoveTodo={handleRemoveTodo}
         />
       )}
       <Timer
@@ -660,13 +656,13 @@ export default function LifeEvaluationTool() {
             onFirstHourChange={handleFirstHourChange}
             editable={!eveningDone}
           />
-          {/* Tomorrow's Todos (Evening planning) */}
+          {/* Tomorrow's Todos (Evening planning) — uses the same list, only cleared by evening reset */}
           <TodosList
             title="Tomorrow's Todos (optional)"
-            todos={tomorrowsTodos}
-            onAdd={handleAddTomorrowTodo}
-            onToggle={handleToggleTomorrowTodo}
-            onRemove={handleRemoveTomorrowTodo}
+            todos={todaysTodos}
+            onAdd={handleAddTodo}
+            onToggle={handleToggleTodo}
+            onRemove={handleRemoveTodo}
             editable={!eveningDone}
           />
           {/* Replacement Actions editor is moved primarily to Settings; leave out from Evening execution */}
@@ -767,9 +763,8 @@ export default function LifeEvaluationTool() {
           setYesterdaysTodos(updatedTodos);
           // also set today's goals state so UI reflects prior to reset
           setTodaysGoals(updatedGoals);
-          // Move planned tomorrow's todos into today's list for the new day
-          setTodaysTodos(tomorrowsTodos);
-          setTomorrowsTodos([]);
+          // Clear today's/tomorrow's shared todos only on evening reset
+          setTodaysTodos([]);
           // continue with reset flow
           try {
             setIsRunning(false);
@@ -842,7 +837,6 @@ export default function LifeEvaluationTool() {
               ,'anxietyRatings'
               ,'todaysTodos'
               ,'yesterdaysTodos'
-              ,'tomorrowsTodos'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

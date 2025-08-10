@@ -7,6 +7,8 @@ import EnvironmentConfirmModal from './modals/EnvironmentConfirmModal';
 import ABCHighlights from './ABCHighlights';
 import EnvironmentChecklist from './EnvironmentChecklist';
 import WhatWorkedToday from './WhatWorkedToday';
+import GoalsList from './GoalsList';
+import TodosList from './TodosList';
 
 const COMMON_TRIGGERS = [
   'bored','anxious','stressed','procrastinating','lonely','excited','frustrated','curious','tired','overwhelmed'
@@ -28,6 +30,13 @@ export default function TodayActionHub({
   anchorSeconds = 30,
   pauseSeconds = 90,
   distractions = [],
+  firstHour,
+  goals,
+  onToggleGoal,
+  todaysTodos = [],
+  onAddTodo,
+  onToggleTodo,
+  onRemoveTodo,
 }) {
   const [newDistraction, setNewDistraction] = useState('');
   const [trigger, setTrigger] = useState('');
@@ -121,6 +130,30 @@ export default function TodayActionHub({
         <Metric label="Replacement helped" value={`${helpedCount}/${replacementLogs.length}`} />
         <Metric label="Env applied" value={envApplyCount} />
       </div>
+
+      {/* First Hour Activity/Task */}
+      {firstHour && firstHour.trim() && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-blue-800 mb-1">First Hour Activity/Task</h3>
+          <div className="p-3 bg-white border border-blue-300 rounded">{firstHour}</div>
+        </div>
+      )}
+
+      {/* Today's Goals */}
+      {goals && (
+        <GoalsList goals={goals} onToggle={onToggleGoal} editable={true} title="Today's Goals" colorClass="bg-green-50" />
+      )}
+
+      {/* Today's Todos (optional) */}
+      <TodosList
+        todos={todaysTodos}
+        onAdd={onAddTodo}
+        onToggle={onToggleTodo}
+        onRemove={onRemoveTodo}
+        editable={true}
+        title="Today's Todos (optional)"
+        colorClass="bg-yellow-50"
+      />
 
       {/* Daily helpers */}
       <EnvironmentChecklist

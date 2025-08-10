@@ -267,9 +267,14 @@ Planned (next)
 
 ## Feature guide — how to use and why it helps
 - Optional Todos (`TodosList`)
-  - How to use: In Morning, add up to 5 small tasks for today; in Evening, add up to 5 for “Tomorrow’s Todos.”
-  - Why it helps: Lightweight capture for minor tasks without crowding the 3 main goals.
-  - Test it: Add 2–3 “today” todos in Morning and mark some complete. In Evening, add 1–2 “Tomorrow’s Todos.” On reset, confirm today’s todos’ completion, then verify tomorrow’s todos become today’s list after reset.
+  - How to use: Add up to 5 small tasks; the same list appears in Morning (Today’s Todos), Evening (Tomorrow’s Todos label), and During. Add/toggle/remove in any tab.
+  - Why it helps: Lightweight capture for minor tasks without crowding the 3 main goals; one unified list avoids confusion.
+  - Behavior: Only cleared by the Evening reset confirmation (never by Morning). You’ll confirm completion states there.
+  - Test it: Add todos in Morning; see/edit them in During and Evening. Perform Evening reset and confirm statuses; list clears afterward.
+
+- During the day — Action Hub (`TodayActionHub`)
+  - Now also surfaces First Hour Activity/Task, Today’s Goals, and Today’s Todos for quick access.
+  - Test it: Verify current First Hour text shows, toggling a goal reflects in Morning, and todos can be added/checked here.
 
 - 5‑Step Protocol (`FiveStepProtocol`)
   - How to use: Tap 5️⃣ in the header. Follow steps: log an ABC, run a quick interrupt (breaths/posture/anchor), pick a replacement, apply one environment tweak, rate anxiety 1–10.

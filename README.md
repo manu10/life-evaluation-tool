@@ -128,6 +128,14 @@ npm run preview
   - How: Click “Weekly Review” in Morning/Evening header; save what worked/didn’t, adjustments, wins.
   - Why: Tight weekly iteration and celebration.
   - Test: Save a review; check Morning export “Weekly Adjustments & Wins”.
+  - Status: Temporarily disabled; will return with week start, weekly lock, and auto‑reset.
+- Optional Todos
+  - How: Add up to 5 small tasks. The same list appears in Morning (Today’s Todos), Evening (as “Tomorrow’s Todos”), and During.
+  - Behavior: Only clears on Evening reset (never by Morning). You’ll confirm completion in the reset dialog.
+  - Test: Add todos in Morning; edit in During; verify they’re present in Evening; reset to clear.
+
+### During Tab Additions
+- Shows First Hour Activity/Task, Today’s Goals, and Today’s Todos for quick access and edits.
 
 1. **🌅 Morning (5-10 minutes)**
    - Rate your feelings across 7 life areas
