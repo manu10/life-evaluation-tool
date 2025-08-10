@@ -236,10 +236,14 @@ Delivered
 - Summaries: What Worked Today card; Morning export shows protocol activity & ABC highlights
 - Help: improved, on‑demand modal
 - Evening reset: confirmation modal to mark today's 3 goals as completed before reset; updates `yesterdaysGoals` to mirror Morning behavior
+- Gratitude: shows yesterday's 3 items with a gentle prompt to pick different ones today
+- Distractions UX: unified action entry in the "Quick stabilizers" box (Start 3 breaths, Choose replacement…, Choose environment tweak…)
+  - Replacement Picker modal lists all actions; Environment modal lists all tweaks (same UX as Step 4)
+  - Removed top "Quick Replacement Actions" and "Quick Environment Tweaks" sections to reduce clutter
 
 Pending (short‑term)
 - [x] Export: add explicit Replacement summary (attempts, helped rate, last rewards) + top action
-- [ ] Insights: surface “helped rate,” interruption rate, and env adherence in `DistractionInsights`
+- [x] Insights: surface “helped rate,” interruption rate, and env adherence in `DistractionInsights`
 - [x] Anxiety rating: persist ratings from Step 5 (included in morning export)
 - [x] Attach `actionTitle` to replacement logs so “What worked today” can highlight it
 

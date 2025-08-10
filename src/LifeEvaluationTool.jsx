@@ -604,6 +604,8 @@ export default function LifeEvaluationTool() {
             title="Today's Focus & Distraction Reflection"
             showFullDetails={true}
             colorTheme="purple"
+            microLogs={microPracticeLogs}
+            environmentApplications={environmentApplications}
           />
 
           {getEveningCompletionCount() > 0 && (
@@ -706,6 +708,8 @@ export default function LifeEvaluationTool() {
           onStartReplacement={(a) => setAttemptAction(a)}
           environmentProfile={environmentProfile}
           onApplyEnvironment={handleApplyEnvironment}
+          onOpenSettings={() => setActiveTab('settings')}
+          onOpenEnvModal={() => {/* reuse Distractions-level modal if needed; handled inside tracker */}}
         />
       )}
       {/* Reset All Data Button */}

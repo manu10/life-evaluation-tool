@@ -10,9 +10,17 @@ export default function DistractionInsights({
   distractions, 
   title = "Focus & Distraction Analysis",
   showFullDetails = true,
-  colorTheme = "purple" // purple, blue, gray
+  colorTheme = "purple", // purple, blue, gray
+  microLogs = [],
+  environmentApplications = []
 }) {
   const summary = createDistractionSummary(distractions);
+  const todayStr = new Date().toDateString();
+  const todayMicro = (microLogs || []).filter(m => new Date(m.ts).toDateString() === todayStr);
+  const interruptionCount = todayMicro.filter(m => ['breaths','posture','anchor','pause'].includes(m.type)).length;
+  const replacementLogs = todayMicro.filter(m => m.type === 'replacement');
+  const helpedCount = replacementLogs.filter(m => m.helped).length;
+  const envApplyCount = (environmentApplications || []).filter(a => new Date(a.ts).toDateString() === todayStr).length;
   
   // Theme colors
   const themes = {
@@ -77,13 +85,34 @@ export default function DistractionInsights({
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
             <span className="text-sm font-medium text-gray-700">Total Distractions</span>
           </div>
           <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{summary.stats.total}</p>
+        </div>
+        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+          <div className="flex items-center gap-2">
+            <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
+            <span className="text-sm font-medium text-gray-700">Interruptions</span>
+          </div>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{interruptionCount}</p>
+        </div>
+        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+          <div className="flex items-center gap-2">
+            <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
+            <span className="text-sm font-medium text-gray-700">Replacement helped</span>
+          </div>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{helpedCount}/{replacementLogs.length}</p>
+        </div>
+        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+          <div className="flex items-center gap-2">
+            <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
+            <span className="text-sm font-medium text-gray-700">Env applied</span>
+          </div>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{envApplyCount}</p>
         </div>
         
         {summary.stats.topTriggers.length > 0 && (

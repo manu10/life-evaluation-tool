@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import EnvironmentConfirmModal from './modals/EnvironmentConfirmModal';
+import BreathingGuideModal from './modals/BreathingGuideModal';
+import ReplacementPickerModal from './modals/ReplacementPickerModal';
 import { Brain, Plus, Trash2, AlertCircle, TrendingUp } from 'lucide-react';
 
 const COMMON_TRIGGERS = [
@@ -29,13 +32,16 @@ export default function DistractionTracker({
   replacementActions = [], // M2: show actions here
   onStartReplacement, // start attempt modal upstream
   environmentProfile = {},
-  onApplyEnvironment // mark an environment item applied
+  onApplyEnvironment, // mark an environment item applied
+  onOpenSettings // navigate to settings to configure replacements/env
 }) {
   const [isAddingDistraction, setIsAddingDistraction] = useState(false);
   const [newDistraction, setNewDistraction] = useState('');
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [customTrigger, setCustomTrigger] = useState('');
   const [breathPrompt, setBreathPrompt] = useState({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null });
+  const [isEnvModalOpen, setIsEnvModalOpen] = useState(false);
+  const [isReplaceModalOpen, setIsReplaceModalOpen] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -73,8 +79,7 @@ export default function DistractionTracker({
       });
     }
     if (typeof onQuickInterrupt === 'function') {
-      const topAction = getTopAction();
-      setBreathPrompt({ isVisible: true, triggerValue: triggerInfo.value, triggerLabel: triggerInfo.label, topAction });
+      setBreathPrompt({ isVisible: true, triggerValue: triggerInfo.value, triggerLabel: triggerInfo.label, topAction: null });
     }
 
     // Reset form
@@ -96,15 +101,7 @@ export default function DistractionTracker({
   };
 
   const topTriggers = getTriggerStats();
-  const topActionList = getTopActions();
-
-  function getTopActions() {
-    const easyFirst = [...replacementActions].sort((a, b) => Number(!!b.isEasy) - Number(!!a.isEasy));
-    return easyFirst.slice(0, 3);
-  }
-  function getTopAction() {
-    return getTopActions()[0] || null;
-  }
+  // (quick sections removed; pickers opened from the breathing box)
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -129,24 +126,7 @@ export default function DistractionTracker({
         </div>
       </div>
 
-      {/* Quick Replacement Actions (top 3) */}
-      {topActionList.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-green-800 mb-2">Quick Replacement Actions</h3>
-          <div className="flex flex-wrap gap-2">
-            {topActionList.map((a) => (
-              <button
-                key={a.id}
-                onClick={() => onStartReplacement && onStartReplacement(a)}
-                className="px-3 py-2 text-xs rounded-lg border border-green-300 text-green-700 hover:bg-green-50"
-                title={a.rewardText ? `Reward: ${a.rewardText}` : ''}
-              >
-                Do now: {a.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Quick sections removed; use buttons in breathing box below */}
 
       {breathPrompt.isVisible && (
         <BreathingPrompt
@@ -163,6 +143,9 @@ export default function DistractionTracker({
           onStartReplacement={onStartReplacement}
           environmentProfile={environmentProfile}
           onApplyEnvironment={onApplyEnvironment}
+          onOpenSettings={onOpenSettings}
+          onOpenEnvModal={() => setIsEnvModalOpen(true)}
+          onOpenReplaceModal={() => setIsReplaceModalOpen(true)}
         />
       )}
 
@@ -336,54 +319,26 @@ export default function DistractionTracker({
           </p>
         </div>
       )}
+
+      <EnvironmentConfirmModal
+        isOpen={isEnvModalOpen}
+        onClose={() => setIsEnvModalOpen(false)}
+        environmentProfile={environmentProfile}
+        onApplyEnvironment={(it) => onApplyEnvironment && onApplyEnvironment(it)}
+      />
+      <ReplacementPickerModal
+        isOpen={isReplaceModalOpen}
+        onClose={() => setIsReplaceModalOpen(false)}
+        actions={replacementActions}
+        onStartReplacement={(a) => { onStartReplacement && onStartReplacement(a); setIsReplaceModalOpen(false); }}
+        onOpenSettings={onOpenSettings}
+      />
     </div>
   );
 } 
 
-function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onStartReplacement, environmentProfile, onApplyEnvironment }) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [phase, setPhase] = useState('Ready'); // Ready | Inhale | Exhale | Done
-  const [secondsLeft, setSecondsLeft] = useState(0);
-  const totalBreaths = 3;
-  const inhaleSeconds = 4;
-  const exhaleSeconds = 4;
-  const [breathCount, setBreathCount] = useState(0);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    if (phase === 'Done') return;
-
-    let timerId;
-    if (phase === 'Ready') {
-      setPhase('Inhale');
-      setSecondsLeft(inhaleSeconds);
-    } else if (phase === 'Inhale') {
-      if (secondsLeft <= 0) {
-        setPhase('Exhale');
-        setSecondsLeft(exhaleSeconds);
-      }
-    } else if (phase === 'Exhale') {
-      if (secondsLeft <= 0) {
-        const nextCount = breathCount + 1;
-        setBreathCount(nextCount);
-        if (nextCount >= totalBreaths) {
-          setPhase('Done');
-          setIsRunning(false);
-          if (typeof onComplete === 'function') onComplete();
-        } else {
-          setPhase('Inhale');
-          setSecondsLeft(inhaleSeconds);
-        }
-      }
-    }
-
-    timerId = setInterval(() => {
-      setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timerId);
-  }, [isRunning, phase, secondsLeft, breathCount, onComplete]);
-
-  const phaseText = phase === 'Ready' ? 'Tap start to begin' : phase === 'Inhale' ? 'Inhale' : phase === 'Exhale' ? 'Exhale' : 'Done';
+function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onStartReplacement, environmentProfile, onApplyEnvironment, onOpenSettings, onOpenEnvModal, onOpenReplaceModal }) {
+  const [showBreath, setShowBreath] = useState(false);
 
   const envItems = [
     ...(environmentProfile?.removals || []).map((t) => ({ type: 'removal', text: t })),
@@ -405,36 +360,18 @@ function BreathingPrompt({ triggerLabel, onComplete, onDismiss, topAction, onSta
           Dismiss
         </button>
       </div>
-      <div className="mt-3 flex items-center justify-between">
-        <div className="text-blue-900 font-medium">{phaseText}{phase !== 'Done' && isRunning ? ` — ${secondsLeft}s` : ''}</div>
-        <div className="text-sm text-blue-800">Breaths: {breathCount}/{totalBreaths}</div>
+      <div className="mt-3 flex items-center gap-2 flex-wrap">
+        <button onClick={() => setShowBreath(true)} className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Start 3 breaths</button>
+        <button onClick={() => onOpenReplaceModal && onOpenReplaceModal()} className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">Choose replacement…</button>
+        <button onClick={() => onOpenEnvModal && onOpenEnvModal()} className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm">Choose environment tweak…</button>
+        <span className="text-xs text-gray-600">Manage lists in Settings</span>
       </div>
-      <div className="mt-3 flex items-center gap-3">
-        <button
-          onClick={() => { setIsRunning(true); setPhase('Ready'); setSecondsLeft(0); setBreathCount(0); }}
-          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          {isRunning ? 'Restart' : 'Start 3 breaths'}
-        </button>
-        {topAction && (
-          <button
-            onClick={() => onStartReplacement && onStartReplacement(topAction)}
-            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
-            title={topAction.rewardText ? `Reward: ${topAction.rewardText}` : ''}
-          >
-            Do replacement: {topAction.title}
-          </button>
-        )}
-        {envTop && (
-          <button
-            onClick={() => onApplyEnvironment && onApplyEnvironment(envTop)}
-            className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm"
-            title={envTop.type === 'removal' ? 'Remove this cue now' : 'Add this anchor now'}
-          >
-            Apply env: {envTop.type === 'removal' ? 'Remove' : 'Add'} {envTop.text}
-          </button>
-        )}
-      </div>
+      {showBreath && (
+        <BreathingGuideModal
+          onClose={() => setShowBreath(false)}
+          onComplete={() => { if (typeof onComplete === 'function') onComplete(); }}
+        />
+      )}
     </div>
   );
 }
