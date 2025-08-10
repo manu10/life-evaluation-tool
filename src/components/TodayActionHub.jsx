@@ -16,6 +16,7 @@ export default function TodayActionHub({
   onAddDistraction,
   onOpenSettings,
   onStartProtocol,
+  onOpenABC,
   onLogMicro,
   replacementActions = [],
   onStartReplacement,
@@ -26,6 +27,7 @@ export default function TodayActionHub({
   environmentApplications = [],
   anchorSeconds = 30,
   pauseSeconds = 90,
+  distractions = [],
 }) {
   const [newDistraction, setNewDistraction] = useState('');
   const [trigger, setTrigger] = useState('');
@@ -51,6 +53,13 @@ export default function TodayActionHub({
   }
 
   const envHasItems = (environmentProfile?.removals?.length || 0) + (environmentProfile?.additions?.length || 0) > 0;
+  const todayStr = new Date().toDateString();
+  const todayMicro = (microLogs || []).filter(m => new Date(m.ts).toDateString() === todayStr);
+  const interruptionCount = todayMicro.filter(m => ['breaths','posture','anchor','pause'].includes(m.type)).length;
+  const replacementLogs = todayMicro.filter(m => m.type === 'replacement');
+  const helpedCount = replacementLogs.filter(m => m.helped).length;
+  const envApplyCount = (environmentApplications || []).filter(a => new Date(a.ts).toDateString() === todayStr).length;
+  const distractionCount = (distractions || []).length;
 
   return (
     <div className="space-y-6">
@@ -95,13 +104,21 @@ export default function TodayActionHub({
         </div>
       </form>
 
+      {/* Compact metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Metric label="Distractions" value={distractionCount} />
+        <Metric label="Interruptions" value={interruptionCount} />
+        <Metric label="Replacement helped" value={`${helpedCount}/${replacementLogs.length}`} />
+        <Metric label="Env applied" value={envApplyCount} />
+      </div>
+
       {/* Daily helpers */}
       <EnvironmentChecklist
         profile={environmentProfile}
         appliedToday={environmentApplications.filter(a => new Date(a.ts).toDateString() === new Date().toDateString())}
         onApply={onApplyEnvironment}
       />
-      <ABCHighlights logs={abcLogs} onAddABC={onOpenSettings} />
+      <ABCHighlights logs={abcLogs} onAddABC={onOpenABC || onOpenSettings} />
       <WhatWorkedToday microLogs={microLogs} />
 
       {/* Modals */}
@@ -156,6 +173,15 @@ export default function TodayActionHub({
 
 function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function Metric({ label, value }) {
+  return (
+    <div className="p-3 bg-white border border-gray-200 rounded-lg">
+      <div className="text-xs text-gray-600">{label}</div>
+      <div className="text-lg font-semibold text-gray-900">{value}</div>
+    </div>
+  );
 }
 
 

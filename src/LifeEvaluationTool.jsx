@@ -413,6 +413,7 @@ export default function LifeEvaluationTool() {
           onAddDistraction={handleAddDistraction}
           onOpenSettings={() => setActiveTab('settings')}
           onStartProtocol={() => setIsProtocolOpen(true)}
+          onOpenABC={() => { setAbcInitial({}); setIsABCOpen(true); }}
           onLogMicro={(type) => handleLogMicroPractice(type)}
           replacementActions={replacementActions}
           onStartReplacement={(a) => setAttemptAction(a)}
@@ -423,6 +424,7 @@ export default function LifeEvaluationTool() {
           environmentApplications={environmentApplications}
           anchorSeconds={mindfulnessSettings.anchorSec}
           pauseSeconds={mindfulnessSettings.pauseSec}
+          distractions={distractions}
         />
       )}
       <Timer
@@ -753,12 +755,15 @@ export default function LifeEvaluationTool() {
               'distractions',
               'yesterdaysDistractions',
               'gratitude',
+              'yesterdaysGratitude',
               'mindfulnessSettings',
               'microPracticeLogs',
               'abcLogs'
               ,'replacementActions'
               ,'environmentProfile'
               ,'environmentApplications'
+              ,'replacementAttempts'
+              ,'anxietyRatings'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }
