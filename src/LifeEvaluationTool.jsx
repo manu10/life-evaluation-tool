@@ -649,6 +649,14 @@ export default function LifeEvaluationTool() {
             onFirstHourChange={handleFirstHourChange}
             editable={!eveningDone}
           />
+          {/* Optional Todos (also editable from Evening) */}
+          <TodosList
+            todos={todaysTodos}
+            onAdd={handleAddTodo}
+            onToggle={handleToggleTodo}
+            onRemove={handleRemoveTodo}
+            editable={!eveningDone}
+          />
           {/* Replacement Actions editor is moved primarily to Settings; leave out from Evening execution */}
           <DayThoughtsPanel
             value={eveningResponses.dayThoughts}
