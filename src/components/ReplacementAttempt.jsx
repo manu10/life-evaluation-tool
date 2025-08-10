@@ -4,6 +4,7 @@ export default function ReplacementAttempt({ action, durationSec = 120, onComple
   const [isRunning, setIsRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(durationSec);
   const [rewardGiven, setRewardGiven] = useState(false);
+  const [helped, setHelped] = useState(null); // null | true | false
 
   useEffect(() => {
     if (!isRunning) return;
@@ -15,12 +16,12 @@ export default function ReplacementAttempt({ action, durationSec = 120, onComple
   useEffect(() => {
     if (isRunning && timeLeft === 0) {
       setIsRunning(false);
-      if (typeof onComplete === 'function') onComplete({ rewardGiven });
+      if (typeof onComplete === 'function') onComplete({ rewardGiven, helped });
     }
   }, [isRunning, timeLeft, rewardGiven, onComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-60 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30" onClick={onCancel} />
       <div className="relative w-full max-w-md bg-white rounded-xl shadow-lg p-6 border border-gray-200">
         <div className="font-semibold text-gray-800 mb-2">Do now: {action?.title}</div>
@@ -38,6 +39,15 @@ export default function ReplacementAttempt({ action, durationSec = 120, onComple
             I took the reward
           </label>
           <button onClick={onCancel} className="px-3 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+        </div>
+        <div className="mt-3 flex items-center gap-3 text-sm text-gray-700">
+          <span>Did it help?</span>
+          <label className="flex items-center gap-1">
+            <input type="radio" name="helped" checked={helped === true} onChange={() => setHelped(true)} /> Yes
+          </label>
+          <label className="flex items-center gap-1">
+            <input type="radio" name="helped" checked={helped === false} onChange={() => setHelped(false)} /> No
+          </label>
         </div>
       </div>
     </div>

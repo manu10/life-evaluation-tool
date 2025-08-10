@@ -118,6 +118,65 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 
 ---
 
+### Proposal: New tab — “During the day” (Action Hub)
+
+Purpose
+- Create a single, high‑frequency workspace to reduce context switching and make the protocol effortless during the day.
+- This becomes the default tab on first load; Morning/Evening remain for planning and reflection.
+
+Why
+- The most common flow (log distraction → interrupt → replacement → environment tweak) currently spans multiple tabs. Consolidating increases usage and lowers friction, especially on mobile.
+
+Scope (initial)
+- Quick Actions row
+  - 🧘 3 Breaths (modal), Posture confirm (modal), 30s Anchor (modal), 90s Pause (modal)
+  - 5️⃣ Start Protocol (opens stepper at Step 1)
+- Distraction Quick Log
+  - Single input + trigger chips; saves and opens ABC prompt option inline
+  - After save: inline breathing prompt + top Replacement chip + “Apply env” CTA
+- Replacement chips (top 3 easy)
+  - One tap opens 2‑min attempt modal with reward + “did it help?”
+- Environment Checklist Today (top 3)
+  - “Mark applied” buttons; small adherence counter
+- ABC Quick Log button
+  - Opens ABCLogger with time+setting prefilled (setting can be a simple free text field)
+- What Worked Today card
+  - Aggregates micro‑practices and replacement effectiveness for the current day
+
+Out of scope (for v1)
+- Weekly review here (remains in M3 component)
+- Historical charts; stay in Insights/M3
+
+Navigation & defaults
+- Insert a new tab key: `today` (label: “During”) placed first in the tab bar and used as default.
+- Morning/Evening/Distractions/Settings remain; Distractions becomes more analytical when the Action Hub exists.
+
+Data model
+- Reuses existing keys: `microPracticeLogs`, `abcLogs`, `replacementActions`, `environmentProfile`, `environmentApplications`, `distractions`.
+- No new persistence needed for v1.
+
+Settings
+- Toggle to make “During” the default tab on open
+- Option to show/hide sub‑sections (e.g., hide Environment or Replacement)
+
+Accessibility
+- Large tap targets (≥44px), keyboard navigable quick actions, aria‑labels for modals
+
+Acceptance criteria
+- A user can complete the core flow (log distraction → 3 breaths → replacement attempt → apply env) without leaving the tab
+- “What worked today” updates live as actions complete
+- All actions log exactly as they do elsewhere (no duplicate logic)
+- Mobile layout feels uncluttered and scrollable; quick actions are always visible at top
+
+Risks & mitigations
+- Clutter risk: allow hiding sections via settings; collapse less‑used sections by default
+- Duplication risk: strictly reuse shared modals/components already built
+
+Rollout
+- Target after current M2 parts (Replacement + Environment) and before M3 insights/full weekly review; call it M2.5
+
+---
+
 ### Data model changes (persistent keys)
 - `mindfulnessSettings`: `{ enablePrompts, anchorSec, pauseSec, enableFiveStep, anchorFrequency? }`
 - `microPracticeLogs`: `[{ id, ts, type: 'breaths'|'posture'|'anchor'|'pause', source?: 'distraction'|'manual', trigger? }]`
@@ -161,5 +220,30 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [2025‑08‑09] Implemented M1: Toolkit, ABC Logger, prompts, settings, and export updates. Added ABC entry points in DayThoughtsPanel and ABCHighlights; added guided Breathing Prompt.
  - [2025‑08‑09] M2 (part): Replacement Actions completed — editor in Settings, quick execution in Distractions, 2‑min attempt modal wired; breathing prompt integrates a “Do replacement” CTA.
  - [2025‑08‑09] M2 (part): Environment Designer completed — settings presets, Morning checklist with adherence logging, Distractions “Apply env” CTA, export updates.
+- [2025‑08‑09] Protocol stepper added — 5‑Step modal with confirmations for Step 2 (breaths/posture/anchor/pause), Step 3 (replacement) layering fix, Step 4 (env confirm). Shared modals created and reused by Toolkit.
+- [2025‑08‑09] What Worked Today card and Help modal (❓) added. Help content rewritten and styled; modal is scrollable.
+
+---
+
+### Current status and pending items
+
+Delivered
+- ABC logging: post‑distraction prompt, DayThoughts button, highlights in Morning/Evening
+- Mindfulness: shared modals for 3 breaths, anchor, pause, posture; Toolkit + 5‑Step reuse
+- Replacement Actions: Settings editor, quick chips in Distractions, 2‑min attempt with reward + “did it help”
+- Environment: Settings presets, Morning checklist with adherence, Distractions “Apply env,” Evening export
+- Protocol: 5‑Step guided flow with confirmation UX
+- Summaries: What Worked Today card; Morning export shows protocol activity & ABC highlights
+- Help: improved, on‑demand modal
+
+Pending (short‑term)
+- Export: add explicit Replacement summary (attempts, helped rate, last rewards) beyond counts
+- Insights: surface “helped rate,” interruption rate, and env adherence in `DistractionInsights`
+- Anxiety rating: persist ratings from Step 5 and correlate in insights
+- Top helpful action: attach `actionTitle` to replacement logs so “What worked today” can highlight it
+
+Planned (next)
+- M2.5 Action Hub (“During the day” tab) — see proposal above
+- M3 Weekly Review page (what worked/didn’t; adjustments & wins) and trend charts
 
 

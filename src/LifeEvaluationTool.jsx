@@ -24,6 +24,9 @@ import ReplacementActions from './components/ReplacementActions';
 import ReplacementAttempt from './components/ReplacementAttempt';
 import EnvironmentDesigner from './components/EnvironmentDesigner';
 import EnvironmentChecklist from './components/EnvironmentChecklist';
+import FiveStepProtocol from './components/FiveStepProtocol';
+import WhatWorkedToday from './components/WhatWorkedToday';
+import HelpModal from './components/HelpModal';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -79,6 +82,8 @@ export default function LifeEvaluationTool() {
   const [attemptAction, setAttemptAction] = useState(null);
   const [environmentProfile, setEnvironmentProfile] = usePersistentState('environmentProfile', { removals: [], additions: [] });
   const [environmentApplications, setEnvironmentApplications] = usePersistentState('environmentApplications', []);
+  const [isProtocolOpen, setIsProtocolOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -235,8 +240,8 @@ export default function LifeEvaluationTool() {
     }
   }
   // Micro-practice logging
-  function handleLogMicroPractice(type, source = 'manual', trigger) {
-    const entry = { id: Date.now(), ts: Date.now(), type, source, trigger };
+  function handleLogMicroPractice(type, source = 'manual', trigger, extra = {}) {
+    const entry = { id: Date.now(), ts: Date.now(), type, source, trigger, ...extra };
     setMicroPracticeLogs(prev => [...prev, entry]);
   }
   // ABC save
@@ -364,6 +369,20 @@ export default function LifeEvaluationTool() {
             title="Open Mindfulness Toolkit"
           >
             🧘
+          </button>
+          <button
+            onClick={() => setIsProtocolOpen(true)}
+            className="px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200"
+            title="Open 5‑Step Protocol"
+          >
+            5️⃣
+          </button>
+          <button
+            onClick={() => setIsHelpOpen(true)}
+            className="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+            title="Help & Guide"
+          >
+            ❓
           </button>
           {/* Copy button when timer is complete and in morning tab */}
           {timeLeft === 0 && activeTab === 'morning' && getMorningCompletionCount() > 0 && (
@@ -506,6 +525,8 @@ export default function LifeEvaluationTool() {
             })}
             onApply={handleApplyEnvironment}
           />
+          {/* What worked today */}
+          <WhatWorkedToday microLogs={microPracticeLogs} />
           {getMorningCompletionCount() > 0 && (
             <SummaryPanel
               title="Morning Summary"
@@ -627,6 +648,7 @@ export default function LifeEvaluationTool() {
           onEnvironmentProfileChange={setEnvironmentProfile}
         />
       )}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       {/* Distractions Tab Content */}
       {activeTab === 'distractions' && (
         <DistractionTracker
@@ -691,10 +713,10 @@ export default function LifeEvaluationTool() {
       {attemptAction && (
         <ReplacementAttempt
           action={attemptAction}
-          onComplete={({ rewardGiven }) => {
+          onComplete={({ rewardGiven, helped }) => {
             // minimal attempt logging; future: store replacementAttempts in state
             setAttemptAction(null);
-            handleLogMicroPractice('replacement', 'manual');
+            handleLogMicroPractice('replacement', 'manual', undefined, { helped });
             if (rewardGiven) {
               handleLogMicroPractice('reward', 'manual');
             }
@@ -702,6 +724,21 @@ export default function LifeEvaluationTool() {
           onCancel={() => setAttemptAction(null)}
         />
       )}
+      <FiveStepProtocol
+        isOpen={isProtocolOpen}
+        onClose={() => setIsProtocolOpen(false)}
+        onSaveABC={(data) => handleSaveABC(data)}
+        onLogMicro={(type) => handleLogMicroPractice(type)}
+        replacementActions={replacementActions}
+        onStartReplacement={(a) => setAttemptAction(a)}
+        environmentProfile={environmentProfile}
+        onApplyEnvironment={(item) => handleApplyEnvironment(item)}
+        onCompleteSession={() => { /* placeholder for history logging */ }}
+        onSaveAnxiety={({ rating, notes }) => {
+          // optional: store in future anxietyRatings
+        }}
+        onOpenSettings={() => setActiveTab('settings')}
+      />
     </div>
   );
 }
