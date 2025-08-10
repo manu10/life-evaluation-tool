@@ -226,6 +226,7 @@ Rollout
   - Test steps: open During; run each quick action and Confirm; log a distraction; open pickers and choose one item; verify compact metrics update.
   - Added quick default-tab controls in Settings (open on During / open on Morning). Test: switch defaults and refresh to confirm behavior.
   - A11y pass on modals: Escape closes, ARIA dialog semantics, labelled titles. Test: open any modal and press Esc.
+  - UX polish: Quick log shows a "Saved ✓" flash for 1.5s after save. Test: log a distraction and observe the flash.
 
 ---
 

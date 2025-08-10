@@ -37,6 +37,7 @@ export default function TodayActionHub({
   const [showPosture, setShowPosture] = useState(false);
   const [showReplace, setShowReplace] = useState(false);
   const [showEnv, setShowEnv] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
 
   function handleQuickLog(e) {
     e.preventDefault();
@@ -50,6 +51,8 @@ export default function TodayActionHub({
     onAddDistraction && onAddDistraction(created);
     setNewDistraction('');
     setTrigger('');
+    setSavedFlash(true);
+    window.setTimeout(() => setSavedFlash(false), 1500);
   }
 
   const envHasItems = (environmentProfile?.removals?.length || 0) + (environmentProfile?.additions?.length || 0) > 0;
@@ -100,7 +103,14 @@ export default function TodayActionHub({
               </button>
             ))}
           </div>
-          <button type="submit" className="px-3 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700">Save</button>
+          <div className="flex items-center gap-2">
+            <button type="submit" className="px-3 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700" title="Save distraction">
+              Save
+            </button>
+            {savedFlash && (
+              <span className="text-xs text-green-700 bg-green-100 border border-green-200 rounded px-2 py-1">Saved ✓</span>
+            )}
+          </div>
         </div>
       </form>
 
