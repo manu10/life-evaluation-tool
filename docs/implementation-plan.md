@@ -107,7 +107,7 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 
 #### M3 — Tracking & weekly review, insights, anchor bar, polish
 - [x] Daily anxiety scale input (1–10) component; store per day
-- [x] `src/components/WeeklyReview.jsx` to show what worked/didn’t and capture adjustments; celebrate wins
+- [ ] Weekly Review (temporarily disabled; will return in a more complete v1)
 - [ ] Insights (`DistractionInsights.jsx`, `utils/distractionUtils.js`):
   - [x] Interruption count and replacement helped/env applied surfaced in UI
   - [x] Interruption rate = micro‑interrupts / distractions
@@ -305,10 +305,14 @@ Planned (next)
   - Why it helps: Turns logs into actionable adjustments.
   - Test it: Create sample data (interrupts, replacements, env applies) and verify percentages and trend.
 
-- Weekly Review (`WeeklyReview`)
-  - How to use: Button in Morning/Evening header area. Capture what worked/didn’t, adjustments, and wins for the week.
-  - Why it helps: Weekly iteration tightens the feedback loop; export shows “Weekly Adjustments & Wins”.
-  - Test it: Save a review; copy Morning export and check the section.
+- Weekly Review (coming soon — v1 design)
+  - How to use: Will appear as a button in Morning/Evening. You’ll set a “week of” date, fill worked/didn’t, adjustments, wins.
+  - Why it helps: Tight weekly iteration and celebration; locks after completion to avoid duplicate edits.
+  - Planned behavior: 
+    - Choose week start (Sunday or Monday) in Settings
+    - Once submitted for the week, it hides until auto‑reset on the next week start
+    - Morning export will include “Weekly Adjustments & Wins” for the active week
+  - Status: Temporarily disabled to allow building this complete flow without regressions.
 
 - Anchor Nudge Bar (`AnchorNudgeBar`)
   - How to use: Enable frequency in Settings (off/low/medium). Header shows time since last anchor and prompts when due.

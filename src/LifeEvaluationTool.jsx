@@ -29,7 +29,6 @@ import WhatWorkedToday from './components/WhatWorkedToday';
 import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
-import WeeklyReview from './components/WeeklyReview';
 import AnchorNudgeBar from './components/AnchorNudgeBar';
 
 const lifeAreas = [
@@ -95,7 +94,6 @@ export default function LifeEvaluationTool() {
   const [linkedDistractionId, setLinkedDistractionId] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
-  const [isWeeklyOpen, setIsWeeklyOpen] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -423,10 +421,10 @@ export default function LifeEvaluationTool() {
         />
       </div>
       <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
-      {/* Weekly Review button when in Morning or Evening */}
-      {(activeTab === 'morning' || activeTab === 'evening') && (
+      {/* Weekly Review temporarily disabled; will return with date setting, weekly lock, and auto-reset */}
+      {false && (activeTab === 'morning' || activeTab === 'evening') && (
         <div className="mb-4 flex justify-end">
-          <button onClick={() => setIsWeeklyOpen(true)} className="px-3 py-2 text-xs rounded-md bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200">
+          <button className="px-3 py-2 text-xs rounded-md bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200">
             Weekly Review
           </button>
         </div>
@@ -744,19 +742,9 @@ export default function LifeEvaluationTool() {
           }
         }}
       />
-      <WeeklyReview
-        isOpen={isWeeklyOpen}
-        onClose={() => setIsWeeklyOpen(false)}
-        onSave={(payload) => {
-          const weekOfISO = getWeekStartISO(new Date());
-          const entry = { id: Date.now(), weekOfISO, ...payload };
-          setWeeklyAdjustments(prev => {
-            const other = prev.filter(e => e.weekOfISO !== weekOfISO);
-            return [entry, ...other];
-          });
-        }}
-        initial={weeklyAdjustments.find(e => e.weekOfISO === getWeekStartISO(new Date()))}
-      />
+      {false && (
+        <div />
+      )}
       {/* Distractions Tab Content */}
       {activeTab === 'distractions' && (
         <DistractionTracker
