@@ -90,7 +90,8 @@ export function generateExportText({
   replacementAttempts = [],
   environmentApplications = [],
   anxietyRatings = [],
-  weeklyAdjustments = []
+  weeklyAdjustments = [],
+  appUsageByDate = {}
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -163,6 +164,13 @@ export function generateExportText({
     const distractionExport = formatDistractionsForExport(distractions);
     if (distractionExport) {
       exportText += distractionExport;
+    }
+    // App usage today
+    const todayKey = new Date();
+    const todayISO = new Date(todayKey.getFullYear(), todayKey.getMonth(), todayKey.getDate()).toISOString().slice(0,10);
+    const todaySec = appUsageByDate?.[todayISO] || 0;
+    if (todaySec > 0) {
+      exportText += `🖥️ App Usage Today: ${formatDurationShort(todaySec)}\n\n`;
     }
   } else {
     // Protocol activity summary (morning export)
@@ -260,6 +268,13 @@ export function generateExportText({
     }
 
     // Yesterday's phone usage if available
+    // App usage yesterday
+    const y = new Date();
+    const yISO = new Date(y.getFullYear(), y.getMonth(), y.getDate()-1).toISOString().slice(0,10);
+    const ySec = appUsageByDate?.[yISO] || 0;
+    if (ySec > 0) {
+      exportText += `🖥️ App Usage Yesterday: ${formatDurationShort(ySec)}\n\n`;
+    }
     if (yesterdaysPhoneUsage && yesterdaysPhoneUsage.trim() && yesterdaysPhoneUsage !== '0m') {
       const feedback = getPhoneUsageFeedback(yesterdaysPhoneUsage);
       exportText += `📱 Yesterday's Phone Usage: ${feedback.emoji} **${yesterdaysPhoneUsage}**\n`;
@@ -342,6 +357,15 @@ function findTopHelpfulAction(attempts) {
   const arr = Object.values(map);
   arr.sort((a, b) => (b.helped / Math.max(1, b.total)) - (a.helped / Math.max(1, a.total)) || b.helped - a.helped);
   return arr[0];
+}
+
+function formatDurationShort(totalSec) {
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
 }
 
 function getWeekStartISO(d) {

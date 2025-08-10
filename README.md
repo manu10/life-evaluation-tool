@@ -136,6 +136,10 @@ npm run preview
 
 ### During Tab Additions
 - Shows First Hour Activity/Task, Today’s Goals, and Today’s Todos for quick access and edits.
+- App Usage Tracking
+  - Tracks focused/visible time in the app.
+  - Evening shows “App usage today”; Morning shows “App usage yesterday”.
+  - Included in exports.
 
 1. **🌅 Morning (5-10 minutes)**
    - Rate your feelings across 7 life areas

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePersistentState } from './hooks/usePersistentState';
 import { formatTime } from './utils/formatTime';
 import { generateExportText } from './utils/generateExportText';
@@ -65,6 +65,8 @@ export default function LifeEvaluationTool() {
   const [yesterdaysGoals, setYesterdaysGoals] = usePersistentState('yesterdaysGoals', defaultGoals);
   const [todaysTodos, setTodaysTodos] = usePersistentState('todaysTodos', []);
   const [yesterdaysTodos, setYesterdaysTodos] = usePersistentState('yesterdaysTodos', []);
+  const [appUsageByDate, setAppUsageByDate] = usePersistentState('appUsageByDate', {});
+  const activeStartRef = useRef(null);
   const [yesterdaysDayThoughts, setYesterdaysDayThoughts] = usePersistentState('yesterdaysDayThoughts', '');
   const [yesterdaysPhoneUsage, setYesterdaysPhoneUsage] = usePersistentState('yesterdaysPhoneUsage', '');
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
@@ -126,6 +128,66 @@ export default function LifeEvaluationTool() {
     }
     return () => clearInterval(interval);
   }, [isRunning, timeLeft, activeTab, eveningDone, hasUsedExtraTime]);
+
+  // App usage tracking (time while tab visible and window focused)
+  useEffect(() => {
+    function getDateKey(ts) {
+      const d = new Date(ts);
+      d.setHours(0, 0, 0, 0);
+      return d.toISOString().slice(0, 10);
+    }
+    function startActive() {
+      if (document.visibilityState === 'visible' && document.hasFocus() && activeStartRef.current == null) {
+        activeStartRef.current = Date.now();
+      }
+    }
+    function stopActive() {
+      if (activeStartRef.current != null) {
+        const now = Date.now();
+        const deltaSec = Math.max(0, Math.floor((now - activeStartRef.current) / 1000));
+        const key = getDateKey(now);
+        setAppUsageByDate(prev => ({ ...prev, [key]: (prev[key] || 0) + deltaSec }));
+        activeStartRef.current = null;
+      }
+    }
+    function onVis() { if (document.visibilityState === 'visible') startActive(); else stopActive(); }
+    function onFocus() { startActive(); }
+    function onBlur() { stopActive(); }
+    function onBeforeUnload() { stopActive(); }
+    startActive();
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => {
+      stopActive();
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+    };
+  }, [setAppUsageByDate]);
+
+  function getUsageSecondsFor(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const key = d.toISOString().slice(0, 10);
+    const base = appUsageByDate?.[key] || 0;
+    const todayKey = new Date().toISOString().slice(0, 10);
+    if (key === todayKey && activeStartRef.current != null && document.visibilityState === 'visible' && document.hasFocus()) {
+      return base + Math.max(0, Math.floor((Date.now() - activeStartRef.current) / 1000));
+    }
+    return base;
+  }
+
+  function formatDurationShort(totalSec) {
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m`;
+    return `${s}s`;
+  }
 
   function markEveningDone() {
     setYesterdaysDayThoughts(eveningResponses.dayThoughts);
@@ -330,7 +392,8 @@ export default function LifeEvaluationTool() {
         replacementAttempts,
         environmentApplications,
         anxietyRatings,
-        weeklyAdjustments
+        weeklyAdjustments,
+        appUsageByDate
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -499,6 +562,15 @@ export default function LifeEvaluationTool() {
             defaultExpanded={false}
           >
             <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
+            {(() => {
+              const secs = getUsageSecondsFor(new Date(Date.now() - 24 * 3600 * 1000));
+              if (secs <= 0) return null;
+              return (
+                <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
+                  <div className="text-sm text-indigo-900">App usage yesterday: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+                </div>
+              );
+            })()}
             {yesterdaysDayThoughts.trim() !== '' && (
               <DayThoughtsPanel value={yesterdaysDayThoughts} editable={false} label="Yesterday's Day Thoughts" colorClass="bg-gray-50" />
             )}
@@ -643,6 +715,14 @@ export default function LifeEvaluationTool() {
               </div>
             </div>
           )}
+          {(() => {
+            const secs = getUsageSecondsFor(new Date());
+            return (
+              <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
+                <div className="text-sm text-indigo-900">App usage today: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+              </div>
+            );
+          })()}
           <PhoneUsageInput
             value={eveningResponses.phoneUsage}
             onChange={handlePhoneUsageChange}
@@ -837,6 +917,7 @@ export default function LifeEvaluationTool() {
               ,'anxietyRatings'
               ,'todaysTodos'
               ,'yesterdaysTodos'
+              ,'appUsageByDate'
             ].forEach(key => localStorage.removeItem(key));
             window.location.reload();
           }

@@ -250,6 +250,7 @@ Delivered
   - Removed top "Quick Replacement Actions" and "Quick Environment Tweaks" sections to reduce clutter
  - Insights (live): shows Interruptions, Replacement helped (helped/total), and Env applied counts in Evening DistractionInsights
  - Replacement→Distraction linking: each replacement attempt stores `linkedDistractionId` so we can learn which replacements help for specific triggers
+- App usage tracking: counts focused/visible time; shown as “App usage today” (Evening) and “App usage yesterday” (Morning); included in exports
 
 Pending (short‑term)
 - [x] Export: add explicit Replacement summary (attempts, helped rate, last rewards) + top action
@@ -275,6 +276,7 @@ Planned (next)
 - During the day — Action Hub (`TodayActionHub`)
   - Now also surfaces First Hour Activity/Task, Today’s Goals, and Today’s Todos for quick access.
   - Test it: Verify current First Hour text shows, toggling a goal reflects in Morning, and todos can be added/checked here.
+  - Note: App usage tracking runs globally, no special hub action required.
 
 - 5‑Step Protocol (`FiveStepProtocol`)
   - How to use: Tap 5️⃣ in the header. Follow steps: log an ABC, run a quick interrupt (breaths/posture/anchor), pick a replacement, apply one environment tweak, rate anxiety 1–10.
