@@ -92,6 +92,43 @@ npm run preview
 
 ### Daily Workflow
 
+### Protocol & Mindfulness Features
+
+- 5‑Step Protocol
+  - How: Click the 5️⃣ button in the header. Complete: ABC → Interrupt → Replacement → Environment → Anxiety rating.
+  - Why: Guides you through a full behavioral loop to reduce anxiety-driven patterns.
+  - Test: Run a full session; check Morning export for ABC patterns and anxiety rating.
+
+- ABC Logger
+  - How: Use “+ Add ABC” in Today/Morning/Evening or after logging a distraction.
+  - Why: Makes triggers visible and patterns discoverable in days.
+  - Test: Add 3+ entries; see Top ABC Patterns in Morning export.
+
+- Mindfulness Toolkit (breaths, posture, anchor, pause)
+  - How: Click 🧘 in the header or use quick actions in “During”. Confirm to log.
+  - Why: Small interrupts early prevent spirals.
+  - Test: Perform each once; see counts in Insights and Morning export.
+
+- Replacement Actions
+  - How: Configure in Settings; start from “During” or 5‑Step; complete 2‑min timer; mark reward and helped.
+  - Why: Replacing behavior + rewards reinforces desired habits.
+  - Test: Try two actions; see “Replacement helped %” in Insights and Top action in Morning export.
+
+- Environment Designer & Checklist
+  - How: Configure removals/additions in Settings; apply 2–3 items in Morning/During.
+  - Why: Choice architecture beats willpower; environment supports calm.
+  - Test: Apply items; see “Env applied (%)” and export “Environment Applied Today”.
+
+- Anchor Nudge Bar
+  - How: Settings → Mindfulness & Protocol → Anchor nudge frequency (off/low/medium).
+  - Why: Gentle cadence for regular regulation.
+  - Test: Set to Medium; run an anchor; watch bar progress and prompt.
+
+- Weekly Review
+  - How: Click “Weekly Review” in Morning/Evening header; save what worked/didn’t, adjustments, wins.
+  - Why: Tight weekly iteration and celebration.
+  - Test: Save a review; check Morning export “Weekly Adjustments & Wins”.
+
 1. **🌅 Morning (5-10 minutes)**
    - Rate your feelings across 7 life areas
    - Review yesterday's goals and routines (collapsible section)

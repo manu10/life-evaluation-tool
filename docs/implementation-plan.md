@@ -260,3 +260,73 @@ Planned (next)
 - M3 Weekly Review page (what worked/didn’t; adjustments & wins) and trend charts
 
 
+
+---
+
+## Feature guide — how to use and why it helps
+
+- 5‑Step Protocol (`FiveStepProtocol`)
+  - How to use: Tap 5️⃣ in the header. Follow steps: log an ABC, run a quick interrupt (breaths/posture/anchor), pick a replacement, apply one environment tweak, rate anxiety 1–10.
+  - Why it helps: Encodes the full behavioral loop from trigger → interrupt → replacement → environment → measurement so anxiety patterns weaken and alternatives strengthen.
+  - Test it: Start protocol, complete all five steps, then check Morning export for ABC patterns and Anxiety rating.
+
+- ABC Logger (`ABCLogger`, `ABCHighlights`)
+  - How to use: From Distraction success prompt or the “+ Add ABC” button in Day Thoughts/Today/Morning. Fill setting, antecedent, behavior, consequence, effect.
+  - Why it helps: Makes triggers explicit; repeated patterns become visible quickly.
+  - Test it: Add 3+ ABC entries with repeated antecedents/settings; check Morning export Top ABC Patterns and ABCHighlights.
+
+- Mindfulness Toolkit (`MindfulnessToolkit` + shared modals)
+  - How to use: Tap 🧘 in the header or quick actions in the During hub. Choose 3 breaths, posture, anchor, or pause; confirm to log.
+  - Why it helps: Micro‑interrupts break escalation early; frequent small wins compound.
+  - Test it: Run each action once; see them reflected in Insights “Interruptions” and Morning export “Protocol Activity”.
+
+- Distraction Tracker (Quick stabilizers)
+  - How to use: Log a distraction; use quick stabilizers to breathe, pick a replacement, or apply an environment tweak.
+  - Why it helps: Reduces friction to act at the moment distraction appears.
+  - Test it: Log 2 distractions; use “Start 3 breaths”; confirm modals layer correctly.
+
+- Replacement Actions (`ReplacementActions`, `ReplacementAttempt`)
+  - How to use: Add actions in Settings (mark “easy” and set a reward). Start from the During hub/Protocol; complete the 2‑min timer; mark reward and whether it helped.
+  - Why it helps: Replacing behavior is more reliable than suppressing it; rewards reinforce alternatives.
+  - Test it: Start 2 different replacements; mark one as helped; see Insights “Replacement helped %” and Morning export “Top action”.
+
+- Environment Designer + Checklist (`EnvironmentDesigner`, `EnvironmentChecklist`)
+  - How to use: Configure removals/additions in Settings. In Morning/During, apply up to 3 items for the day.
+  - Why it helps: Choice architecture beats willpower; removing cues and adding anchors reduces anxious loops.
+  - Test it: Add 3 items; mark 2 applied; see “Env applied (%)” in Insights and “Environment Applied Today” in export.
+
+- During the day — Action Hub (`TodayActionHub`)
+  - How to use: Default landing tab. Use quick actions row, quick distraction log, open replacement/env pickers, and check mini metrics.
+  - Why it helps: Centralizes the highest‑frequency actions to reduce context switching.
+  - Test it: Save a quick distraction; observe “Saved ✓” flash; run an anchor; start a replacement; confirm metrics update.
+
+- Distraction Insights (`DistractionInsights`)
+  - How to use: See in Evening and Morning Yesterday review. Shows totals, interruption rate, replacement success %, env adherence %, top triggers, ABC patterns, and a 7‑day anxiety trend.
+  - Why it helps: Turns logs into actionable adjustments.
+  - Test it: Create sample data (interrupts, replacements, env applies) and verify percentages and trend.
+
+- Weekly Review (`WeeklyReview`)
+  - How to use: Button in Morning/Evening header area. Capture what worked/didn’t, adjustments, and wins for the week.
+  - Why it helps: Weekly iteration tightens the feedback loop; export shows “Weekly Adjustments & Wins”.
+  - Test it: Save a review; copy Morning export and check the section.
+
+- Anchor Nudge Bar (`AnchorNudgeBar`)
+  - How to use: Enable frequency in Settings (off/low/medium). Header shows time since last anchor and prompts when due.
+  - Why it helps: Gentle cadence for regular regulation without notifications.
+  - Test it: Set frequency to Medium, run one anchor, wait until bar approaches due, then tap “Anchor now”.
+
+- Evening Reset Confirm (`EveningResetConfirm`)
+  - How to use: In Evening, tap Reset. Modal lets you mark today’s 3 goals as completed before data rolls to yesterday.
+  - Why it helps: Prevents losing the chance to reflect accurate completion status.
+  - Test it: Mark 1–2 as complete in modal; verify they appear completed in Yesterday’s Goals next morning.
+
+- Gratitude with yesterday’s items (`GratitudeInput`)
+  - How to use: Morning gratitude shows yesterday’s three and suggests picking different ones today.
+  - Why it helps: Encourages novelty and broader appreciation.
+  - Test it: Enter 3 items today; after reset, see them as yesterday’s and the prompt.
+
+- Help modal (`HelpModal`, `HelpContent`)
+  - How to use: Tap ❓ in header.
+  - Why it helps: On‑demand guidance without leaving context.
+  - Test it: Open and scroll; verify content readability and accessibility.
+
