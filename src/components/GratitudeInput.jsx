@@ -41,7 +41,7 @@ function getDailyGratitudePhrase() {
   return gratitudePhrases[dayOfYear % gratitudePhrases.length];
 }
 
-export default function GratitudeInput({ gratitude, onGratitudeChange, editable = true }) {
+export default function GratitudeInput({ gratitude, onGratitudeChange, editable = true, yesterdaysGratitude }) {
   const handleChange = (itemNumber, value) => {
     if (!editable) return;
     onGratitudeChange({ ...gratitude, [`item${itemNumber}`]: value });
@@ -55,6 +55,17 @@ export default function GratitudeInput({ gratitude, onGratitudeChange, editable 
       <p className="text-sm text-gray-600 mb-4 italic">
         {dailyPhrase}
       </p>
+      {hasYesterdays(yesterdaysGratitude) && (
+        <div className="mb-4 p-3 rounded-md bg-white border border-yellow-200">
+          <div className="text-xs text-gray-700 mb-1">Yesterday you wrote:</div>
+          <div className="flex flex-wrap gap-2">
+            {Object.values(yesterdaysGratitude || {}).filter(Boolean).map((txt, idx) => (
+              <span key={idx} className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">{txt}</span>
+            ))}
+          </div>
+          <div className="text-xs text-gray-600 mt-2">Try choosing something different today to broaden your attention to the good. ✨</div>
+        </div>
+      )}
       <div className="space-y-4">
         {[1, 2, 3].map((num) => (
           <div key={num}>
@@ -76,4 +87,9 @@ export default function GratitudeInput({ gratitude, onGratitudeChange, editable 
       </div>
     </div>
   );
+}
+
+function hasYesterdays(grat) {
+  if (!grat) return false;
+  return Object.values(grat).some((v) => v && String(v).trim() !== '');
 }

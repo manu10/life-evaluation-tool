@@ -81,6 +81,7 @@ export function generateExportText({
   morningResponses = {},
   feelingOptions = [],
   gratitude = {},
+  yesterdaysGratitude = {},
   microPracticeLogs = [],
   abcLogs = [],
   mindfulnessSettings = {},

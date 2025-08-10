@@ -67,6 +67,7 @@ export default function LifeEvaluationTool() {
   const [distractions, setDistractions] = usePersistentState('distractions', []);
   const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
   const [gratitude, setGratitude] = usePersistentState('gratitude', defaultGratitude);
+  const [yesterdaysGratitude, setYesterdaysGratitude] = usePersistentState('yesterdaysGratitude', defaultGratitude);
   // Mindfulness & ABC (M1)
   const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
     enablePrompts: true,
@@ -150,6 +151,7 @@ export default function LifeEvaluationTool() {
       setHasUsedExtraTime(false);
       if (activeTab === 'morning') {
         setMorningResponses(defaultMorningResponses);
+        setYesterdaysGratitude(gratitude);
         setGratitude(defaultGratitude);
         setTodaysGoals(prev => ({
           goal1: { text: prev.goal1.text, completed: false },
@@ -500,6 +502,7 @@ export default function LifeEvaluationTool() {
             gratitude={gratitude}
             onGratitudeChange={handleGratitudeChange}
             editable={true}
+            yesterdaysGratitude={yesterdaysGratitude}
           />
           
           <LifeAreasGrid
@@ -541,6 +544,7 @@ export default function LifeEvaluationTool() {
                 morningResponses,
                 feelingOptions,
                 gratitude,
+                yesterdaysGratitude,
                 microPracticeLogs,
                 abcLogs,
                 mindfulnessSettings,
@@ -620,6 +624,7 @@ export default function LifeEvaluationTool() {
                 morningResponses,
                 feelingOptions,
                 gratitude,
+                yesterdaysGratitude,
                 microPracticeLogs,
                 abcLogs,
                 mindfulnessSettings,
