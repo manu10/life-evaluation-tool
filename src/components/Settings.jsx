@@ -61,6 +61,16 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             value={mindfulnessSettings?.pauseSec ?? 90}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, pauseSec: v })}
           />
+          <SelectField
+            label="Anchor nudge frequency"
+            value={mindfulnessSettings?.anchorFrequency ?? 'off'}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, anchorFrequency: v })}
+            options={[
+              { value: 'off', label: 'Off' },
+              { value: 'low', label: 'Low (every 60 min)' },
+              { value: 'medium', label: 'Medium (every 30 min)' }
+            ]}
+          />
           <div className="pt-2 border-t border-gray-200">
             <p className="text-sm text-gray-700 mb-2">Default tab</p>
             <div className="flex items-center gap-2">
@@ -150,6 +160,23 @@ function NumberField({ label, value, onChange }) {
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
         className="mt-1 p-2 border border-gray-300 rounded-md w-32"
       />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options = [] }) {
+  return (
+    <label className="block">
+      <span className="text-sm text-gray-700">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 p-2 border border-gray-300 rounded-md w-64"
+      >
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </label>
   );
 }

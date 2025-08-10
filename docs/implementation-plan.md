@@ -114,7 +114,7 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
   - [x] Replacement success rate and environment adherence score
   - [x] Top antecedents and settings (from ABC) – shown in Insights and morning export
   - [x] Anxiety trend (last up to 7 days) and delta
-- [ ] Anchor frequency bar (nudges) below timer with settings: off/low/medium
+- [x] Anchor frequency bar (nudges) below header with settings: off/low/medium (Settings → Mindfulness & Protocol)
 - [ ] A11y/mobile polish (buttons ≥ 44px, ARIA live for timers, contrast)
 
 ---

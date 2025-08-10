@@ -30,6 +30,7 @@ import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
 import WeeklyReview from './components/WeeklyReview';
+import AnchorNudgeBar from './components/AnchorNudgeBar';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -75,7 +76,8 @@ export default function LifeEvaluationTool() {
     enablePrompts: true,
     anchorSec: 30,
     pauseSec: 90,
-    enableFiveStep: true
+    enableFiveStep: true,
+    anchorFrequency: 'off'
   });
   const [microPracticeLogs, setMicroPracticeLogs] = usePersistentState('microPracticeLogs', []);
   const [abcLogs, setAbcLogs] = usePersistentState('abcLogs', []);
@@ -410,6 +412,15 @@ export default function LifeEvaluationTool() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
         <p className="text-gray-600">Track your feelings and set intentions</p>
+        <AnchorNudgeBar
+          frequency={mindfulnessSettings.anchorFrequency}
+          microLogs={microPracticeLogs}
+          seconds={mindfulnessSettings.anchorSec}
+          onStartAnchor={(sec) => {
+            // Open toolkit anchor via protocol or log directly
+            handleLogMicroPractice('anchor');
+          }}
+        />
       </div>
       <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
       {/* Weekly Review button when in Morning or Evening */}
