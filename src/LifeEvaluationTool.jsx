@@ -470,6 +470,19 @@ export default function LifeEvaluationTool() {
           anchorSeconds={mindfulnessSettings.anchorSec}
           pauseSeconds={mindfulnessSettings.pauseSec}
           distractions={distractions}
+          goals={todaysGoals}
+          onToggleGoal={handleGoalToggle}
+          dailyRoutines={dailyRoutines}
+          onToggleRoutine={(index) => {
+            const newRoutines = [...dailyRoutines];
+            newRoutines[index] = { ...newRoutines[index], completed: !newRoutines[index].completed };
+            setDailyRoutines(newRoutines);
+          }}
+          firstHour={eveningResponses.firstHour}
+          todaysTodos={todaysTodos}
+          onAddTodo={handleAddTodo}
+          onToggleTodo={handleToggleTodo}
+          onRemoveTodo={handleRemoveTodo}
         />
       )}
       <Timer
