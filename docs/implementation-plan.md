@@ -110,10 +110,10 @@ Note: Exact wording can be updated to match the source post. This draft mirrors 
 - [x] `src/components/WeeklyReview.jsx` to show what worked/didn’t and capture adjustments; celebrate wins
 - [ ] Insights (`DistractionInsights.jsx`, `utils/distractionUtils.js`):
   - [x] Interruption count and replacement helped/env applied surfaced in UI
-  - [ ] Interruption rate = micro‑interrupts / distractions
-  - [ ] Replacement success rate and environment adherence score
-  - [ ] Top antecedents and settings (from ABC) – partially in export
-  - [ ] Anxiety trend line and weekly deltas
+  - [x] Interruption rate = micro‑interrupts / distractions
+  - [x] Replacement success rate and environment adherence score
+  - [x] Top antecedents and settings (from ABC) – shown in Insights and morning export
+  - [x] Anxiety trend (last up to 7 days) and delta
 - [ ] Anchor frequency bar (nudges) below timer with settings: off/low/medium
 - [ ] A11y/mobile polish (buttons ≥ 44px, ARIA live for timers, contrast)
 

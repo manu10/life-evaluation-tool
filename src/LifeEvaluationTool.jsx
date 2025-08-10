@@ -641,6 +641,9 @@ export default function LifeEvaluationTool() {
             colorTheme="purple"
             microLogs={microPracticeLogs}
             environmentApplications={environmentApplications}
+            environmentProfile={environmentProfile}
+            abcLogs={abcLogs}
+            anxietyRatings={anxietyRatings}
           />
 
           {getEveningCompletionCount() > 0 && (

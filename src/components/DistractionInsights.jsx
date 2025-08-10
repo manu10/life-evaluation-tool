@@ -12,7 +12,10 @@ export default function DistractionInsights({
   showFullDetails = true,
   colorTheme = "purple", // purple, blue, gray
   microLogs = [],
-  environmentApplications = []
+  environmentApplications = [],
+  environmentProfile = {},
+  abcLogs = [],
+  anxietyRatings = []
 }) {
   const summary = createDistractionSummary(distractions);
   const todayStr = new Date().toDateString();
@@ -21,6 +24,16 @@ export default function DistractionInsights({
   const replacementLogs = todayMicro.filter(m => m.type === 'replacement');
   const helpedCount = replacementLogs.filter(m => m.helped).length;
   const envApplyCount = (environmentApplications || []).filter(a => new Date(a.ts).toDateString() === todayStr).length;
+  const envConfiguredCount = ((environmentProfile?.removals || []).length + (environmentProfile?.additions || []).length) || 0;
+  const interruptionRate = summary.stats.total > 0 ? Math.round((interruptionCount / summary.stats.total) * 100) : null;
+  const replacementRate = replacementLogs.length > 0 ? Math.round((helpedCount / replacementLogs.length) * 100) : null;
+  const envAdherence = envConfiguredCount > 0 ? Math.round((envApplyCount / envConfiguredCount) * 100) : null;
+
+  // ABC Patterns (top antecedents/settings)
+  const abcPatterns = getTopAbcPatterns(abcLogs);
+
+  // Anxiety trend (last up to 7 days)
+  const trend = buildAnxietyTrend(anxietyRatings);
   
   // Theme colors
   const themes = {
@@ -98,21 +111,21 @@ export default function DistractionInsights({
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
             <span className="text-sm font-medium text-gray-700">Interruptions</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{interruptionCount}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{interruptionCount}{interruptionRate !== null ? <span className="text-sm text-gray-500"> ({interruptionRate}%)</span> : null}</p>
         </div>
         <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
             <span className="text-sm font-medium text-gray-700">Replacement helped</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{helpedCount}/{replacementLogs.length}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{helpedCount}/{replacementLogs.length}{replacementRate !== null ? <span className="text-sm text-gray-500"> ({replacementRate}%)</span> : null}</p>
         </div>
         <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
             <span className="text-sm font-medium text-gray-700">Env applied</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{envApplyCount}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{envApplyCount}{envAdherence !== null ? <span className="text-sm text-gray-500"> ({envAdherence}%)</span> : null}</p>
         </div>
         
         {summary.stats.topTriggers.length > 0 && (
@@ -163,6 +176,22 @@ export default function DistractionInsights({
         </div>
       )}
 
+      {/* ABC Patterns from logs */}
+      {showFullDetails && (abcPatterns.antecedents.length > 0 || abcPatterns.settings.length > 0) && (
+        <div className="mb-4">
+          <h4 className={`text-sm font-semibold ${theme.titleColor} mb-2 flex items-center gap-1`}>
+            <TrendingUp className="w-4 h-4" />
+            Top ABC Patterns
+          </h4>
+          {abcPatterns.antecedents.length > 0 && (
+            <p className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-indigo-400">Antecedents: {abcPatterns.antecedents.map(p => `${p.value} (${p.count})`).join(', ')}</p>
+          )}
+          {abcPatterns.settings.length > 0 && (
+            <p className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-indigo-400 mt-2">Settings: {abcPatterns.settings.map(p => `${p.value} (${p.count})`).join(', ')}</p>
+          )}
+        </div>
+      )}
+
       {/* Suggestions */}
       {summary.insights.suggestions.length > 0 && (
         <div>
@@ -198,6 +227,48 @@ export default function DistractionInsights({
           </div>
         </div>
       )}
+
+      {/* Anxiety Trend */}
+      {showFullDetails && trend.list.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <h4 className={`text-sm font-semibold ${theme.titleColor} mb-2`}>
+            Anxiety Trend (last {trend.list.length} days)
+          </h4>
+          <div className="text-sm text-gray-700 bg-white p-2 rounded border border-gray-200">
+            {trend.list.join(' → ')} {trend.delta != null && <span className="ml-2 text-xs text-gray-500">Δ {trend.delta > 0 ? '+' : ''}{trend.delta}</span>}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
+
+function getTopAbcPatterns(abcLogs) {
+  if (!Array.isArray(abcLogs) || abcLogs.length === 0) return { antecedents: [], settings: [] };
+  const countKey = (key) => {
+    const map = {};
+    abcLogs.forEach(l => {
+      const v = (l && l[key] && String(l[key]).trim()) || '';
+      if (!v) return;
+      map[v] = (map[v] || 0) + 1;
+    });
+    return Object.entries(map).map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count).slice(0, 3);
+  };
+  return { antecedents: countKey('antecedent'), settings: countKey('setting') };
+}
+
+function buildAnxietyTrend(anxietyRatings) {
+  if (!Array.isArray(anxietyRatings) || anxietyRatings.length === 0) return { list: [], delta: null };
+  const byDay = {};
+  anxietyRatings.forEach(r => {
+    const d = new Date(r.ts);
+    d.setHours(0,0,0,0);
+    const key = d.toISOString().slice(0,10);
+    if (!byDay[key] || r.ts > byDay[key].ts) byDay[key] = r;
+  });
+  const days = Object.keys(byDay).sort();
+  const last7 = days.slice(-7).map(k => byDay[k].rating);
+  let delta = null;
+  if (last7.length >= 2) delta = last7[last7.length - 1] - last7[0];
+  return { list: last7, delta };
+}
