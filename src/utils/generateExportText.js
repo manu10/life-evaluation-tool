@@ -61,6 +61,9 @@ function getPhoneUsageFeedback(timeStr) {
  * @param {Array} params.abcLogs
  * @param {Object} params.mindfulnessSettings
  * @param {Object} params.environmentProfile
+ * @param {Array} params.replacementAttempts
+ * @param {Array} params.environmentApplications
+ * @param {Array} params.anxietyRatings
  * @returns {string}
  */
 export function generateExportText({
@@ -81,7 +84,10 @@ export function generateExportText({
   microPracticeLogs = [],
   abcLogs = [],
   mindfulnessSettings = {},
-  environmentProfile = { removals: [], additions: [] }
+  environmentProfile = { removals: [], additions: [] },
+  replacementAttempts = [],
+  environmentApplications = [],
+  anxietyRatings = []
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -139,6 +145,17 @@ export function generateExportText({
       exportText += `\n`;
     }
 
+    // Replacement summary (evening)
+    if (replacementAttempts && replacementAttempts.length > 0) {
+      const today = new Date().toDateString();
+      const todayAttempts = replacementAttempts.filter(a => new Date(a.ts).toDateString() === today);
+      if (todayAttempts.length > 0) {
+        const helped = todayAttempts.filter(a => a.helped).length;
+        const rewards = todayAttempts.filter(a => a.rewardGiven).length;
+        exportText += `🔁 Replacement Summary Today: ${helped}/${todayAttempts.length} helped, ${rewards} rewards taken\n\n`;
+      }
+    }
+
     // Distractions for evening
     const distractionExport = formatDistractionsForExport(distractions);
     if (distractionExport) {
@@ -166,6 +183,36 @@ export function generateExportText({
         exportText += `   ${idx+1}. [${when}] Setting: ${log.setting || '-'} | Antecedent: ${log.antecedent || '-'} | Behavior: ${log.behavior || '-'}\n`;
       });
       exportText += `\n`;
+    }
+
+    // Replacement summary (morning)
+    if (replacementAttempts && replacementAttempts.length > 0) {
+      const today = new Date().toDateString();
+      const todayAttempts = replacementAttempts.filter(a => new Date(a.ts).toDateString() === today);
+      if (todayAttempts.length > 0) {
+        const helped = todayAttempts.filter(a => a.helped).length;
+        const rewards = todayAttempts.filter(a => a.rewardGiven).length;
+        const topAction = findTopHelpfulAction(todayAttempts);
+        exportText += `🔁 Replacement Summary Today: ${helped}/${todayAttempts.length} helped, ${rewards} rewards taken\n`;
+        if (topAction) exportText += `   Top action: ${topAction.title} (${topAction.helped}/${topAction.total})\n`;
+        exportText += `\n`;
+      }
+    }
+
+    // Environment adherence
+    if (environmentApplications && environmentApplications.length > 0) {
+      const today = new Date().toDateString();
+      const todayEnv = environmentApplications.filter(a => new Date(a.ts).toDateString() === today);
+      if (todayEnv.length > 0) {
+        exportText += `🏡 Environment Applied Today: ${todayEnv.length} item(s)\n\n`;
+      }
+    }
+
+    // Anxiety rating (last)
+    if (anxietyRatings && anxietyRatings.length > 0) {
+      const last = anxietyRatings[0];
+      const when = new Date(last.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      exportText += `🧠 Anxiety Rating: ${last.rating}/10 at ${when}${last.notes ? ` — ${last.notes}` : ''}\n\n`;
     }
     // Yesterday's goals if available
     const hasYesterdayGoals = Object.values(yesterdaysGoals).some(goal => goal.text && goal.text.trim() !== '');
@@ -255,3 +302,17 @@ export function generateExportText({
   exportText += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
   return exportText;
 } 
+
+function findTopHelpfulAction(attempts) {
+  const map = {};
+  attempts.forEach(a => {
+    const t = a.title || a.actionTitle;
+    if (!t) return;
+    if (!map[t]) map[t] = { title: t, helped: 0, total: 0 };
+    map[t].total += 1;
+    if (a.helped) map[t].helped += 1;
+  });
+  const arr = Object.values(map);
+  arr.sort((a, b) => (b.helped / Math.max(1, b.total)) - (a.helped / Math.max(1, a.total)) || b.helped - a.helped);
+  return arr[0];
+}

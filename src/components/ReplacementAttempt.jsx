@@ -16,7 +16,7 @@ export default function ReplacementAttempt({ action, durationSec = 120, onComple
   useEffect(() => {
     if (isRunning && timeLeft === 0) {
       setIsRunning(false);
-      if (typeof onComplete === 'function') onComplete({ rewardGiven, helped });
+      if (typeof onComplete === 'function') onComplete({ rewardGiven, helped, actionTitle: action?.title });
     }
   }, [isRunning, timeLeft, rewardGiven, onComplete]);
 

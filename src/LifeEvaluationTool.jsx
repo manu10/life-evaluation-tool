@@ -84,6 +84,8 @@ export default function LifeEvaluationTool() {
   const [environmentProfile, setEnvironmentProfile] = usePersistentState('environmentProfile', { removals: [], additions: [] });
   const [environmentApplications, setEnvironmentApplications] = usePersistentState('environmentApplications', []);
   const [isProtocolOpen, setIsProtocolOpen] = useState(false);
+  const [replacementAttempts, setReplacementAttempts] = usePersistentState('replacementAttempts', []);
+  const [anxietyRatings, setAnxietyRatings] = usePersistentState('anxietyRatings', []);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
@@ -302,7 +304,10 @@ export default function LifeEvaluationTool() {
       microPracticeLogs,
       abcLogs,
         mindfulnessSettings,
-        environmentProfile
+        environmentProfile,
+        replacementAttempts,
+        environmentApplications,
+        anxietyRatings
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -539,7 +544,10 @@ export default function LifeEvaluationTool() {
                 microPracticeLogs,
                 abcLogs,
                 mindfulnessSettings,
-                environmentProfile
+                environmentProfile,
+                replacementAttempts,
+                environmentApplications,
+                anxietyRatings
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -615,7 +623,10 @@ export default function LifeEvaluationTool() {
                 microPracticeLogs,
                 abcLogs,
                 mindfulnessSettings,
-                environmentProfile
+                environmentProfile,
+                replacementAttempts,
+                environmentApplications,
+                anxietyRatings
               })}
               onCopy={() => copyToClipboard(true)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -741,10 +752,12 @@ export default function LifeEvaluationTool() {
       {attemptAction && (
         <ReplacementAttempt
           action={attemptAction}
-          onComplete={({ rewardGiven, helped }) => {
+          onComplete={({ rewardGiven, helped, actionTitle }) => {
             // minimal attempt logging; future: store replacementAttempts in state
             setAttemptAction(null);
-            handleLogMicroPractice('replacement', 'manual', undefined, { helped });
+            const entry = { id: Date.now(), ts: Date.now(), actionId: attemptAction.id, title: attemptAction.title, durationSec: 120, completed: true, rewardGiven, helped };
+            setReplacementAttempts(prev => [entry, ...prev]);
+            handleLogMicroPractice('replacement', 'manual', undefined, { helped, actionTitle });
             if (rewardGiven) {
               handleLogMicroPractice('reward', 'manual');
             }
@@ -763,7 +776,7 @@ export default function LifeEvaluationTool() {
         onApplyEnvironment={(item) => handleApplyEnvironment(item)}
         onCompleteSession={() => { /* placeholder for history logging */ }}
         onSaveAnxiety={({ rating, notes }) => {
-          // optional: store in future anxietyRatings
+          setAnxietyRatings(prev => [{ id: Date.now(), ts: Date.now(), rating, notes }, ...prev]);
         }}
         onOpenSettings={() => setActiveTab('settings')}
       />
