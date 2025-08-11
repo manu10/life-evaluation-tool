@@ -98,6 +98,21 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
+      {/* Sessions (Beta) */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-800">Sessions (Beta)</h3>
+          <p className="text-sm text-gray-600 mt-1">Enable lightweight focus sessions with hooks and quests.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <Toggle
+            label="Enable Sessions (beta)"
+            checked={!!mindfulnessSettings?.enableSessions}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, enableSessions: v })}
+          />
+        </div>
+      </div>
+
       {/* Replacement Actions Editor */}
       <ReplacementActions
         actions={replacementActions || []}

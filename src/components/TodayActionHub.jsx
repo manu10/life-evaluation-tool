@@ -37,6 +37,8 @@ export default function TodayActionHub({
   onAddTodo,
   onToggleTodo,
   onRemoveTodo,
+  liveSession,
+  onEndSession,
 }) {
   const [newDistraction, setNewDistraction] = useState('');
   const [trigger, setTrigger] = useState('');
@@ -47,6 +49,7 @@ export default function TodayActionHub({
   const [showReplace, setShowReplace] = useState(false);
   const [showEnv, setShowEnv] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [sessionNow, setSessionNow] = useState(Date.now());
 
   function handleQuickLog(e) {
     e.preventDefault();
@@ -72,6 +75,19 @@ export default function TodayActionHub({
   const helpedCount = replacementLogs.filter(m => m.helped).length;
   const envApplyCount = (environmentApplications || []).filter(a => new Date(a.ts).toDateString() === todayStr).length;
   const distractionCount = (distractions || []).length;
+  // Sessions tiles will be passed later; keep metrics area minimal for now
+
+  // Live session ticking timer (local)
+  React.useEffect(() => {
+    if (!liveSession) return;
+    const id = setInterval(() => setSessionNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [liveSession]);
+
+  const liveElapsedSec = liveSession ? Math.max(0, Math.floor((sessionNow - liveSession.startedAt) / 1000)) : 0;
+  const livePlannedSec = (liveSession?.plannedMin || 0) * 60;
+  const liveLeftSec = Math.max(0, livePlannedSec - liveElapsedSec);
+  const liveProgress = livePlannedSec > 0 ? Math.min(100, Math.floor((liveElapsedSec / livePlannedSec) * 100)) : 0;
 
   return (
     <div className="space-y-6">
@@ -89,6 +105,26 @@ export default function TodayActionHub({
         </div>
         <div className="mt-2 text-xs text-gray-600">Manage lists in Settings.</div>
       </div>
+
+      {/* Live Session (if any) */}
+      {liveSession && (
+        <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-purple-800">Current session</h3>
+            <button onClick={onEndSession} className="px-2 py-1 text-xs rounded-md bg-purple-600 text-white hover:bg-purple-700">End Session</button>
+          </div>
+          <div className="text-sm text-purple-900 mb-1">
+            {liveSession.hookLabel ? `Hook: ${liveSession.hookLabel}` : 'No hook'}{liveSession.questTitle ? ` • ${liveSession.questTitle}` : ''}
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold text-purple-900">{formatMmSs(liveLeftSec)} left</div>
+            <div className="text-xs text-purple-800">{Math.floor(liveElapsedSec/60)}m elapsed</div>
+          </div>
+          <div className="w-full bg-purple-100 rounded h-2 mt-2 overflow-hidden">
+            <div className="h-2 bg-purple-600" style={{ width: `${liveProgress}%` }} />
+          </div>
+        </div>
+      )}
 
       {/* Distraction Quick Log */}
       <form onSubmit={handleQuickLog} className="p-4 bg-white border border-gray-200 rounded-lg">
@@ -225,6 +261,12 @@ function Metric({ label, value }) {
       <div className="text-lg font-semibold text-gray-900">{value}</div>
     </div>
   );
+}
+
+function formatMmSs(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 

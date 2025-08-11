@@ -31,6 +31,9 @@ import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
 import AnchorNudgeBar from './components/AnchorNudgeBar';
 import TodosList from './components/TodosList';
+import SessionStarterModal from './components/modals/SessionStarterModal';
+import SessionEnderModal from './components/modals/SessionEnderModal';
+import SessionsDashboard from './components/SessionsDashboard';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -99,6 +102,11 @@ export default function LifeEvaluationTool() {
   const [linkedDistractionId, setLinkedDistractionId] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isStartSessionOpen, setIsStartSessionOpen] = useState(false);
+  const [isEndSessionOpen, setIsEndSessionOpen] = useState(false);
+  const [hooks, setHooks] = usePersistentState('hooks', []);
+  const [sessions, setSessions] = usePersistentState('sessions', []);
+  const [liveSession, setLiveSession] = useState(null);
 
   // Timer effect
   useEffect(() => {
@@ -391,9 +399,10 @@ export default function LifeEvaluationTool() {
         environmentProfile,
         replacementAttempts,
         environmentApplications,
-        anxietyRatings,
-        weeklyAdjustments,
-        appUsageByDate
+      anxietyRatings,
+      weeklyAdjustments,
+      appUsageByDate,
+      sessions
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -445,6 +454,17 @@ export default function LifeEvaluationTool() {
       <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
         <div className="flex items-center gap-2">
           <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
+          {!!mindfulnessSettings?.enableSessions && (
+            <button
+              onClick={() => {
+                if (liveSession) { setIsEndSessionOpen(true); } else { setIsStartSessionOpen(true); }
+              }}
+              className={`px-2 py-1 text-xs rounded-lg border ${liveSession ? 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200' : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'}`}
+              title={liveSession ? 'End current session' : 'Start focus session'}
+            >
+              {liveSession ? 'End Session' : 'Start Session'}
+            </button>
+          )}
           <button
             onClick={() => setIsToolkitOpen(true)}
             className="px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200"
@@ -496,7 +516,7 @@ export default function LifeEvaluationTool() {
           }}
         />
       </div>
-      <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} />
+      <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} showSessions={!!mindfulnessSettings?.enableSessions} />
       {/* Weekly Review temporarily disabled; will return with date setting, weekly lock, and auto-reset */}
       {false && (activeTab === 'morning' || activeTab === 'evening') && (
         <div className="mb-4 flex justify-end">
@@ -529,6 +549,8 @@ export default function LifeEvaluationTool() {
           onAddTodo={handleAddTodo}
           onToggleTodo={handleToggleTodo}
           onRemoveTodo={handleRemoveTodo}
+          liveSession={liveSession}
+          onEndSession={() => setIsEndSessionOpen(true)}
         />
       )}
       <Timer
@@ -697,6 +719,7 @@ export default function LifeEvaluationTool() {
                 replacementAttempts,
                 environmentApplications,
                 anxietyRatings
+                ,sessions
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -799,6 +822,7 @@ export default function LifeEvaluationTool() {
                 replacementAttempts,
                 environmentApplications,
                 anxietyRatings
+                ,sessions
               })}
               onCopy={() => copyToClipboard(true)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -806,6 +830,12 @@ export default function LifeEvaluationTool() {
             />
           )}
         </>
+      )}
+      {activeTab === 'sessions' && !!mindfulnessSettings?.enableSessions && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Sessions</h2>
+          <SessionsDashboard sessions={sessions} />
+        </div>
       )}
       {/* Settings Tab Content */}
       {activeTab === 'settings' && (
@@ -823,6 +853,33 @@ export default function LifeEvaluationTool() {
         />
       )}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <SessionStarterModal
+        isOpen={isStartSessionOpen}
+        onClose={() => setIsStartSessionOpen(false)}
+        hooks={hooks}
+        onAddHook={({ label, type }) => {
+          const item = { id: Date.now().toString(), label, type };
+          setHooks(prev => [item, ...prev]);
+          return item;
+        }}
+        onStart={({ hookId, hookLabel, questTitle, plannedMin }) => {
+          const session = { id: Date.now().toString(), startedAt: Date.now(), hookId, hookLabel, questTitle, plannedMin };
+          setLiveSession(session);
+          setSessions(prev => [session, ...prev]);
+          setIsStartSessionOpen(false);
+        }}
+      />
+      <SessionEnderModal
+        isOpen={isEndSessionOpen}
+        onClose={() => setIsEndSessionOpen(false)}
+        onEnd={({ enjoyment, highlight, rewardTaken }) => {
+          if (!liveSession) { setIsEndSessionOpen(false); return; }
+          const updated = { ...liveSession, endedAt: Date.now(), enjoyment, highlight, rewardTaken, minutes: Math.max(1, Math.round(((Date.now() - liveSession.startedAt) / 60000))) };
+          setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
+          setLiveSession(null);
+          setIsEndSessionOpen(false);
+        }}
+      />
       <EveningResetConfirm
         isOpen={isResetConfirmOpen}
         onClose={() => setIsResetConfirmOpen(false)}

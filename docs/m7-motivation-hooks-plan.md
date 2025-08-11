@@ -50,6 +50,12 @@ Build consistent, enjoyable 1–2h/day deep‑work on “special situations” b
 - Dashboard tiles (During): Streak, Today minutes, Avg enjoyment, Boredom→Action%.
 - Curiosity Inbox chip; Quest Builder in Settings.
 
+Current partial implementation (safe slice):
+- Sessions (Beta) toggle in Settings (off by default).
+- Header button to Start/End session.
+- During tab shows live in‑progress session (timer, progress bar, hook/quest).
+- Sessions tab (visible when enabled): time by hook bars + grouped session log. No import/export yet.
+
 ---
 
 ### Data model (new slices)

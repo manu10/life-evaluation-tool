@@ -91,7 +91,8 @@ export function generateExportText({
   environmentApplications = [],
   anxietyRatings = [],
   weeklyAdjustments = [],
-  appUsageByDate = {}
+  appUsageByDate = {},
+  sessions = []
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -171,6 +172,16 @@ export function generateExportText({
     const todaySec = appUsageByDate?.[todayISO] || 0;
     if (todaySec > 0) {
       exportText += `🖥️ App Usage Today: ${formatDurationShort(todaySec)}\n\n`;
+    }
+    // Sessions today (brief)
+    if (Array.isArray(sessions) && sessions.length > 0) {
+      const today = new Date().toDateString();
+      const todaySessions = sessions.filter(s => new Date(s.startedAt).toDateString() === today);
+      if (todaySessions.length > 0) {
+        const totalMin = todaySessions.reduce((acc, s) => acc + (s.minutes || 0), 0);
+        const avgEnjoy = Math.round((todaySessions.filter(s => s.enjoyment != null).reduce((a, s) => a + s.enjoyment, 0) / Math.max(1, todaySessions.filter(s => s.enjoyment != null).length)) * 10) / 10;
+        exportText += `🎯 Sessions Today: ${todaySessions.length} (total ${totalMin}m${isNaN(avgEnjoy)?'':`, avg enjoy ${avgEnjoy}/5`})\n\n`;
+      }
     }
   } else {
     // Protocol activity summary (morning export)
@@ -269,6 +280,16 @@ export function generateExportText({
 
     // Yesterday's phone usage if available
     // App usage yesterday
+    // Sessions yesterday (summary)
+    if (Array.isArray(sessions) && sessions.length > 0) {
+      const y = new Date(Date.now() - 24*3600*1000).toDateString();
+      const ySessions = sessions.filter(s => new Date(s.startedAt).toDateString() === y);
+      if (ySessions.length > 0) {
+        const totalMin = ySessions.reduce((acc, s) => acc + (s.minutes || 0), 0);
+        const topHook = findTopHook(ySessions);
+        exportText += `🎯 Sessions Yesterday: ${ySessions.length} (total ${totalMin}m)${topHook?` — Top hook: ${topHook.label}`:''}\n\n`;
+      }
+    }
     const y = new Date();
     const yISO = new Date(y.getFullYear(), y.getMonth(), y.getDate()-1).toISOString().slice(0,10);
     const ySec = appUsageByDate?.[yISO] || 0;
@@ -366,6 +387,19 @@ function formatDurationShort(totalSec) {
   if (h > 0) return `${h}h ${m}m`;
   if (m > 0) return `${m}m`;
   return `${s}s`;
+}
+
+function findTopHook(sessions) {
+  const map = {};
+  sessions.forEach(s => {
+    const k = s.hookId || s.hookLabel;
+    if (!k) return;
+    if (!map[k]) map[k] = { count: 0, label: s.hookLabel };
+    map[k].count += 1;
+  });
+  const arr = Object.entries(map).map(([id, v]) => ({ id, ...v }));
+  arr.sort((a, b) => b.count - a.count);
+  return arr[0];
 }
 
 function getWeekStartISO(d) {

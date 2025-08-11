@@ -1,7 +1,7 @@
 import React from 'react';
-import { Sun, Moon, CheckCircle, Brain, Settings, Zap } from 'lucide-react';
+import { Sun, Moon, CheckCircle, Brain, Settings, Zap, Target } from 'lucide-react';
 
-export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount }) {
+export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false }) {
   return (
     <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
       <button
@@ -46,6 +46,17 @@ export default function Tabs({ activeTab, setActiveTab, eveningDone, distraction
           </span>
         )}
       </button>
+      {showSessions && (
+        <button
+          onClick={() => setActiveTab('sessions')}
+          className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+            activeTab === 'sessions' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <Target className="w-5 h-5" />
+          Sessions
+        </button>
+      )}
       <button
         onClick={() => setActiveTab('settings')}
         className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
