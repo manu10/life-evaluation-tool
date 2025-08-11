@@ -347,3 +347,8 @@ Planned (next)
   - Why it helps: On‑demand guidance without leaving context.
   - Test it: Open and scroll; verify content readability and accessibility.
 
+---
+
+## Forthcoming: M7 — Motivation Hooks & Enjoyment System
+- See `docs/m7-motivation-hooks-plan.md` for goals, features, data model, milestones, metrics, and test plans.
+
