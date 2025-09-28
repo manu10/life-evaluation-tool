@@ -834,7 +834,13 @@ export default function LifeEvaluationTool() {
       {activeTab === 'sessions' && !!mindfulnessSettings?.enableSessions && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Sessions</h2>
-          <SessionsDashboard sessions={sessions} />
+          <SessionsDashboard
+            sessions={sessions}
+            hooks={hooks}
+            onUpdateHook={(hookId, partial) => {
+              setHooks(prev => prev.map(h => h.id === hookId ? { ...h, ...partial } : h));
+            }}
+          />
         </div>
       )}
       {/* Settings Tab Content */}
@@ -981,6 +987,26 @@ export default function LifeEvaluationTool() {
         }}
       >
         Reset All Data
+      </button>
+      {/* Reset Sessions Data Button */}
+      <button
+        className="mt-3 ml-3 px-4 py-2 bg-purple-100 text-purple-800 rounded-lg border border-purple-300 hover:bg-purple-200 transition-colors"
+        onClick={() => {
+          if (window.confirm('Reset all Sessions data? This clears past sessions and ends any live session.')) {
+            try {
+              localStorage.removeItem('sessions');
+              setSessions([]);
+              setLiveSession(null);
+              alert('Sessions data cleared.');
+            } catch (e) {
+              // fallback
+              setSessions([]);
+              setLiveSession(null);
+            }
+          }
+        }}
+      >
+        Reset Sessions Data
       </button>
       {/* Overlays */}
       <MindfulnessToolkit
