@@ -36,6 +36,16 @@ export default function HelpContent() {
         </List>
       </Section>
 
+      <Divider />
+
+      <Section title="Add to Home Screen (iPad/iPhone)" icon="📱">
+        <List>
+          <Item>Open the site in <strong>Safari</strong>.</Item>
+          <Item>Tap <strong>Share</strong> (square with up‑arrow) → <strong>Add to Home Screen</strong> → <strong>Add</strong>.</Item>
+          <Item>Launch from the new icon; it opens in <strong>standalone</strong> mode (separate from browser tabs).</Item>
+        </List>
+      </Section>
+
       <Tips />
     </div>
   );
