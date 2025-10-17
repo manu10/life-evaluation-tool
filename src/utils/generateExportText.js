@@ -92,7 +92,9 @@ export function generateExportText({
   anxietyRatings = [],
   weeklyAdjustments = [],
   appUsageByDate = {},
-  sessions = []
+  sessions = [],
+  yesterdaysOnePercentPlan = '',
+  yesterdaysOnePercentDone = false
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -271,6 +273,11 @@ export function generateExportText({
         }
       });
       exportText += `\n`;
+    }
+
+    if (yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim()) {
+      const status = yesterdaysOnePercentDone ? '✅' : '⏳';
+      exportText += `📈 Yesterday's 1% Learning: ${status} ${yesterdaysOnePercentPlan}\n\n`;
     }
 
     // Yesterday's day thoughts if available

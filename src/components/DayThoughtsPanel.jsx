@@ -26,6 +26,11 @@ export default function DayThoughtsPanel({ value, onChange, editable = true, lab
           placeholder={placeholder}
           className={`w-full p-3 border border-gray-300 rounded-lg resize-none h-32 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
+        {editable && (
+          <div className="mt-2 text-xs text-gray-600">
+            Tip: Jot down one insight from your 1% learning today.
+          </div>
+        )}
       </div>
     </div>
   );

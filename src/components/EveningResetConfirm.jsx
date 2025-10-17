@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, todaysTodos = [], onConfirm }) {
+export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, todaysTodos = [], onePercentPlan, onePercentDone = false, onConfirm }) {
   if (!isOpen) return null;
   const [local, setLocal] = useState({
     goal1: !!todaysGoals?.goal1?.completed,
     goal2: !!todaysGoals?.goal2?.completed,
     goal3: !!todaysGoals?.goal3?.completed,
-    todos: (todaysTodos || []).map(t => ({ id: t.id, completed: !!t.completed }))
+    todos: (todaysTodos || []).map(t => ({ id: t.id, completed: !!t.completed })),
+    onePercentDone: !!onePercentDone
   });
 
   function toggle(key) { setLocal(prev => ({ ...prev, [key]: !prev[key] })); }
@@ -36,6 +37,17 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
               );
             })}
           </div>
+          {onePercentPlan && onePercentPlan.trim() && (
+            <div className="mt-2">
+              <label className="flex items-center justify-between p-3 rounded-md border border-emerald-200 bg-emerald-50">
+                <span className="text-sm text-emerald-900 truncate mr-3">📈 1% Better: {onePercentPlan}</span>
+                <span className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={!!local.onePercentDone} onChange={() => toggle('onePercentDone')} />
+                  Done
+                </span>
+              </label>
+            </div>
+          )}
           {todaysTodos && todaysTodos.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-800 mb-2">Today's Todos</h4>

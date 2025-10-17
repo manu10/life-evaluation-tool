@@ -49,7 +49,7 @@ const feelingOptions = [
 ];
 
 const defaultMorningResponses = lifeAreas.reduce((acc, area) => ({ ...acc, [area]: { feeling: '', notes: '' } }), {});
-const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '', firstHour: '', phoneUsage: '' };
+const defaultEveningResponses = { goal1: '', goal2: '', goal3: '', dayThoughts: '', firstHour: '', phoneUsage: '', onePercentPlan: '', onePercentLink: '' };
 const defaultGoals = { goal1: { text: '', completed: false }, goal2: { text: '', completed: false }, goal3: { text: '', completed: false } };
 const defaultDailyRoutines = Array(5).fill(null).map(() => ({ text: '', completed: false }));
 const defaultGratitude = { item1: '', item2: '', item3: '' };
@@ -78,6 +78,9 @@ export default function LifeEvaluationTool() {
   const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
   const [gratitude, setGratitude] = usePersistentState('gratitude', defaultGratitude);
   const [yesterdaysGratitude, setYesterdaysGratitude] = usePersistentState('yesterdaysGratitude', defaultGratitude);
+  const [onePercentDone, setOnePercentDone] = usePersistentState('onePercentDone', false);
+  const [yesterdaysOnePercentPlan, setYesterdaysOnePercentPlan] = usePersistentState('yesterdaysOnePercentPlan', '');
+  const [yesterdaysOnePercentDone, setYesterdaysOnePercentDone] = usePersistentState('yesterdaysOnePercentDone', false);
   // Mindfulness & ABC (M1)
   const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
     enablePrompts: true,
@@ -202,6 +205,8 @@ export default function LifeEvaluationTool() {
     setYesterdaysPhoneUsage(eveningResponses.phoneUsage);
     setYesterdaysRoutines(dailyRoutines.map(routine => ({ ...routine, completed: false })));
     setYesterdaysDistractions(distractions); // Save current distractions as yesterday's
+    setYesterdaysOnePercentPlan(eveningResponses.onePercentPlan || '');
+    setYesterdaysOnePercentDone(!!onePercentDone);
     setEveningDone(true);
     setIsComplete(true);
   }
@@ -244,6 +249,7 @@ export default function LifeEvaluationTool() {
         setEveningDone(false);
         // Reset distractions when resetting evening tab since they are daily
         setDistractions([]);
+        setOnePercentDone(false);
       }
     } catch (error) {
       setIsRunning(false);
@@ -254,6 +260,7 @@ export default function LifeEvaluationTool() {
         setEveningDone(false);
         // Also reset distractions in error case
         setDistractions([]);
+        setOnePercentDone(false);
       }
     }
   }
@@ -285,6 +292,14 @@ export default function LifeEvaluationTool() {
   function handleEveningThoughtsChange(value) {
     if (eveningDone) return;
     setEveningResponses(prev => ({ ...prev, dayThoughts: value }));
+  }
+  function handleOnePercentPlanChange(value) {
+    if (eveningDone) return;
+    setEveningResponses(prev => ({ ...prev, onePercentPlan: value }));
+  }
+  function handleOnePercentLinkChange(value) {
+    if (eveningDone) return;
+    setEveningResponses(prev => ({ ...prev, onePercentLink: value }));
   }
   function handlePhoneUsageChange(value) {
     if (eveningDone) return;
@@ -375,7 +390,8 @@ export default function LifeEvaluationTool() {
     // Phone usage is valid if it's not empty and not "0m" (which means no time selected)
     const phoneUsage = (eveningResponses?.phoneUsage || '').trim();
     const phoneCount = phoneUsage !== '' && phoneUsage !== '0m' ? 1 : 0;
-    return goalCount + thoughtsCount + phoneCount;
+    const onePercentCount = (eveningResponses?.onePercentPlan || '').trim() !== '' ? 1 : 0;
+    return goalCount + thoughtsCount + phoneCount + onePercentCount;
   }
   function copyToClipboard(isEvening = false) {
     const exportText = generateExportText({
@@ -402,7 +418,9 @@ export default function LifeEvaluationTool() {
       anxietyRatings,
       weeklyAdjustments,
       appUsageByDate,
-      sessions
+      sessions,
+      yesterdaysOnePercentPlan,
+      yesterdaysOnePercentDone
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -543,6 +561,10 @@ export default function LifeEvaluationTool() {
           pauseSeconds={mindfulnessSettings.pauseSec}
           distractions={distractions}
           firstHour={eveningResponses.firstHour}
+          onePercentPlan={eveningResponses.onePercentPlan}
+          onePercentLink={eveningResponses.onePercentLink}
+          onePercentDone={onePercentDone}
+          onToggleOnePercentDone={() => setOnePercentDone(prev => !prev)}
           goals={todaysGoals}
           onToggleGoal={handleGoalToggle}
           todaysTodos={todaysTodos}
@@ -564,13 +586,13 @@ export default function LifeEvaluationTool() {
         onReset={handleReset}
         onMarkEveningDone={markEveningDone}
         canResume={!isRunning && timeLeft < 120 && !eveningDone}
-        canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 5}
+        canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 6}
       />
       <div className="text-sm text-gray-600 mb-8">
         {activeTab === 'morning' ? (
           <>Progress: {getMorningCompletionCount()}/{lifeAreas.length + 3} items completed</>
         ) : (
-          <>Progress: {getEveningCompletionCount()}/5 items completed {eveningDone && <span className="text-green-600 font-semibold">✓ Locked</span>}</>
+          <>Progress: {getEveningCompletionCount()}/6 items completed {eveningDone && <span className="text-green-600 font-semibold">✓ Locked</span>}</>
         )}
       </div>
       {/* Morning Tab Content */}
@@ -584,6 +606,15 @@ export default function LifeEvaluationTool() {
             defaultExpanded={false}
           >
             <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
+            {yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim() !== '' && (
+              <div className="mb-4 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50">
+                <div className="text-sm text-emerald-900 font-semibold mb-1">📈 Yesterday's 1% Learning</div>
+                <div className="flex items-center gap-2 text-sm text-emerald-900">
+                  <span className="text-base">{yesterdaysOnePercentDone ? '✅' : '⏳'}</span>
+                  <span>{yesterdaysOnePercentPlan}</span>
+                </div>
+              </div>
+            )}
             {(() => {
               const secs = getUsageSecondsFor(new Date(Date.now() - 24 * 3600 * 1000));
               if (secs <= 0) return null;
@@ -719,7 +750,9 @@ export default function LifeEvaluationTool() {
                 replacementAttempts,
                 environmentApplications,
                 anxietyRatings
-                ,sessions
+                ,sessions,
+                yesterdaysOnePercentPlan,
+                yesterdaysOnePercentDone
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/u/0/"
@@ -757,6 +790,8 @@ export default function LifeEvaluationTool() {
             eveningResponses={eveningResponses}
             onGoalChange={handleEveningGoalChange}
             onFirstHourChange={handleFirstHourChange}
+            onOnePercentPlanChange={handleOnePercentPlanChange}
+            onOnePercentLinkChange={handleOnePercentLinkChange}
             editable={!eveningDone}
           />
           {/* Tomorrow's Todos (Evening planning) — uses the same list, only cleared by evening reset */}
@@ -891,6 +926,8 @@ export default function LifeEvaluationTool() {
         onClose={() => setIsResetConfirmOpen(false)}
         todaysGoals={todaysGoals}
         todaysTodos={todaysTodos}
+        onePercentPlan={eveningResponses.onePercentPlan}
+        onePercentDone={onePercentDone}
         onConfirm={(localStatuses) => {
           setIsResetConfirmOpen(false);
           // apply completion statuses before reset
@@ -904,6 +941,10 @@ export default function LifeEvaluationTool() {
           // reflect todos in yesterday's
           const updatedTodos = (todaysTodos || []).map((t, idx) => ({ ...t, completed: !!(localStatuses.todos?.[idx]?.completed) }));
           setYesterdaysTodos(updatedTodos);
+          // persist 1% done and carry plan to yesterday for morning export
+          setOnePercentDone(!!localStatuses.onePercentDone);
+          setYesterdaysOnePercentPlan(eveningResponses.onePercentPlan || '');
+          setYesterdaysOnePercentDone(!!localStatuses.onePercentDone);
           // also set today's goals state so UI reflects prior to reset
           setTodaysGoals(updatedGoals);
           // Clear today's/tomorrow's shared todos only on evening reset

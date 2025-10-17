@@ -31,6 +31,10 @@ export default function TodayActionHub({
   pauseSeconds = 90,
   distractions = [],
   firstHour,
+  onePercentPlan,
+  onePercentLink,
+  onePercentDone,
+  onToggleOnePercentDone,
   goals,
   onToggleGoal,
   todaysTodos = [],
@@ -172,6 +176,30 @@ export default function TodayActionHub({
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h3 className="text-sm font-semibold text-blue-800 mb-1">First Hour Activity/Task</h3>
           <div className="p-3 bg-white border border-blue-300 rounded">{firstHour}</div>
+        </div>
+      )}
+
+      {/* 1% Better Learning Prompt */}
+      {onePercentPlan && onePercentPlan.trim() && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-emerald-800 mb-1">📈 1% Better Today (15–30 min)</h3>
+              <div className="p-3 bg-white border border-emerald-300 rounded text-sm">
+                {onePercentPlan}
+                {onePercentLink && (
+                  <div className="mt-2">
+                    <a href={onePercentLink} target="_blank" rel="noreferrer" className="text-emerald-700 underline">Open link</a>
+                  </div>
+                )}
+              </div>
+              <div className="mt-2 text-xs text-emerald-900">Aim to be 1% better than yesterday. Quick, specific, and doable.</div>
+            </div>
+            <label className="flex items-center gap-2 text-sm text-emerald-900">
+              <input type="checkbox" checked={!!onePercentDone} onChange={onToggleOnePercentDone} />
+              Done
+            </label>
+          </div>
         </div>
       )}
 

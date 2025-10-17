@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlarmClock } from 'lucide-react';
 
-export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFirstHourChange, editable = true }) {
+export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFirstHourChange, onOnePercentPlanChange, onOnePercentLinkChange, editable = true }) {
   return (
     <div className="bg-purple-50 rounded-lg p-6 mb-8">
       <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
@@ -16,6 +16,30 @@ export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFi
             placeholder="What will you do in your first hour tomorrow?"
             className={`w-full p-3 border border-blue-300 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
+        </div>
+      </div>
+      <div className="mb-6 p-4 border-2 border-emerald-500 bg-emerald-50 rounded">
+        <div className="flex items-start gap-4">
+          <div className="flex-1">
+            <label className="block text-base font-semibold text-emerald-800 mb-1">📈 1% Better Learning (15–30 min)</label>
+            <input
+              type="text"
+              value={eveningResponses.onePercentPlan || ''}
+              onChange={e => editable && onOnePercentPlanChange && onOnePercentPlanChange(e.target.value)}
+              disabled={!editable}
+              placeholder="E.g., Read Chapter 2 of Atomic Habits, or Watch: https://…"
+              className={`w-full p-3 border border-emerald-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            />
+            <input
+              type="url"
+              value={eveningResponses.onePercentLink || ''}
+              onChange={e => editable && onOnePercentLinkChange && onOnePercentLinkChange(e.target.value)}
+              disabled={!editable}
+              placeholder="Optional link (YouTube, podcast, article)"
+              className={`mt-2 w-full p-3 border border-emerald-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            />
+            <p className="mt-2 text-xs text-emerald-900">Keep it specific and short. Something you can finish over breakfast or on the bus.</p>
+          </div>
         </div>
       </div>
       <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Tomorrow's 3 Main Goals</h3>
