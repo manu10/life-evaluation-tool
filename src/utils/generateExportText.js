@@ -94,7 +94,8 @@ export function generateExportText({
   appUsageByDate = {},
   sessions = [],
   yesterdaysOnePercentPlan = '',
-  yesterdaysOnePercentDone = false
+  yesterdaysOnePercentDone = false,
+  missedAdjustments = []
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -278,6 +279,17 @@ export function generateExportText({
     if (yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim()) {
       const status = yesterdaysOnePercentDone ? '✅' : '⏳';
       exportText += `📈 Yesterday's 1% Learning: ${status} ${yesterdaysOnePercentPlan}\n\n`;
+    }
+
+    if (Array.isArray(missedAdjustments) && missedAdjustments.length > 0) {
+      exportText += `🛠️ Missed items & adjustments:\n`;
+      missedAdjustments.forEach((it, idx) => {
+        const why = (it.causes && it.causes.length) ? ` — Why: ${it.causes.join(', ')}` : '';
+        const next = (it.counters && it.counters.length) ? ` — Next: ${it.counters.join(', ')}` : '';
+        const note = it.note ? ` — ${it.note}` : '';
+        exportText += `   ${idx+1}. ${it.text}${why}${next}${note}\n`;
+      });
+      exportText += `\n`;
     }
 
     // Yesterday's day thoughts if available

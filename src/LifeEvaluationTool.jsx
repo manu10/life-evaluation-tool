@@ -102,6 +102,7 @@ export default function LifeEvaluationTool() {
   const [replacementAttempts, setReplacementAttempts] = usePersistentState('replacementAttempts', []);
   const [anxietyRatings, setAnxietyRatings] = usePersistentState('anxietyRatings', []);
   const [weeklyAdjustments, setWeeklyAdjustments] = usePersistentState('weeklyAdjustments', []);
+  const [missedAdjustments, setMissedAdjustments] = usePersistentState('missedAdjustments', []);
   const [linkedDistractionId, setLinkedDistractionId] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
@@ -420,7 +421,8 @@ export default function LifeEvaluationTool() {
       appUsageByDate,
       sessions,
       yesterdaysOnePercentPlan,
-      yesterdaysOnePercentDone
+      yesterdaysOnePercentDone,
+      missedAdjustments
     });
     if (isEvening) markEveningDone();
     else setMorningCopied(true); // Mark morning content as copied
@@ -724,6 +726,21 @@ export default function LifeEvaluationTool() {
           />
           {/* What worked today */}
           <WhatWorkedToday microLogs={microPracticeLogs} />
+          {Array.isArray(missedAdjustments) && missedAdjustments.length > 0 && (
+            <div className="mb-6 p-4 rounded-lg border-2 border-amber-400 bg-amber-50">
+              <h3 className="text-base font-semibold text-amber-900 mb-2">Adjustments from yesterday’s misses</h3>
+              <ul className="list-disc ml-5 space-y-1 text-sm text-amber-900">
+                {missedAdjustments.map((it, idx) => (
+                  <li key={idx}>
+                    <span className="font-medium">{it.text}</span>
+                    {it.counters?.length ? <span> — Next: {it.counters.join(', ')}</span> : null}
+                    {it.causes?.length ? <span> — Why: {it.causes.join(', ')}</span> : null}
+                    {it.note ? <span> — {it.note}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {getMorningCompletionCount() > 0 && (
             <SummaryPanel
               title="Morning Summary"
@@ -947,6 +964,33 @@ export default function LifeEvaluationTool() {
           setYesterdaysOnePercentDone(!!localStatuses.onePercentDone);
           // also set today's goals state so UI reflects prior to reset
           setTodaysGoals(updatedGoals);
+          // collect missed adjustments
+          try {
+            const items = [];
+            [1,2,3].forEach(n => {
+              const key = `goal${n}`;
+              const text = todaysGoals?.[key]?.text || '';
+              if (text && !localStatuses[key]) {
+                items.push({ type: 'goal', text, causes: localStatuses[`${key}Meta`]?.causes || [], counters: localStatuses[`${key}Meta`]?.counters || [], note: localStatuses[`${key}Meta`]?.note || '', carry: !!localStatuses[`${key}Meta`]?.carry });
+              }
+            });
+            (todaysTodos || []).forEach((t, idx) => {
+              if (!localStatuses.todos?.[idx]?.completed) {
+                const meta = localStatuses.todosMeta?.[idx] || {};
+                items.push({ type: 'todo', text: t.text, causes: meta.causes || [], counters: meta.counters || [], note: meta.note || '', carry: !!meta.carry });
+              }
+            });
+            if ((eveningResponses.onePercentPlan || '').trim() && !localStatuses.onePercentDone) {
+              const meta = localStatuses.onePercentMeta || {};
+              items.push({ type: 'onePercent', text: eveningResponses.onePercentPlan, causes: meta.causes || [], counters: meta.counters || [], note: meta.note || '', carry: !!meta.carry });
+            }
+            if (items.length > 0) setMissedAdjustments(items);
+            // carry-forward to tomorrow's todos if selected
+            const carryTodos = items.filter(it => it.carry && it.text).map(it => ({ id: Date.now() + Math.random(), text: it.text, completed: false }));
+            if (carryTodos.length > 0) {
+              setTodaysTodos(carryTodos.slice(0, 5));
+            }
+          } catch {}
           // Clear today's/tomorrow's shared todos only on evening reset
           setTodaysTodos([]);
           // continue with reset flow
