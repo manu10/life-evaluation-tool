@@ -144,6 +144,21 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
+      {/* Invest Settings */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-800">Invest Settings</h3>
+          <p className="text-sm text-gray-600 mt-1">Caps reading time to avoid endless research; keep docs as source of truth.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <NumberField
+            label="Reading cap (minutes/day)"
+            value={mindfulnessSettings?.investReadingCapMin ?? 0}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, investReadingCapMin: Math.max(0, v) })}
+          />
+        </div>
+      </div>
+
       {/* Replacement Actions Editor */}
       <ReplacementActions
         actions={replacementActions || []}

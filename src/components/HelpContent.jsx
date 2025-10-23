@@ -46,6 +46,17 @@ export default function HelpContent() {
         </List>
       </Section>
 
+      <Divider />
+
+      <Section title="Invest decisions" icon="📈">
+        <List>
+          <Item>🟢 <strong>Buy</strong>: You’re committing to a position. Save 2–3 reasons, top risk, and a premortem. Add triggers to revisit. Link to your Google Doc.</Item>
+          <Item>🟡 <strong>Track</strong>: Not buying now. Define what you need to see (conditions) and a review date. Keep the doc link handy.</Item>
+          <Item>🔴 <strong>Pass</strong>: You’re archiving the idea. Log a clear reason (kill‑criteria) so you learn from it later.</Item>
+          <Item>🗒️ <strong>Decision Log</strong>: Each decision is stored with reasons/risks/premortem. Use “Copy” for one entry or “Export all” to paste into your Google Doc.</Item>
+        </List>
+      </Section>
+
       <Tips />
     </div>
   );

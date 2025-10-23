@@ -115,6 +115,12 @@ export default function LifeEvaluationTool() {
   const [sessions, setSessions] = usePersistentState('sessions', []);
   const [liveSession, setLiveSession] = useState(null);
 
+  // Invest: Opportunities, Sprints, Decisions, Reading usage
+  const [investOpportunities, setInvestOpportunities] = usePersistentState('investOpportunities', []);
+  const [investSprints, setInvestSprints] = usePersistentState('investSprints', []);
+  const [investDecisions, setInvestDecisions] = usePersistentState('investDecisions', []);
+  const [investReadingUsageByDate, setInvestReadingUsageByDate] = usePersistentState('investReadingUsageByDate', {});
+
   // Sync Areas Reflection into classic morningResponses for unified export structure
   useEffect(() => {
     if (mindfulnessSettings?.morningMode !== 'areasReflection') return;
@@ -943,7 +949,49 @@ export default function LifeEvaluationTool() {
         </div>
       )}
       {activeTab === 'invest' && (
-        <InvestTab />
+        <InvestTab
+          opportunities={investOpportunities}
+          decisions={investDecisions}
+          onCopyDecision={(d) => {
+            const opp = investOpportunities.find(o => o.id === d.opportunityId);
+            const snippet = `Decision: ${d.type.toUpperCase()}\nOpportunity: ${opp?.title || ''}\nDate: ${new Date(d.decidedAt).toLocaleString()}\nReasons: ${(d.reasons||[]).join(', ') || '-'}\nRisk: ${d.risk || '-'}\nPremortem: ${d.premortem || '-'}`;
+            try { navigator.clipboard.writeText(snippet); alert('Copied decision snippet'); } catch {}
+          }}
+          onAddOpportunity={({ title, docUrl, tagId }) => {
+            const item = { id: Date.now().toString(), title, docUrl, tagId: tagId || null, status: 'Backlog', createdAt: Date.now(), timeSpentSec: 0 };
+            setInvestOpportunities(prev => [item, ...prev]);
+          }}
+          onUpdateOpportunity={(id, partial) => {
+            setInvestOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...partial } : o));
+          }}
+          onDeleteOpportunity={(id) => {
+            setInvestOpportunities(prev => prev.filter(o => o.id !== id));
+          }}
+          onStartSprint={(id, kind) => {
+            // Reading usage enforcement: soft cap
+            const todayISO = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toISOString().slice(0,10);
+            const settingsCap = mindfulnessSettings?.investReadingCapMin ?? 0;
+            const usedMin = Math.floor((investReadingUsageByDate?.[todayISO] || 0)/60);
+            if (kind === 'reading' && settingsCap > 0 && usedMin >= settingsCap) {
+              const ok = window.confirm(`Reading cap reached (${usedMin}/${settingsCap} min). Use a 10m joker?`);
+              if (!ok) return;
+              // allow 10 more minutes implicitly
+            }
+            setActiveTab('sessions');
+            setIsStartSessionOpen(true);
+            const opp = investOpportunities.find(o => o.id === id);
+            if (opp) setHooks(prev => [{ id: `opp-${id}`, label: `Opp: ${opp.title}`, type: 'invest' }, ...prev]);
+          }}
+          onDecide={(id, payload) => {
+            const opp = investOpportunities.find(o => o.id === id);
+            if (!opp || !payload) return;
+            const dec = { id: Date.now().toString(), opportunityId: id, type: payload.type, reasons: payload.reasons || [], risk: payload.risk || '', premortem: payload.premortem || '', decidedAt: Date.now() };
+            setInvestDecisions(prev => [dec, ...prev]);
+            setInvestOpportunities(prev => prev.map(o => o.id === id ? { ...o, status: 'Decided' } : o));
+          }}
+          readingUsedMin={Math.floor(((() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return investReadingUsageByDate?.[iso] || 0; })())/60)}
+          readingCapMin={mindfulnessSettings?.investReadingCapMin ?? 0}
+        />
       )}
       {/* Settings Tab Content */}
       {activeTab === 'settings' && (
