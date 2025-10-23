@@ -249,7 +249,14 @@ function OppCard({ o, column = 'Backlog', collapsed = false, tags = [], onAssign
           <DecideModal onClose={() => setShowDecide(false)} onSubmit={(payload) => { setShowDecide(false); onDecide && onDecide(o.id, payload); }} />
         )}
         {showEdit && (
-          <EditOppModal o={o} onClose={() => setShowEdit(false)} onSave={(partial) => { onUpdate && onUpdate(o.id, partial); setShowEdit(false); }} />
+          <EditOppModal
+            o={o}
+            tags={tags}
+            onClose={() => setShowEdit(false)}
+            onSave={(partial) => { onUpdate && onUpdate(o.id, partial); setShowEdit(false); }}
+            onAssignTag={(tagId) => onAssignTag && onAssignTag(o.id, tagId)}
+            onCreateTag={onCreateTag}
+          />
         )}
         {showTagPicker && (
           <TagPickerModal
@@ -369,8 +376,11 @@ function OppCard({ o, column = 'Backlog', collapsed = false, tags = [], onAssign
       {showEdit && (
         <EditOppModal
           o={o}
+          tags={tags}
           onClose={() => setShowEdit(false)}
           onSave={(partial) => { onUpdate && onUpdate(o.id, partial); setShowEdit(false); }}
+          onAssignTag={(tagId) => onAssignTag && onAssignTag(o.id, tagId)}
+          onCreateTag={onCreateTag}
         />
       )}
       {showTagPicker && (
@@ -435,11 +445,12 @@ function formatDecision(opportunities, d) {
   return [header, reasons && `Reasons:\n${reasons}`, risk, prem, doc].filter(Boolean).join('\n');
 }
 
-function EditOppModal({ o, onClose, onSave }) {
+function EditOppModal({ o, tags = [], onClose, onSave, onAssignTag, onCreateTag }) {
   const [draft, setDraft] = React.useState(() => ({
     title: o.title || '',
     docUrl: o.docUrl || '',
     tag: o.tag || '',
+    tagId: o.tagId || null,
     thesis: o.thesis || '',
     nextAction: o.nextAction || '',
     conviction: o.conviction ?? 3,
@@ -463,10 +474,14 @@ function EditOppModal({ o, onClose, onSave }) {
             </label>
             <label className="block text-sm text-gray-700">Tag
               <div className="mt-1 flex items-center gap-2">
+                <select className="p-2 border border-gray-300 rounded text-xs" value={draft.tagId || 'none'} onChange={e => setDraft({ ...draft, tagId: e.target.value === 'none' ? null : e.target.value })}>
+                  <option value="none">No tag</option>
+                  {tags.map(t => (
+                    <option key={t.id} value={t.id}>{`${t.emoji || ''} ${t.label}`.trim()}</option>
+                  ))}
+                </select>
                 {renderTagPill(tags || [], { tagId: draft.tagId, tag: draft.tag }, true)}
-                <button className="px-2 py-1 rounded border border-gray-300 text-xs" onClick={(e) => { e.preventDefault(); setDraft(prev => prev); }}>Select via card</button>
               </div>
-              <div className="text-[11px] text-gray-500 mt-1">Tip: use Tag… on the card to assign or create tags.</div>
             </label>
           </div>
           <label className="block text-sm text-gray-700">Thesis
