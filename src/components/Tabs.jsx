@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, CheckCircle, Brain, Settings, Zap, Target } from 'lucide-react';
+import { Sun, Moon, CheckCircle, Brain, Settings, Zap, Target, LineChart } from 'lucide-react';
 
 export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false }) {
   return (
@@ -57,6 +57,15 @@ export default function Tabs({ activeTab, setActiveTab, eveningDone, distraction
           Sessions
         </button>
       )}
+      <button
+        onClick={() => setActiveTab('invest')}
+        className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+          activeTab === 'invest' ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+        }`}
+      >
+        <LineChart className="w-5 h-5" />
+        Invest
+      </button>
       <button
         onClick={() => setActiveTab('settings')}
         className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${

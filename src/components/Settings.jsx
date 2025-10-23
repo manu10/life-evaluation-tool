@@ -46,6 +46,37 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
           <p className="text-sm text-gray-600 mt-1">Configure prompts and durations for micro‑interrupts.</p>
         </div>
         <div className="p-4 space-y-4">
+          <div className="pt-2 border-t border-gray-200">
+            <h4 className="text-md font-semibold text-gray-800 mb-2">Gratitude/Input Mode</h4>
+            <SelectField
+              label="Morning reflection mode"
+              value={mindfulnessSettings?.morningMode ?? 'classic'}
+              onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, morningMode: v })}
+              options={[
+                { value: 'classic', label: 'Classic: Gratitude + Life Areas grid' },
+                { value: 'areasReflection', label: 'Areas Reflection: gratitude + improvement per area' }
+              ]}
+            />
+            {mindfulnessSettings?.morningMode === 'areasReflection' && (
+              <NumberField
+                label="Minimum areas required"
+                value={mindfulnessSettings?.areasMinRequired ?? 2}
+                onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, areasMinRequired: Math.max(0, Math.min(7, v)) })}
+              />
+            )}
+            {mindfulnessSettings?.morningMode === 'areasReflection' && (
+              <SelectField
+                label="Areas interaction style"
+                value={mindfulnessSettings?.areasStyle ?? 'unfold'}
+                onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, areasStyle: v })}
+                options={[
+                  { value: 'unfold', label: 'Tap‑to‑unfold cards' },
+                  { value: 'inline', label: 'Inline chip cascade' },
+                  { value: 'focus', label: 'Focus mode carousel' }
+                ]}
+              />
+            )}
+          </div>
           <Toggle
             label="Enable prompts after tracking a distraction"
             checked={!!mindfulnessSettings?.enablePrompts}

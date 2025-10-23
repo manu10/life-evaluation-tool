@@ -7,6 +7,8 @@ import Timer from './components/Timer';
 import Tabs from './components/Tabs';
 import GoalsList from './components/GoalsList';
 import LifeAreasGrid from './components/LifeAreasGrid';
+import LifeAreasReflection from './components/LifeAreasReflection';
+import InvestTab from './components/InvestTab';
 import SummaryPanel from './components/SummaryPanel';
 import DayThoughtsPanel from './components/DayThoughtsPanel';
 import EveningGoalsInput from './components/EveningGoalsInput';
@@ -63,6 +65,7 @@ export default function LifeEvaluationTool() {
   const [hasUsedExtraTime, setHasUsedExtraTime] = useState(false);
   const [morningCopied, setMorningCopied] = usePersistentState('morningCopied', false);
   const [morningResponses, setMorningResponses] = usePersistentState('morningResponses', defaultMorningResponses);
+  const [areasReflections, setAreasReflections] = usePersistentState('areasReflections', {});
   const [eveningResponses, setEveningResponses] = usePersistentState('eveningResponses', defaultEveningResponses);
   const [todaysGoals, setTodaysGoals] = usePersistentState('todaysGoals', defaultGoals);
   const [yesterdaysGoals, setYesterdaysGoals] = usePersistentState('yesterdaysGoals', defaultGoals);
@@ -111,6 +114,23 @@ export default function LifeEvaluationTool() {
   const [hooks, setHooks] = usePersistentState('hooks', []);
   const [sessions, setSessions] = usePersistentState('sessions', []);
   const [liveSession, setLiveSession] = useState(null);
+
+  // Sync Areas Reflection into classic morningResponses for unified export structure
+  useEffect(() => {
+    if (mindfulnessSettings?.morningMode !== 'areasReflection') return;
+    const mapped = lifeAreas.reduce((acc, area) => {
+      const ref = areasReflections?.[area] || {};
+      const parts = [];
+      if (ref.grateful && String(ref.grateful).trim()) parts.push(`Grateful: ${ref.grateful}`);
+      if (ref.improve && String(ref.improve).trim()) parts.push(`Improve: ${ref.improve}`);
+      acc[area] = {
+        feeling: ref.feeling || '',
+        notes: parts.join(' | ')
+      };
+      return acc;
+    }, {});
+    setMorningResponses(mapped);
+  }, [areasReflections, mindfulnessSettings?.morningMode, lifeAreas]);
 
   // Timer effect
   useEffect(() => {
@@ -237,6 +257,7 @@ export default function LifeEvaluationTool() {
         setMorningResponses(defaultMorningResponses);
         setYesterdaysGratitude(gratitude);
         setGratitude(defaultGratitude);
+        setAreasReflections({});
         setTodaysGoals(prev => ({
           goal1: { text: prev.goal1.text, completed: false },
           goal2: { text: prev.goal2.text, completed: false },
@@ -262,6 +283,8 @@ export default function LifeEvaluationTool() {
         // Also reset distractions in error case
         setDistractions([]);
         setOnePercentDone(false);
+      } else if (activeTab === 'morning') {
+        setAreasReflections({});
       }
     }
   }
@@ -377,9 +400,20 @@ export default function LifeEvaluationTool() {
     autoStartTimer();
   }
   function getMorningCompletionCount() {
-    const lifeAreasCount = Object.values(morningResponses).filter(r => r.feeling !== '').length;
-    const gratitudeCount = Object.values(gratitude).filter(item => item.trim() !== '').length;
-    return lifeAreasCount + gratitudeCount;
+    if (mindfulnessSettings?.morningMode === 'areasReflection') {
+      // feelings required for all areas; plus minRequired for content
+      const feelingsOk = lifeAreas.every(a => (areasReflections?.[a]?.feeling || '').trim() !== '');
+      const minReq = mindfulnessSettings?.areasMinRequired ?? 2;
+      const contentCount = lifeAreas.filter(a => {
+        const r = areasReflections?.[a];
+        return !!(r && ((r.grateful && r.grateful.trim()) || (r.improve && r.improve.trim())));
+      }).length;
+      return (feelingsOk ? lifeAreas.length : 0) + Math.min(contentCount, minReq);
+    } else {
+      const lifeAreasCount = Object.values(morningResponses).filter(r => r.feeling !== '').length;
+      const gratitudeCount = Object.values(gratitude).filter(item => item.trim() !== '').length;
+      return lifeAreasCount + gratitudeCount;
+    }
   }
   function getEveningCompletionCount() {
     const goalCount = [
@@ -688,13 +722,24 @@ export default function LifeEvaluationTool() {
             />
           </div>
           
-          {/* Daily Gratitude */}
-          <GratitudeInput
-            gratitude={gratitude}
-            onGratitudeChange={handleGratitudeChange}
-            editable={true}
-            yesterdaysGratitude={yesterdaysGratitude}
-          />
+          {/* Reflection Mode */}
+          {mindfulnessSettings?.morningMode === 'areasReflection' ? (
+            <LifeAreasReflection
+              lifeAreas={lifeAreas}
+              reflections={areasReflections}
+              onChange={setAreasReflections}
+              minRequired={mindfulnessSettings?.areasMinRequired ?? 2}
+              onAnyChange={autoStartTimer}
+              style={mindfulnessSettings?.areasStyle ?? 'unfold'}
+            />
+          ) : (
+            <GratitudeInput
+              gratitude={gratitude}
+              onGratitudeChange={handleGratitudeChange}
+              editable={true}
+              yesterdaysGratitude={yesterdaysGratitude}
+            />
+          )}
 
           {/* Optional Todos */}
           <TodosList
@@ -705,14 +750,16 @@ export default function LifeEvaluationTool() {
             editable={true}
           />
           
-          <LifeAreasGrid
-            lifeAreas={lifeAreas}
-            morningResponses={morningResponses}
-            setMorningResponses={setMorningResponses}
-            feelingOptions={feelingOptions}
-            editable={true}
-            onAnyChange={autoStartTimer}
-          />
+          {mindfulnessSettings?.morningMode !== 'areasReflection' && (
+            <LifeAreasGrid
+              lifeAreas={lifeAreas}
+              morningResponses={morningResponses}
+              setMorningResponses={setMorningResponses}
+              feelingOptions={feelingOptions}
+              editable={true}
+              onAnyChange={autoStartTimer}
+            />
+          )}
           {/* ABC Highlights (today) */}
           <ABCHighlights logs={abcLogs} onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }} />
           {/* Environment Checklist Today */}
@@ -894,6 +941,9 @@ export default function LifeEvaluationTool() {
             }}
           />
         </div>
+      )}
+      {activeTab === 'invest' && (
+        <InvestTab />
       )}
       {/* Settings Tab Content */}
       {activeTab === 'settings' && (
