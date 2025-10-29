@@ -60,12 +60,12 @@ export default function TodosList({
                 disabled={!editable}
                 className="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
               />
-              <span className={`text-gray-800 ${todo.completed ? 'line-through text-gray-500' : ''}`}>{todo.text}</span>
+              <span className={`text-gray-800 dark:text-gray-100 ${todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : ''}`}>{todo.text}</span>
             </label>
             {editable && (
               <button
                 onClick={() => onRemove && onRemove(todo.id)}
-                className="text-xs text-gray-600 hover:text-red-600"
+                className="text-xs text-gray-600 dark:text-gray-400 hover:text-red-600"
                 title="Remove todo"
               >
                 Remove

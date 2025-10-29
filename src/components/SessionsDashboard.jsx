@@ -13,10 +13,10 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
     .sort((a,b)=>b.startedAt-a.startedAt);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-gray-900 dark:text-gray-100">
       {/* Summary */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Summary</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Tile label="Total minutes" value={`${totalMin}m`} />
           <Tile label="Sessions" value={`${sessions.length}`} />
@@ -28,8 +28,8 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
       </div>
 
       {/* Time by hook */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Time by hook</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Time by hook</h3>
         <HookBars grouped={grouped} />
       </div>
 
@@ -47,13 +47,13 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
             const sessionsByDay = groupByDay(latest);
             const open = cardOpen[hookKey] ?? true;
             return (
-              <div key={hookKey} className={`bg-white border ${palette.border} rounded-lg`}>
-                <div className={`px-4 py-3 flex items-center justify-between ${palette.headerBg}`}>
+          <div key={hookKey} className={`bg-white dark:bg-gray-800 border ${palette.border.replace('border-','dark:border-').replace('200','700')} ${palette.border} rounded-lg`}>
+                <div className={`px-4 py-3 flex items-center justify-between ${palette.headerBg} ${toDarkBg(palette.headerBg)}`}>
                   <div className="flex items-center gap-2">
                     <span className="text-xl" aria-hidden>{grouped.emojis[hookKey] || '🎯'}</span>
                     <div>
-                      <div className={`font-semibold ${palette.headerText}`}>{grouped.labels[hookKey]}</div>
-                      <div className="text-xs text-gray-600">{grouped.totals[hookKey] || 0}m • {items.length} sessions{!isNaN(hookEnjoy)?` • Avg enjoy ${hookEnjoy}/5`:''}</div>
+                      <div className={`font-semibold ${palette.headerText} ${toDarkText(palette.headerText)}`}>{grouped.labels[hookKey]}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{grouped.totals[hookKey] || 0}m • {items.length} sessions{!isNaN(hookEnjoy)?` • Avg enjoy ${hookEnjoy}/5`:''}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
                       color={grouped.colors[hookKey]}
                       onUpdate={(partial) => onUpdateHook && onUpdateHook(hookKey, partial)}
                     />
-                    <button onClick={() => setCardOpen(o => ({ ...o, [hookKey]: !open }))} className="p-1 rounded border border-gray-300 bg-white hover:bg-gray-50" aria-label={open?'Collapse':'Expand'}>
+                    <button onClick={() => setCardOpen(o => ({ ...o, [hookKey]: !open }))} className="p-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700" aria-label={open?'Collapse':'Expand'}>
                       {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     </button>
                   </div>
@@ -77,19 +77,19 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
                         const key = `${hookKey}:${day}`;
                         const dayIsOpen = dayOpen[key] ?? (idx === 0);
                         return (
-                          <div key={day} className="border border-gray-200 rounded">
-                            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer" onClick={() => setDayOpen(o => ({ ...o, [key]: !dayIsOpen }))}>
+                          <div key={day} className="border border-gray-200 dark:border-gray-700 rounded">
+                            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 cursor-pointer" onClick={() => setDayOpen(o => ({ ...o, [key]: !dayIsOpen }))}>
                               <div className="flex items-center gap-2">
-                                {dayIsOpen ? <ChevronDown className="w-4 h-4 text-gray-600" /> : <ChevronRight className="w-4 h-4 text-gray-600" />}
-                                <div className="text-xs text-gray-700">{day}</div>
+                                {dayIsOpen ? <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-300" /> : <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />}
+                                <div className="text-xs text-gray-700 dark:text-gray-300">{day}</div>
                               </div>
                             </div>
                             {dayIsOpen && (
                               <div className="px-3 py-2 space-y-1">
                                 {arr.map(s => (
-                                  <div key={s.id} className="text-sm text-gray-800 flex items-center justify-between">
+                                  <div key={s.id} className="text-sm text-gray-800 dark:text-gray-100 flex items-center justify-between">
                                     <span>{formatTimeOnly(s.startedAt)} • {s.questTitle || '—'}</span>
-                                    <span className="text-gray-600">{s.minutes || 0}m{s.enjoyment!=null?` • Enjoy ${s.enjoyment}/5`:''}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">{s.minutes || 0}m{s.enjoyment!=null?` • Enjoy ${s.enjoyment}/5`:''}</span>
                                   </div>
                                 ))}
                               </div>
@@ -101,23 +101,23 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
                     {/* Highlights within hook — grouped by day (collapsible per day) */}
                     {hookHighlights.length > 0 && (
                       <div className="px-4 pb-3">
-                        <div className="text-xs font-semibold text-gray-700 mb-1">Highlights by day</div>
+                        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Highlights by day</div>
                         <div className="space-y-2">
                           {Object.entries(groupByDay(hookHighlights)).map(([day, arr]) => {
                             const key = `${hookKey}:H:${day}`;
                             const dayIsOpen = dayOpen[key] ?? false;
                             return (
-                              <div key={day} className="border border-gray-200 rounded">
-                                <div className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer" onClick={() => setDayOpen(o => ({ ...o, [key]: !dayIsOpen }))}>
+                              <div key={day} className="border border-gray-200 dark:border-gray-700 rounded">
+                                <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 cursor-pointer" onClick={() => setDayOpen(o => ({ ...o, [key]: !dayIsOpen }))}>
                                   <div className="flex items-center gap-2">
-                                    {dayIsOpen ? <ChevronDown className="w-4 h-4 text-gray-600" /> : <ChevronRight className="w-4 h-4 text-gray-600" />}
-                                    <div className="text-xs text-gray-700">{day}</div>
+                                    {dayIsOpen ? <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-300" /> : <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />}
+                                    <div className="text-xs text-gray-700 dark:text-gray-300">{day}</div>
                                   </div>
                                 </div>
                                 {dayIsOpen && (
                                   <ul className="list-disc pl-5 py-2 pr-3 space-y-1">
                                     {arr.map(h => (
-                                      <li key={`hc-${h.id}`} className="text-sm text-gray-800">{h.highlight}</li>
+                                      <li key={`hc-${h.id}`} className="text-sm text-gray-800 dark:text-gray-100">{h.highlight}</li>
                                     ))}
                                   </ul>
                                 )}
@@ -140,11 +140,51 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
   );
 }
 
+function toDarkBg(lightBg) {
+  // Map bg-*-50 to dark translucent 900/20
+  if (!lightBg) return '';
+  return lightBg
+    .replace('bg-emerald-50', 'dark:bg-emerald-900/20')
+    .replace('bg-blue-50', 'dark:bg-blue-900/20')
+    .replace('bg-purple-50', 'dark:bg-purple-900/20')
+    .replace('bg-amber-50', 'dark:bg-amber-900/20')
+    .replace('bg-rose-50', 'dark:bg-rose-900/20')
+    .replace('bg-indigo-50', 'dark:bg-indigo-900/20')
+    .replace('bg-teal-50', 'dark:bg-teal-900/20')
+    .replace('bg-orange-50', 'dark:bg-orange-900/20');
+}
+
+function toDarkText(lightText) {
+  if (!lightText) return '';
+  return lightText
+    .replace('text-emerald-900', 'dark:text-emerald-200')
+    .replace('text-blue-900', 'dark:text-blue-200')
+    .replace('text-purple-900', 'dark:text-purple-200')
+    .replace('text-amber-900', 'dark:text-amber-200')
+    .replace('text-rose-900', 'dark:text-rose-200')
+    .replace('text-indigo-900', 'dark:text-indigo-200')
+    .replace('text-teal-900', 'dark:text-teal-200')
+    .replace('text-orange-900', 'dark:text-orange-200');
+}
+
+function toDarkBarBg(light) {
+  if (!light) return '';
+  return light
+    .replace('bg-emerald-100', 'dark:bg-emerald-900/40')
+    .replace('bg-blue-100', 'dark:bg-blue-900/40')
+    .replace('bg-purple-100', 'dark:bg-purple-900/40')
+    .replace('bg-amber-100', 'dark:bg-amber-900/40')
+    .replace('bg-rose-100', 'dark:bg-rose-900/40')
+    .replace('bg-indigo-100', 'dark:bg-indigo-900/40')
+    .replace('bg-teal-100', 'dark:bg-teal-900/40')
+    .replace('bg-orange-100', 'dark:bg-orange-900/40');
+}
+
 function Tile({ label, value }) {
   return (
-    <div className="p-3 bg-white border border-gray-200 rounded-lg">
-      <div className="text-xs text-gray-600">{label}</div>
-      <div className="text-lg font-semibold text-gray-900">{value}</div>
+    <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div className="text-xs text-gray-600 dark:text-gray-400">{label}</div>
+      <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{value}</div>
     </div>
   );
 }
@@ -157,14 +197,14 @@ function HookBars({ grouped }) {
         const palette = getHookPalette(grouped.colors[k]);
         return (
           <div key={k} className="flex items-center gap-2">
-            <div className="w-40 text-sm text-gray-700 truncate">
+            <div className="w-40 text-sm text-gray-700 dark:text-gray-300 truncate">
               <span className="mr-1" aria-hidden>{grouped.emojis[k] || '🎯'}</span>
               {grouped.labels[k]}
             </div>
-            <div className={`flex-1 ${palette.barBg} h-3 rounded`}>
-              <div className={`h-3 ${palette.barFill} rounded`} style={{ width: `${Math.round(((grouped.totals[k]||0)/max)*100)}%` }} />
+            <div className={`flex-1 ${palette.barBg} ${toDarkBarBg(palette.barBg)} h-3 rounded`}>
+              <div className={`h-3 ${palette.barFill}`} style={{ width: `${Math.round(((grouped.totals[k]||0)/max)*100)}%` }} />
             </div>
-            <div className="w-16 text-right text-sm text-gray-700">{grouped.totals[k]||0}m</div>
+            <div className="w-16 text-right text-sm text-gray-700 dark:text-gray-300">{grouped.totals[k]||0}m</div>
           </div>
         );
       })}
