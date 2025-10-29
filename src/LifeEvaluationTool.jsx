@@ -120,6 +120,7 @@ export default function LifeEvaluationTool() {
   const [hooks, setHooks] = usePersistentState('hooks', []);
   const [sessions, setSessions] = usePersistentState('sessions', []);
   const [liveSession, setLiveSession] = useState(null);
+  const [sessionNow, setSessionNow] = useState(Date.now());
 
   // Invest: Opportunities, Sprints, Decisions, Reading usage
   const [investOpportunities, setInvestOpportunities] = usePersistentState('investOpportunities', []);
@@ -182,6 +183,13 @@ export default function LifeEvaluationTool() {
     }
     return () => clearInterval(interval);
   }, [isRunning, timeLeft, activeTab, eveningDone, hasUsedExtraTime]);
+
+  // Live session ticking timer (updates every second for toolbar display)
+  useEffect(() => {
+    if (!liveSession) return;
+    const id = setInterval(() => setSessionNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [liveSession]);
 
   // App usage tracking (time while tab visible and window focused)
   useEffect(() => {
@@ -527,15 +535,19 @@ export default function LifeEvaluationTool() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
       {/* Floating Toolbar - Context-sensitive based on active tab */}
-      {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (
-        <FloatingToolbar
-          // Timer display (morning/evening)
-          timeLeft={timeLeft}
-          showTimer={activeTab === 'morning' || activeTab === 'evening'}
-          
-          // Session time display (during tab with live session)
-          sessionTimeElapsed={liveSession?.elapsedSeconds || 0}
-          showSessionTime={activeTab === 'today' && !!liveSession}
+      {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (() => {
+        // Calculate live session elapsed seconds
+        const liveElapsedSec = liveSession ? Math.max(0, Math.floor((sessionNow - liveSession.startedAt) / 1000)) : 0;
+        
+        return (
+          <FloatingToolbar
+            // Timer display (morning/evening)
+            timeLeft={timeLeft}
+            showTimer={activeTab === 'morning' || activeTab === 'evening'}
+            
+            // Session time display (during tab with live session)
+            sessionTimeElapsed={liveElapsedSec}
+            showSessionTime={activeTab === 'today' && !!liveSession}
           
           // Session controls
           liveSession={liveSession}
@@ -552,8 +564,9 @@ export default function LifeEvaluationTool() {
           showCopyButton={activeTab === 'morning' && timeLeft === 0 && getMorningCompletionCount() > 0}
           onCopy={() => copyToClipboard(false)}
           copyStatus={morningCopied}
-        />
-      )}
+          />
+        );
+      })()}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
         <p className="text-gray-600">Track your feelings and set intentions</p>
