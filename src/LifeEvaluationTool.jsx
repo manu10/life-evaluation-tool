@@ -581,8 +581,8 @@ export default function LifeEvaluationTool() {
         );
       })()}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
-        <p className="text-gray-600">Track your feelings and set intentions</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Daily Check-In</h1>
+        <p className="text-gray-600 dark:text-gray-400">Track your feelings and set intentions</p>
         <AnchorNudgeBar
           frequency={mindfulnessSettings.anchorFrequency}
           microLogs={microPracticeLogs}
