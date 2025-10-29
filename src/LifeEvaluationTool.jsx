@@ -740,16 +740,16 @@ export default function LifeEvaluationTool() {
 
           {/* Today's Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b-2 border-blue-200 pb-2">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b-2 border-blue-200 dark:border-blue-700 pb-2">
               🌟 Today's Focus
             </h2>
             {/* First Hour Activity Display */}
             {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
-              <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded-lg flex items-center gap-4">
+              <div className="mb-6 p-4 border-2 border-blue-500 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center gap-4">
                 <AlarmClock className="w-6 h-6 text-blue-600" />
                 <div className="flex-1">
-                  <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
-                  <div className="p-3 border border-blue-300 rounded-lg text-base bg-white">
+                  <label className="block text-base font-semibold text-blue-800 dark:text-blue-300 mb-1">First Hour Activity/Task</label>
+                  <div className="p-3 border border-blue-300 dark:border-blue-700 rounded-lg text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                     {eveningResponses.firstHour}
                   </div>
                 </div>
@@ -889,8 +889,8 @@ export default function LifeEvaluationTool() {
           {(() => {
             const secs = getUsageSecondsFor(new Date());
             return (
-              <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
-                <div className="text-sm text-indigo-900">App usage today: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+              <div className="mb-4 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
+                <div className="text-sm text-indigo-900 dark:text-indigo-200">App usage today: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
               </div>
             );
           })()}

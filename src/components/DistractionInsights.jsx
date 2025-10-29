@@ -64,17 +64,17 @@ export default function DistractionInsights({
 
   if (!summary.hasDistractions) {
     return (
-      <div className={`${theme.bg} ${theme.border} border rounded-lg p-6`}>
-        <h3 className={`text-lg font-semibold ${theme.titleColor} mb-4 flex items-center gap-2`}>
+      <div className={`${theme.bg} ${theme.border} border dark:border-${colorTheme}-700 rounded-lg p-6 dark:bg-${colorTheme}-900/20`}>
+        <h3 className={`text-lg font-semibold ${theme.titleColor} dark:text-${colorTheme}-200 mb-4 flex items-center gap-2`}>
           <Brain className={`w-5 h-5 ${theme.iconColor}`} />
           {title}
         </h3>
         <div className="text-center py-6">
           <Target className={`w-12 h-12 mx-auto mb-3 ${theme.iconColor} opacity-50`} />
-          <p className={`text-lg font-medium ${theme.titleColor} mb-2`}>🎯 Perfect Focus Day!</p>
-          <p className="text-gray-600">No distractions tracked today. Keep up the excellent work!</p>
-          <div className={`mt-4 p-3 ${theme.accentColor} rounded-lg`}>
-            <p className={`text-sm ${theme.titleColor} font-medium`}>
+          <p className={`text-lg font-medium ${theme.titleColor} dark:text-${colorTheme}-200 mb-2`}>🎯 Perfect Focus Day!</p>
+          <p className="text-gray-600 dark:text-gray-400">No distractions tracked today. Keep up the excellent work!</p>
+          <div className={`mt-4 p-3 ${theme.accentColor} dark:bg-${colorTheme}-900/20 rounded-lg`}>
+            <p className={`text-sm ${theme.titleColor} dark:text-${colorTheme}-200 font-medium`}>
               Focus Score: 100/100 ✨
             </p>
           </div>
@@ -84,14 +84,14 @@ export default function DistractionInsights({
   }
 
   return (
-    <div className={`${theme.bg} ${theme.border} border rounded-lg p-6`}>
+    <div className={`${theme.bg} ${theme.border} border dark:border-${colorTheme}-700 rounded-lg p-6 dark:bg-${colorTheme}-900/20`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className={`text-lg font-semibold ${theme.titleColor} flex items-center gap-2`}>
+        <h3 className={`text-lg font-semibold ${theme.titleColor} dark:text-${colorTheme}-200 flex items-center gap-2`}>
           <Brain className={`w-5 h-5 ${theme.iconColor}`} />
           {title}
         </h3>
-        <div className={`px-3 py-1 ${theme.accentColor} rounded-full`}>
-          <span className={`text-sm font-medium ${theme.titleColor}`}>
+        <div className={`px-3 py-1 ${theme.accentColor} dark:bg-${colorTheme}-900/20 rounded-full`}>
+          <span className={`text-sm font-medium ${theme.titleColor} dark:text-${colorTheme}-200`}>
             Focus Score: {summary.focusScore}/100
           </span>
         </div>
@@ -99,33 +99,33 @@ export default function DistractionInsights({
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+        <div className={`p-3 bg-white dark:bg-gray-800 border ${theme.border} dark:border-gray-700 rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
-            <span className="text-sm font-medium text-gray-700">Total Distractions</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Distractions</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{summary.stats.total}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} dark:text-${colorTheme}-200 mt-1`}>{summary.stats.total}</p>
         </div>
-        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+        <div className={`p-3 bg-white dark:bg-gray-800 border ${theme.border} dark:border-gray-700 rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
-            <span className="text-sm font-medium text-gray-700">Interruptions</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Interruptions</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{interruptionCount}{interruptionRate !== null ? <span className="text-sm text-gray-500"> ({interruptionRate}%)</span> : null}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} dark:text-${colorTheme}-200 mt-1`}>{interruptionCount}{interruptionRate !== null ? <span className="text-sm text-gray-500 dark:text-gray-400"> ({interruptionRate}%)</span> : null}</p>
         </div>
-        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+        <div className={`p-3 bg-white dark:bg-gray-800 border ${theme.border} dark:border-gray-700 rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
-            <span className="text-sm font-medium text-gray-700">Replacement helped</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Replacement helped</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{helpedCount}/{replacementLogs.length}{replacementRate !== null ? <span className="text-sm text-gray-500"> ({replacementRate}%)</span> : null}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} dark:text-${colorTheme}-200 mt-1`}>{helpedCount}/{replacementLogs.length}{replacementRate !== null ? <span className="text-sm text-gray-500 dark:text-gray-400"> ({replacementRate}%)</span> : null}</p>
         </div>
-        <div className={`p-3 bg-white border ${theme.border} rounded-lg`}>
+        <div className={`p-3 bg-white dark:bg-gray-800 border ${theme.border} dark:border-gray-700 rounded-lg`}>
           <div className="flex items-center gap-2">
             <TrendingUp className={`w-4 h-4 ${theme.iconColor}`} />
-            <span className="text-sm font-medium text-gray-700">Env applied</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Env applied</span>
           </div>
-          <p className={`text-2xl font-bold ${theme.titleColor} mt-1`}>{envApplyCount}{envAdherence !== null ? <span className="text-sm text-gray-500"> ({envAdherence}%)</span> : null}</p>
+          <p className={`text-2xl font-bold ${theme.titleColor} dark:text-${colorTheme}-200 mt-1`}>{envApplyCount}{envAdherence !== null ? <span className="text-sm text-gray-500 dark:text-gray-400"> ({envAdherence}%)</span> : null}</p>
         </div>
         
         {summary.stats.topTriggers.length > 0 && (
@@ -151,7 +151,7 @@ export default function DistractionInsights({
           </h4>
           <div className="space-y-2">
             {summary.insights.observations.map((observation, index) => (
-              <p key={index} className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-blue-400">
+              <p key={index} className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border-l-4 border-blue-400 dark:border-blue-700">
                 {observation}
               </p>
             ))}
@@ -168,7 +168,7 @@ export default function DistractionInsights({
           </h4>
           <div className="space-y-2">
             {summary.insights.patterns.map((pattern, index) => (
-              <p key={index} className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-yellow-400">
+              <p key={index} className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border-l-4 border-yellow-400 dark:border-yellow-700">
                 {pattern}
               </p>
             ))}
@@ -184,10 +184,10 @@ export default function DistractionInsights({
             Top ABC Patterns
           </h4>
           {abcPatterns.antecedents.length > 0 && (
-            <p className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-indigo-400">Antecedents: {abcPatterns.antecedents.map(p => `${p.value} (${p.count})`).join(', ')}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border-l-4 border-indigo-400 dark:border-indigo-700">Antecedents: {abcPatterns.antecedents.map(p => `${p.value} (${p.count})`).join(', ')}</p>
           )}
           {abcPatterns.settings.length > 0 && (
-            <p className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-indigo-400 mt-2">Settings: {abcPatterns.settings.map(p => `${p.value} (${p.count})`).join(', ')}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border-l-4 border-indigo-400 dark:border-indigo-700 mt-2">Settings: {abcPatterns.settings.map(p => `${p.value} (${p.count})`).join(', ')}</p>
           )}
         </div>
       )}
@@ -201,7 +201,7 @@ export default function DistractionInsights({
           </h4>
           <div className="space-y-2">
             {summary.insights.suggestions.map((suggestion, index) => (
-              <p key={index} className="text-sm text-gray-700 bg-white p-2 rounded border-l-4 border-green-400">
+              <p key={index} className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border-l-4 border-green-400 dark:border-green-700">
                 💡 {suggestion}
               </p>
             ))}
@@ -211,7 +211,7 @@ export default function DistractionInsights({
 
       {/* Top Triggers Summary (if full details) */}
       {showFullDetails && summary.stats.topTriggers.length > 1 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <h4 className={`text-sm font-semibold ${theme.titleColor} mb-2`}>
             Trigger Breakdown
           </h4>
@@ -230,11 +230,11 @@ export default function DistractionInsights({
 
       {/* Anxiety Trend */}
       {showFullDetails && trend.list.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <h4 className={`text-sm font-semibold ${theme.titleColor} mb-2`}>
             Anxiety Trend (last {trend.list.length} days)
           </h4>
-          <div className="text-sm text-gray-700 bg-white p-2 rounded border border-gray-200">
+          <div className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
             {trend.list.join(' → ')} {trend.delta != null && <span className="ml-2 text-xs text-gray-500">Δ {trend.delta > 0 ? '+' : ''}{trend.delta}</span>}
           </div>
         </div>
