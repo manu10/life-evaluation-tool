@@ -95,7 +95,16 @@ export function useProjectsStore() {
     });
   };
 
-  return { projects, addProject, updateProject, removeProject, addItem, updateItem, deleteItem, toggleAction };
+  const setNextAction = (id, actionIndex) => {
+    setProjectsById(prev => {
+      const curr = (prev||{})[id];
+      if (!curr) return prev||{};
+      const updated = { ...curr, nextActionIndex: actionIndex, updatedAt: new Date().toISOString() };
+      return { ...(prev||{}), [id]: updated };
+    });
+  };
+
+  return { projects, addProject, updateProject, removeProject, addItem, updateItem, deleteItem, toggleAction, setNextAction };
 }
 
 

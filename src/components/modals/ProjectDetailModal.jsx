@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import ProjectCanvas from '../ProjectCanvas';
 
-export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate, onDelete }) {
+export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate, onSetNextAction, onDelete }) {
   const [localTitle, setLocalTitle] = useState(project?.title || '');
   const [localStatus, setLocalStatus] = useState(project?.status || 'active');
   const [localNotes, setLocalNotes] = useState(project?.notes || '');
@@ -52,7 +52,7 @@ export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate,
         </div>
 
         <div className="space-y-6">
-          <ProjectCanvas project={project} onUpdate={onUpdate} />
+          <ProjectCanvas project={project} onUpdate={onUpdate} onSetNextAction={onSetNextAction} />
 
           <div className="flex items-center justify-end gap-2">
             <button onClick={onClose} className="px-3 py-2 border border-gray-300 rounded-md">Close</button>

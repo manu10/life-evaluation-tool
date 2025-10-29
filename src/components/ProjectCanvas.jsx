@@ -14,7 +14,7 @@ function TextBlock({ id, value, placeholder, onChange }) {
   );
 }
 
-export default function ProjectCanvas({ project, onUpdate }) {
+export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
   const p = project || {};
   const [newActionText, setNewActionText] = React.useState('');
   const [showCompleted, setShowCompleted] = React.useState(false);
@@ -25,6 +25,7 @@ export default function ProjectCanvas({ project, onUpdate }) {
   const activeActions = actions.filter(a => !a.done);
   const completedActions = actions.filter(a => a.done);
   const canAddAction = actions.length < 5;
+  const nextActionIndex = p.nextActionIndex;
 
   const updates = (partial) => typeof onUpdate === 'function' && onUpdate(partial);
 
@@ -121,8 +122,9 @@ export default function ProjectCanvas({ project, onUpdate }) {
         <div className="space-y-2 mb-3">
           {activeActions.map((action, idx) => {
             const realIndex = actions.findIndex(a => a === action);
+            const isNext = realIndex === nextActionIndex;
             return (
-              <div key={realIndex} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-emerald-200">
+              <div key={realIndex} className={`flex items-start gap-3 p-3 bg-white rounded-lg border ${isNext ? 'border-amber-400 ring-2 ring-amber-200' : 'border-emerald-200'}`}>
                 <input
                   type="checkbox"
                   checked={false}
@@ -130,15 +132,27 @@ export default function ProjectCanvas({ project, onUpdate }) {
                   className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-900">{action.content}</div>
+                  <div className="text-sm text-gray-900 flex items-center gap-2">
+                    {isNext && <span className="text-amber-500">⭐</span>}
+                    {action.content}
+                  </div>
                   <div className="text-xs text-gray-500 mt-1">{formatDateEnglish(action.timestamp).short}</div>
                 </div>
-                <button
-                  onClick={() => deleteAction(realIndex)}
-                  className="text-xs text-gray-500 hover:text-red-600 ml-2"
-                >
-                  Remove
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onSetNextAction && onSetNextAction(isNext ? null : realIndex)}
+                    className={`text-lg ${isNext ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
+                    title={isNext ? 'Unstar (remove as next action)' : 'Star as next action'}
+                  >
+                    {isNext ? '⭐' : '☆'}
+                  </button>
+                  <button
+                    onClick={() => deleteAction(realIndex)}
+                    className="text-xs text-gray-500 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             );
           })}

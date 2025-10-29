@@ -39,6 +39,7 @@ import SessionsDashboard from './components/SessionsDashboard';
 import ProjectsTab from './components/ProjectsTab';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
+import ProjectsSummary from './components/ProjectsSummary';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -126,7 +127,7 @@ export default function LifeEvaluationTool() {
   // App feature flags
   const [featureFlags, setFeatureFlags] = usePersistentState('featureFlags', { projectsTab: false, investTab: true });
   // Projects store
-  const { projects, addProject, updateProject, removeProject } = useProjectsStore();
+  const { projects, addProject, updateProject, removeProject, setNextAction } = useProjectsStore();
   const [openProjectId, setOpenProjectId] = useState(null);
 
   // Sync Areas Reflection into classic morningResponses for unified export structure
@@ -602,7 +603,22 @@ export default function LifeEvaluationTool() {
         </div>
       )}
       {activeTab === 'today' && (
-        <TodayActionHub
+        <>
+          {!!featureFlags?.projectsTab && (
+            <ProjectsSummary
+              projects={projects}
+              onToggleAction={(projectId, actionIndex) => {
+                const proj = projects.find(p => p.id === projectId);
+                if (!proj) return;
+                const actions = Array.isArray(proj.actions) ? proj.actions.slice() : [];
+                if (!actions[actionIndex]) return;
+                actions[actionIndex] = { ...actions[actionIndex], done: !actions[actionIndex].done };
+                updateProject(projectId, { actions });
+              }}
+              onOpenProject={(id) => setOpenProjectId(id)}
+            />
+          )}
+          <TodayActionHub
           onAddDistraction={handleAddDistraction}
           onOpenSettings={() => setActiveTab('settings')}
           onStartProtocol={() => setIsProtocolOpen(true)}
@@ -632,6 +648,7 @@ export default function LifeEvaluationTool() {
           liveSession={liveSession}
           onEndSession={() => setIsEndSessionOpen(true)}
         />
+        </>
       )}
       <Timer
         timeLeft={timeLeft} // pass the raw number
@@ -965,16 +982,30 @@ export default function LifeEvaluationTool() {
         </div>
       )}
       {activeTab === 'projects' && !!featureFlags?.projectsTab && (
-        <ProjectsTab
-          projects={projects}
-          onCreate={() => {
-            const id = addProject();
-            setOpenProjectId(id);
-          }}
-          onOpen={(id) => {
-            setOpenProjectId(id);
-          }}
-        />
+        <>
+          <ProjectsSummary
+            projects={projects}
+            onToggleAction={(projectId, actionIndex) => {
+              const proj = projects.find(p => p.id === projectId);
+              if (!proj) return;
+              const actions = Array.isArray(proj.actions) ? proj.actions.slice() : [];
+              if (!actions[actionIndex]) return;
+              actions[actionIndex] = { ...actions[actionIndex], done: !actions[actionIndex].done };
+              updateProject(projectId, { actions });
+            }}
+            onOpenProject={(id) => setOpenProjectId(id)}
+          />
+          <ProjectsTab
+            projects={projects}
+            onCreate={() => {
+              const id = addProject();
+              setOpenProjectId(id);
+            }}
+            onOpen={(id) => {
+              setOpenProjectId(id);
+            }}
+          />
+        </>
       )}
       {activeTab === 'invest' && (
         <InvestTab
@@ -1045,6 +1076,10 @@ export default function LifeEvaluationTool() {
         onUpdate={(partial) => {
           if (!openProjectId) return;
           updateProject(openProjectId, partial);
+        }}
+        onSetNextAction={(actionIndex) => {
+          if (!openProjectId) return;
+          setNextAction(openProjectId, actionIndex);
         }}
         onDelete={() => {
           if (!openProjectId) return;
