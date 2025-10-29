@@ -88,6 +88,44 @@ npm run build
 npm run preview
 ```
 
+### Reference: Journal (MSTmarco/journal)
+
+We track the `journal` app as a git submodule for inspiration and feature parity research.
+
+- Location: `reference/journal/` (ignored by this repo)
+- Docs: see `docs/journal-reference.md` for features, data model, and integration ideas
+
+Initialize/update the submodule after cloning this repo:
+
+```bash
+git submodule update --init --recursive
+```
+
+Run it locally:
+
+```bash
+npx --yes serve -l 5501 -s reference/journal
+# then open http://localhost:5501
+```
+
+Update to the latest upstream changes:
+
+```bash
+cd reference/journal
+git fetch origin
+git checkout main
+git pull --ff-only
+# Optionally update and record the newer commit in the parent repo:
+cd -
+git add reference/journal
+git commit -m "chore: bump journal submodule"
+```
+
+Notes:
+- Only the `reference/journal` path is tracked (as a submodule). Other `reference/*` paths remain ignored.
+- The reference app is standalone (vanilla HTML/JS). It won’t impact your Vite dev server.
+- New clones can do `git clone --recurse-submodules` to get everything in one step.
+
 ## 🎯 How to Use
 
 ### Daily Workflow

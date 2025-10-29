@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+ # Reference folder: ignore all except the journal submodule path
+ reference/*
+ !reference/journal
