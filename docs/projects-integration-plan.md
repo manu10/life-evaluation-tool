@@ -53,6 +53,10 @@ Introduce a Projects tab inspired by the reference journal’s canvas to replace
 - 2025-10-29: Implemented `ProjectDetailModal` with editable title, status toggle. Wired create/open/delete.
 - 2025-10-29: Added `ProjectCanvas` replicating reference UI (🎯, 🤔, 💡, ✅, 📊, 📝) with chips, item lists, done toggles, and notes word count. Store extended with item CRUD and toggle helpers.
 - 2025-10-29: **Fixed reversed text issue**: Replaced contenteditable with controlled `<textarea>` components (like `DayThoughtsPanel`) to avoid contenteditable LTR quirks. Plain text editing now works reliably across all project fields (Goal, Situation, Ideas, Actions, Progress, Notes).
+- 2025-10-29: **Enhanced Actions & Next Steps**: Limited actions to 5 max, made it prominent, added collapsible "Completed" section with progress counter, and a prompt for 30-min tasks.
+- 2025-10-29: **Next Action Starring & ProjectsSummary**: Added star (⭐) icon to mark an action as "Next Action" for a project. Created `ProjectsSummary` widget that displays all projects' next actions in the Projects and During tabs. Next action is highlighted with amber border/ring.
+- 2025-10-29: **Smart fallback for Next Action**: If no action is starred, automatically show the first active action. If no actions exist for an active project, display a warning prompting the user to add tasks or change project status.
+- 2025-10-29: **Customizable active project limit**: Added `maxActiveProjects` setting (default: 3) in Settings → Projects Settings. Display a warning banner when the number of active projects exceeds this threshold to encourage focus.
 
 ### Improvements vs Reference
 - Modular components (`ProjectCanvas`, `ProjectsTab`, `ProjectDetailModal`) for clarity and testability
