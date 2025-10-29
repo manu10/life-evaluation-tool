@@ -134,6 +134,8 @@ export default function LifeEvaluationTool() {
     distractionsTab: false, 
     sessionsTab: false 
   });
+  // Theme
+  const [theme, setTheme] = usePersistentState('theme', 'light');
   // Projects store
   const { projects, addProject, updateProject, removeProject, setNextAction } = useProjectsStore();
   const [openProjectId, setOpenProjectId] = useState(null);
@@ -190,6 +192,15 @@ export default function LifeEvaluationTool() {
     const id = setInterval(() => setSessionNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [liveSession]);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   // App usage tracking (time while tab visible and window focused)
   useEffect(() => {
@@ -533,7 +544,7 @@ export default function LifeEvaluationTool() {
 
   // UI
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
       {/* Floating Toolbar - Context-sensitive based on active tab */}
       {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (() => {
         // Calculate live session time left (countdown)
@@ -1072,6 +1083,8 @@ export default function LifeEvaluationTool() {
           onEnvironmentProfileChange={setEnvironmentProfile}
           featureFlags={featureFlags}
           onFeatureFlagsChange={setFeatureFlags}
+          theme={theme}
+          onThemeChange={setTheme}
         />
       )}
       <ProjectDetailModal

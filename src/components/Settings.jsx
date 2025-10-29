@@ -4,7 +4,7 @@ import ReplacementActions from './ReplacementActions';
 import EnvironmentDesigner from './EnvironmentDesigner';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange, theme, onThemeChange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -144,11 +144,26 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
+      {/* Appearance */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Appearance</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Customize the look and feel of the app.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <Toggle
+            label="Dark Mode"
+            checked={theme === 'dark'}
+            onChange={(v) => onThemeChange(v ? 'dark' : 'light')}
+          />
+        </div>
+      </div>
+
       {/* Tab Visibility */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Tab Visibility</h3>
-          <p className="text-sm text-gray-600 mt-1">Show or hide tabs to customize your workflow.</p>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Tab Visibility</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Show or hide tabs to customize your workflow.</p>
         </div>
         <div className="p-4 space-y-4">
           <Toggle
