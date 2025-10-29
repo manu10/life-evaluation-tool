@@ -126,7 +126,12 @@ export default function LifeEvaluationTool() {
   const [investDecisions, setInvestDecisions] = usePersistentState('investDecisions', []);
   const [investReadingUsageByDate, setInvestReadingUsageByDate] = usePersistentState('investReadingUsageByDate', {});
   // App feature flags
-  const [featureFlags, setFeatureFlags] = usePersistentState('featureFlags', { projectsTab: false, investTab: true });
+  const [featureFlags, setFeatureFlags] = usePersistentState('featureFlags', { 
+    projectsTab: true, 
+    investTab: true, 
+    distractionsTab: false, 
+    sessionsTab: false 
+  });
   // Projects store
   const { projects, addProject, updateProject, removeProject, setNextAction } = useProjectsStore();
   const [openProjectId, setOpenProjectId] = useState(null);
@@ -591,9 +596,10 @@ export default function LifeEvaluationTool() {
         setActiveTab={handleTabChange}
         eveningDone={eveningDone}
         distractionCount={distractions.length}
-        showSessions={!!mindfulnessSettings?.enableSessions}
+        showSessions={featureFlags?.sessionsTab !== false && !!mindfulnessSettings?.enableSessions}
         showInvest={featureFlags?.investTab !== false}
         showProjects={!!featureFlags?.projectsTab}
+        showDistractions={featureFlags?.distractionsTab !== false}
       />
       {/* Weekly Review temporarily disabled; will return with date setting, weekly lock, and auto-reset */}
       {false && (activeTab === 'morning' || activeTab === 'evening') && (
@@ -974,7 +980,7 @@ export default function LifeEvaluationTool() {
           )}
         </>
       )}
-      {activeTab === 'sessions' && !!mindfulnessSettings?.enableSessions && (
+      {activeTab === 'sessions' && featureFlags?.sessionsTab !== false && !!mindfulnessSettings?.enableSessions && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Sessions</h2>
           <SessionsDashboard
@@ -1204,7 +1210,7 @@ export default function LifeEvaluationTool() {
         <div />
       )}
       {/* Distractions Tab Content */}
-      {activeTab === 'distractions' && (
+      {activeTab === 'distractions' && featureFlags?.distractionsTab !== false && (
         <DistractionTracker
           distractions={distractions}
           onAddDistraction={handleAddDistraction}

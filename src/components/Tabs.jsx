@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sun, Moon, CheckCircle, Brain, Settings, Zap, Target, LineChart } from 'lucide-react';
 
-export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false, showInvest = true, showProjects = false }) {
+export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false, showInvest = true, showProjects = false, showDistractions = true }) {
   return (
     <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
       <button
@@ -32,20 +32,22 @@ export default function Tabs({ activeTab, setActiveTab, eveningDone, distraction
         Evening
         {eveningDone && <CheckCircle className="w-4 h-4 text-green-600" />}
       </button>
-      <button
-        onClick={() => setActiveTab('distractions')}
-        className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
-          activeTab === 'distractions' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-        }`}
-      >
-        <Brain className="w-5 h-5" />
-        Distractions
-        {distractionCount > 0 && (
-          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] h-5 flex items-center justify-center">
-            {distractionCount}
-          </span>
-        )}
-      </button>
+      {showDistractions && (
+        <button
+          onClick={() => setActiveTab('distractions')}
+          className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+            activeTab === 'distractions' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <Brain className="w-5 h-5" />
+          Distractions
+          {distractionCount > 0 && (
+            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] h-5 flex items-center justify-center">
+              {distractionCount}
+            </span>
+          )}
+        </button>
+      )}
       {showSessions && (
         <button
           onClick={() => setActiveTab('sessions')}

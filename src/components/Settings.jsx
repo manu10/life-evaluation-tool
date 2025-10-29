@@ -144,15 +144,15 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
-      {/* Experimental Features */}
+      {/* Tab Visibility */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Experimental Features</h3>
-          <p className="text-sm text-gray-600 mt-1">Toggle visibility of in‑progress tabs.</p>
+          <h3 className="text-lg font-semibold text-gray-800">Tab Visibility</h3>
+          <p className="text-sm text-gray-600 mt-1">Show or hide tabs to customize your workflow.</p>
         </div>
         <div className="p-4 space-y-4">
           <Toggle
-            label="Show Projects tab (new)"
+            label="Show Projects tab"
             checked={!!featureFlags?.projectsTab}
             onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), projectsTab: v })}
           />
@@ -160,6 +160,16 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             label="Show Invest tab"
             checked={featureFlags?.investTab !== false}
             onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), investTab: v })}
+          />
+          <Toggle
+            label="Show Distractions tab"
+            checked={featureFlags?.distractionsTab !== false}
+            onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), distractionsTab: v })}
+          />
+          <Toggle
+            label="Show Sessions tab"
+            checked={featureFlags?.sessionsTab !== false}
+            onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), sessionsTab: v })}
           />
         </div>
       </div>
