@@ -4,7 +4,7 @@ import ReplacementActions from './ReplacementActions';
 import EnvironmentDesigner from './EnvironmentDesigner';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -140,6 +140,26 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             label="Enable Sessions (beta)"
             checked={!!mindfulnessSettings?.enableSessions}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, enableSessions: v })}
+          />
+        </div>
+      </div>
+
+      {/* Experimental Features */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-800">Experimental Features</h3>
+          <p className="text-sm text-gray-600 mt-1">Toggle visibility of in‑progress tabs.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <Toggle
+            label="Show Projects tab (new)"
+            checked={!!featureFlags?.projectsTab}
+            onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), projectsTab: v })}
+          />
+          <Toggle
+            label="Show Invest tab"
+            checked={featureFlags?.investTab !== false}
+            onChange={(v) => onFeatureFlagsChange({ ...(featureFlags||{}), investTab: v })}
           />
         </div>
       </div>

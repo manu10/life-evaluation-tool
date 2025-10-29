@@ -36,6 +36,9 @@ import TodosList from './components/TodosList';
 import SessionStarterModal from './components/modals/SessionStarterModal';
 import SessionEnderModal from './components/modals/SessionEnderModal';
 import SessionsDashboard from './components/SessionsDashboard';
+import ProjectsTab from './components/ProjectsTab';
+import { useProjectsStore } from './hooks/useProjectsStore';
+import ProjectDetailModal from './components/modals/ProjectDetailModal';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -120,6 +123,11 @@ export default function LifeEvaluationTool() {
   const [investSprints, setInvestSprints] = usePersistentState('investSprints', []);
   const [investDecisions, setInvestDecisions] = usePersistentState('investDecisions', []);
   const [investReadingUsageByDate, setInvestReadingUsageByDate] = usePersistentState('investReadingUsageByDate', {});
+  // App feature flags
+  const [featureFlags, setFeatureFlags] = usePersistentState('featureFlags', { projectsTab: false, investTab: true });
+  // Projects store
+  const { projects, addProject, updateProject, removeProject } = useProjectsStore();
+  const [openProjectId, setOpenProjectId] = useState(null);
 
   // Sync Areas Reflection into classic morningResponses for unified export structure
   useEffect(() => {
@@ -576,7 +584,15 @@ export default function LifeEvaluationTool() {
           }}
         />
       </div>
-      <Tabs activeTab={activeTab} setActiveTab={handleTabChange} eveningDone={eveningDone} distractionCount={distractions.length} showSessions={!!mindfulnessSettings?.enableSessions} />
+      <Tabs
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        eveningDone={eveningDone}
+        distractionCount={distractions.length}
+        showSessions={!!mindfulnessSettings?.enableSessions}
+        showInvest={featureFlags?.investTab !== false}
+        showProjects={!!featureFlags?.projectsTab}
+      />
       {/* Weekly Review temporarily disabled; will return with date setting, weekly lock, and auto-reset */}
       {false && (activeTab === 'morning' || activeTab === 'evening') && (
         <div className="mb-4 flex justify-end">
@@ -948,6 +964,18 @@ export default function LifeEvaluationTool() {
           />
         </div>
       )}
+      {activeTab === 'projects' && !!featureFlags?.projectsTab && (
+        <ProjectsTab
+          projects={projects}
+          onCreate={() => {
+            const id = addProject();
+            setOpenProjectId(id);
+          }}
+          onOpen={(id) => {
+            setOpenProjectId(id);
+          }}
+        />
+      )}
       {activeTab === 'invest' && (
         <InvestTab
           opportunities={investOpportunities}
@@ -1006,8 +1034,27 @@ export default function LifeEvaluationTool() {
           onToggleReplacementEasy={handleToggleEasy}
           environmentProfile={environmentProfile}
           onEnvironmentProfileChange={setEnvironmentProfile}
+          featureFlags={featureFlags}
+          onFeatureFlagsChange={setFeatureFlags}
         />
       )}
+      <ProjectDetailModal
+        isOpen={!!openProjectId}
+        onClose={() => setOpenProjectId(null)}
+        project={projects.find(p => p.id === openProjectId)}
+        onUpdate={(partial) => {
+          if (!openProjectId) return;
+          updateProject(openProjectId, partial);
+        }}
+        onDelete={() => {
+          if (!openProjectId) return;
+          const ok = window.confirm('Delete this project?');
+          if (ok) {
+            removeProject(openProjectId);
+            setOpenProjectId(null);
+          }
+        }}
+      />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <SessionStarterModal
         isOpen={isStartSessionOpen}

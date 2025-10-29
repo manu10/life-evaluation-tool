@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sun, Moon, CheckCircle, Brain, Settings, Zap, Target, LineChart } from 'lucide-react';
 
-export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false }) {
+export default function Tabs({ activeTab, setActiveTab, eveningDone, distractionCount, showSessions = false, showInvest = true, showProjects = false }) {
   return (
     <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
       <button
@@ -57,15 +57,28 @@ export default function Tabs({ activeTab, setActiveTab, eveningDone, distraction
           Sessions
         </button>
       )}
-      <button
-        onClick={() => setActiveTab('invest')}
-        className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
-          activeTab === 'invest' ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-        }`}
-      >
-        <LineChart className="w-5 h-5" />
-        Invest
-      </button>
+      {showProjects && (
+        <button
+          onClick={() => setActiveTab('projects')}
+          className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+            activeTab === 'projects' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <Target className="w-5 h-5" />
+          Projects
+        </button>
+      )}
+      {showInvest && (
+        <button
+          onClick={() => setActiveTab('invest')}
+          className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
+            activeTab === 'invest' ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <LineChart className="w-5 h-5" />
+          Invest
+        </button>
+      )}
       <button
         onClick={() => setActiveTab('settings')}
         className={`flex items-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
