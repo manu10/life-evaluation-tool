@@ -4,6 +4,7 @@ import { formatTime } from './utils/formatTime';
 import { generateExportText } from './utils/generateExportText';
 import { AlarmClock } from 'lucide-react';
 import Timer from './components/Timer';
+import FloatingToolbar from './components/FloatingToolbar';
 import Tabs from './components/Tabs';
 import GoalsList from './components/GoalsList';
 import LifeAreasGrid from './components/LifeAreasGrid';
@@ -525,60 +526,33 @@ export default function LifeEvaluationTool() {
   // UI
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
-      {/* Floating Timer - Only show on Morning and Evening tabs */}
-      {(activeTab === 'morning' || activeTab === 'evening') && (
-        <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
-          <div className="flex items-center gap-2">
-            <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
-            {!!mindfulnessSettings?.enableSessions && (
-              <button
-                onClick={() => {
-                  if (liveSession) { setIsEndSessionOpen(true); } else { setIsStartSessionOpen(true); }
-                }}
-                className={`px-2 py-1 text-xs rounded-lg border ${liveSession ? 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200' : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'}`}
-                title={liveSession ? 'End current session' : 'Start focus session'}
-              >
-                {liveSession ? 'End Session' : 'Start Session'}
-              </button>
-            )}
-            <button
-              onClick={() => setIsToolkitOpen(true)}
-              className="px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200"
-              title="Open Mindfulness Toolkit"
-            >
-              🧘
-            </button>
-            <button
-              onClick={() => setIsProtocolOpen(true)}
-              className="px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200"
-              title="Open 5‑Step Protocol"
-            >
-              5️⃣
-            </button>
-          <button
-            onClick={() => setIsHelpOpen(true)}
-            className="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
-            title="Help & Guide"
-          >
-            ❓
-          </button>
-          {/* Copy button when timer is complete and in morning tab */}
-          {timeLeft === 0 && activeTab === 'morning' && getMorningCompletionCount() > 0 && (
-            <button
-              onClick={() => copyToClipboard(false)}
-              className={`flex items-center gap-1 px-2 py-1 text-xs rounded-lg transition-colors ${
-                !morningCopied 
-                  ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200' 
-                  : 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
-              }`}
-              title={!morningCopied ? 'Copy morning summary - not copied yet!' : 'Copy morning summary'}
-            >
-              📋
-              {!morningCopied && <span className="text-red-600">⚠️</span>}
-            </button>
-          )}
-        </div>
-        </div>
+      {/* Floating Toolbar - Context-sensitive based on active tab */}
+      {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (
+        <FloatingToolbar
+          // Timer display (morning/evening)
+          timeLeft={timeLeft}
+          showTimer={activeTab === 'morning' || activeTab === 'evening'}
+          
+          // Session time display (during tab with live session)
+          sessionTimeElapsed={liveSession?.elapsedSeconds || 0}
+          showSessionTime={activeTab === 'today' && !!liveSession}
+          
+          // Session controls
+          liveSession={liveSession}
+          onStartSession={() => setIsStartSessionOpen(true)}
+          onEndSession={() => setIsEndSessionOpen(true)}
+          enableSessions={!!mindfulnessSettings?.enableSessions}
+          
+          // Always-available actions
+          onOpenToolkit={() => setIsToolkitOpen(true)}
+          onOpenProtocol={() => setIsProtocolOpen(true)}
+          onOpenHelp={() => setIsHelpOpen(true)}
+          
+          // Copy button (morning only, when timer complete)
+          showCopyButton={activeTab === 'morning' && timeLeft === 0 && getMorningCompletionCount() > 0}
+          onCopy={() => copyToClipboard(false)}
+          copyStatus={morningCopied}
+        />
       )}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
