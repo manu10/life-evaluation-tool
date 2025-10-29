@@ -675,11 +675,11 @@ export default function LifeEvaluationTool() {
           canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 6}
         />
       )}
-      <div className="text-sm text-gray-600 mb-8">
+      <div className="text-sm text-gray-600 dark:text-gray-400 mb-8">
         {activeTab === 'morning' ? (
           <>Progress: {getMorningCompletionCount()}/{lifeAreas.length + 3} items completed</>
         ) : (
-          <>Progress: {getEveningCompletionCount()}/6 items completed {eveningDone && <span className="text-green-600 font-semibold">✓ Locked</span>}</>
+          <>Progress: {getEveningCompletionCount()}/6 items completed {eveningDone && <span className="text-green-600 dark:text-green-400 font-semibold">✓ Locked</span>}</>
         )}
       </div>
       {/* Morning Tab Content */}
