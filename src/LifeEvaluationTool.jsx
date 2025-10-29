@@ -12,6 +12,7 @@ import InvestTab from './components/InvestTab';
 import SummaryPanel from './components/SummaryPanel';
 import DayThoughtsPanel from './components/DayThoughtsPanel';
 import EveningGoalsInput from './components/EveningGoalsInput';
+import EveningGoalsWithProjects from './components/EveningGoalsWithProjects';
 import PhoneUsageInput from './components/PhoneUsageInput';
 import DailyRoutineInput from './components/DailyRoutineInput';
 import DistractionTracker from './components/DistractionTracker';
@@ -890,13 +891,16 @@ export default function LifeEvaluationTool() {
             label="Phone Usage Time"
             colorClass="bg-red-50"
           />
-          <EveningGoalsInput
+          <EveningGoalsWithProjects
             eveningResponses={eveningResponses}
             onGoalChange={handleEveningGoalChange}
             onFirstHourChange={handleFirstHourChange}
             onOnePercentPlanChange={handleOnePercentPlanChange}
             onOnePercentLinkChange={handleOnePercentLinkChange}
             editable={!eveningDone}
+            projects={projects}
+            todaysTodos={todaysTodos}
+            onAddTodo={handleAddTodo}
           />
           {/* Tomorrow's Todos (Evening planning) — uses the same list, only cleared by evening reset */}
           <TodosList

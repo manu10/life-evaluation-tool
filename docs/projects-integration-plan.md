@@ -57,6 +57,7 @@ Introduce a Projects tab inspired by the reference journal’s canvas to replace
 - 2025-10-29: **Next Action Starring & ProjectsSummary**: Added star (⭐) icon to mark an action as "Next Action" for a project. Created `ProjectsSummary` widget that displays all projects' next actions in the Projects and During tabs. Next action is highlighted with amber border/ring.
 - 2025-10-29: **Smart fallback for Next Action**: If no action is starred, automatically show the first active action. If no actions exist for an active project, display a warning prompting the user to add tasks or change project status.
 - 2025-10-29: **Customizable active project limit**: Added `maxActiveProjects` setting (default: 3) in Settings → Projects Settings. Display a warning banner when the number of active projects exceeds this threshold to encourage focus.
+- 2025-10-29: **Evening planning integration**: Created `EveningGoalsWithProjects` component that wraps `EveningGoalsInput` and adds a collapsible suggestion panel. Shows up to 3 next actions from active projects (starred or first active). Users can click buttons to add tasks to Goals 1-3 or Tomorrow's Todos. Tasks are prefixed with `[Project Name]` for easy identification.
 
 ### Improvements vs Reference
 - Modular components (`ProjectCanvas`, `ProjectsTab`, `ProjectDetailModal`) for clarity and testability
