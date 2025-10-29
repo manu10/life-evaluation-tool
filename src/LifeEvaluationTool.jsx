@@ -607,6 +607,7 @@ export default function LifeEvaluationTool() {
           {!!featureFlags?.projectsTab && (
             <ProjectsSummary
               projects={projects}
+              maxActiveProjects={mindfulnessSettings?.maxActiveProjects ?? 3}
               onToggleAction={(projectId, actionIndex) => {
                 const proj = projects.find(p => p.id === projectId);
                 if (!proj) return;
@@ -985,6 +986,7 @@ export default function LifeEvaluationTool() {
         <>
           <ProjectsSummary
             projects={projects}
+            maxActiveProjects={mindfulnessSettings?.maxActiveProjects ?? 3}
             onToggleAction={(projectId, actionIndex) => {
               const proj = projects.find(p => p.id === projectId);
               if (!proj) return;

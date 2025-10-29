@@ -164,6 +164,26 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
+      {/* Projects Settings */}
+      {featureFlags?.projectsTab && (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="border-b border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-800">Projects Settings</h3>
+            <p className="text-sm text-gray-600 mt-1">Configure how you manage your projects.</p>
+          </div>
+          <div className="p-4 space-y-4">
+            <NumberField
+              label="Maximum active projects (warning threshold)"
+              value={mindfulnessSettings?.maxActiveProjects ?? 3}
+              onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, maxActiveProjects: Math.max(1, Math.min(20, v)) })}
+            />
+            <p className="text-xs text-gray-500">
+              You'll see a warning when you have more than this many active projects. Recommended: 3-5 to maintain focus.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Invest Settings */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
