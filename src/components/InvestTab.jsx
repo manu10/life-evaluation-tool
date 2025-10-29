@@ -29,23 +29,23 @@ export default function InvestTab({
   }, [tagFilter]);
 
   return (
-    <div className="mb-12 space-y-6">
+    <div className="mb-12 space-y-6 text-gray-900 dark:text-gray-100">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Invest</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Invest</h2>
         {readingCapMin > 0 && (
-          <div className="text-xs px-2 py-1 rounded bg-indigo-50 border border-indigo-200 text-indigo-800">
+          <div className="text-xs px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 text-indigo-800 dark:text-indigo-200">
             Reading today: {Math.min(readingUsedMin, readingCapMin)}/{readingCapMin} min
           </div>
         )}
       </div>
 
       {/* Quick Capture */}
-      <div className="p-4 bg-white border border-gray-200 rounded-lg">
-        <h3 className="text-sm font-semibold text-gray-800 mb-2">Quick capture (Backlog)</h3>
+      <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Quick capture (Backlog)</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <input className="p-2 border border-gray-300 rounded" placeholder="Title" value={quick.title} onChange={e => setQuick({ ...quick, title: e.target.value })} />
-          <input className="p-2 border border-gray-300 rounded" placeholder="Doc URL (optional)" value={quick.docUrl} onChange={e => setQuick({ ...quick, docUrl: e.target.value })} />
-          <select className="p-2 border border-gray-300 rounded" value={quick.tagId} onChange={e => setQuick({ ...quick, tagId: e.target.value })}>
+          <input className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="Title" value={quick.title} onChange={e => setQuick({ ...quick, title: e.target.value })} />
+          <input className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="Doc URL (optional)" value={quick.docUrl} onChange={e => setQuick({ ...quick, docUrl: e.target.value })} />
+          <select className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={quick.tagId} onChange={e => setQuick({ ...quick, tagId: e.target.value })}>
             <option value="none">No tag</option>
             {tags.map(t => (
               <option key={t.id} value={t.id}>{`${t.emoji || ''} ${t.label}`.trim()}</option>
@@ -67,7 +67,7 @@ export default function InvestTab({
 
       {/* View toggle (A/B test helper) */}
       <div className="flex items-center justify-end">
-        <label className="text-xs text-gray-700 flex items-center gap-2">
+        <label className="text-xs text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <input type="checkbox" checked={collapsedView} onChange={e => setCollapsedView(e.target.checked)} />
           Collapsed cards
         </label>
@@ -95,8 +95,8 @@ export default function InvestTab({
       {/* Kanban */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['Backlog','Active','Decided'].map(col => (
-          <div key={col} className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2">{col}</h3>
+          <div key={col} className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">{col}</h3>
             <div className="space-y-3">
               {(
                 opportunities
@@ -123,7 +123,7 @@ export default function InvestTab({
                 ))
               )}
               {opportunities.filter(o => o.status === col).length === 0 && (
-                <div className="text-xs text-gray-500">No items</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">No items</div>
               )}
             </div>
           </div>
@@ -131,9 +131,9 @@ export default function InvestTab({
       </div>
 
       {/* Decision Log */}
-      <div className="p-4 bg-white border border-gray-200 rounded-lg">
+      <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-800">Decision Log</h3>
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">Decision Log</h3>
           {decisions && decisions.length > 0 && (
             <button
               className="text-xs px-2 py-1 rounded bg-gray-900 text-white hover:bg-gray-800"
@@ -146,26 +146,26 @@ export default function InvestTab({
             </button>
           )}
         </div>
-        {(!decisions || decisions.length === 0) && <div className="text-xs text-gray-500">No decisions yet</div>}
+        {(!decisions || decisions.length === 0) && <div className="text-xs text-gray-500 dark:text-gray-400">No decisions yet</div>}
         <div className="space-y-2">
           {(decisions || []).map(d => {
             const opp = opportunities.find(o => o.id === d.opportunityId);
             const kind = (d.type || '').toLowerCase();
-            const style = kind === 'buy' ? 'border-emerald-300 bg-emerald-50' : kind === 'pass' ? 'border-rose-300 bg-rose-50' : 'border-amber-300 bg-amber-50';
+            const style = kind === 'buy' ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20' : kind === 'pass' ? 'border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/20' : 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20';
             const emoji = kind === 'buy' ? '🟢' : kind === 'pass' ? '🔴' : '🟡';
             return (
               <div key={d.id} className={`p-3 border rounded hover:shadow-sm ${style}`}>
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900 truncate" title={opp?.title || ''}>{emoji} {kind.toUpperCase()} • {opp?.title || '—'}</div>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-700">
+                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate" title={opp?.title || ''}>{emoji} {kind.toUpperCase()} • {opp?.title || '—'}</div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-700 dark:text-gray-300">
                       <span>{new Date(d.decidedAt).toLocaleString()}</span>
                       {opp?.docUrl && <a href={opp.docUrl} target="_blank" rel="noreferrer" className="underline">Doc</a>}
                     </div>
                   </div>
                   <div className="shrink-0">
                     <button
-                      className="text-[11px] px-2 py-1 rounded bg-white border border-gray-300 hover:bg-gray-100"
+                      className="text-[11px] px-2 py-1 rounded bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => {
                         const text = formatDecision(opportunities, d);
                         if (onCopyDecision) onCopyDecision(d); else { try { navigator.clipboard.writeText(text); alert('Copied'); } catch {} }
@@ -173,7 +173,7 @@ export default function InvestTab({
                     >Copy</button>
                   </div>
                 </div>
-                <div className="mt-2 text-xs text-gray-900">
+                <div className="mt-2 text-xs text-gray-900 dark:text-gray-100">
                   {d.reasons && d.reasons.length > 0 && (
                     <div>
                       <div className="font-medium">Reasons</div>
@@ -533,7 +533,7 @@ function TagChip({ label, color = '#e5e7eb', active = false, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`px-2 py-1 rounded-full border text-xs ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+      className={`px-2 py-1 rounded-full border text-xs ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
       style={{ boxShadow: `inset 0 0 0 2px ${color}22` }}
     >
       {label}
@@ -552,14 +552,14 @@ function NewTagInline({ onAdd }) {
     onAdd && onAdd(tag);
     setOpen(false); setLabel(''); setEmoji(''); setColor('#e5e7eb');
   }
-  if (!open) return <button className="text-xs px-2 py-1 rounded border border-dashed border-gray-300 hover:bg-gray-50" onClick={() => setOpen(true)}>+ New tag</button>;
+  if (!open) return <button className="text-xs px-2 py-1 rounded border border-dashed border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setOpen(true)}>+ New tag</button>;
   return (
-    <div className="flex items-center gap-2 text-xs p-2 border border-gray-200 rounded">
-      <input className="p-1 border border-gray-300 rounded" placeholder="Label" value={label} onChange={e => setLabel(e.target.value)} />
-      <input className="p-1 border border-gray-300 rounded w-16" placeholder="😊" value={emoji} onChange={e => setEmoji(e.target.value)} />
-      <input type="color" className="w-10 h-7 p-0 border border-gray-300 rounded" value={color} onChange={e => setColor(e.target.value)} />
+    <div className="flex items-center gap-2 text-xs p-2 border border-gray-200 dark:border-gray-700 rounded">
+      <input className="p-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="Label" value={label} onChange={e => setLabel(e.target.value)} />
+      <input className="p-1 border border-gray-300 dark:border-gray-600 rounded w-16 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="😊" value={emoji} onChange={e => setEmoji(e.target.value)} />
+      <input type="color" className="w-10 h-7 p-0 border border-gray-300 dark:border-gray-600 rounded" value={color} onChange={e => setColor(e.target.value)} />
       <button className="px-2 py-1 rounded bg-gray-900 text-white" onClick={create}>Add</button>
-      <button className="px-2 py-1 rounded border border-gray-300" onClick={() => setOpen(false)}>Cancel</button>
+      <button className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600" onClick={() => setOpen(false)}>Cancel</button>
     </div>
   );
 }
@@ -571,26 +571,26 @@ function TagPickerModal({ tags = [], onClose, onAssign, onCreate }) {
   return (
     <div className="fixed inset-0 z-70 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-lg p-0 border border-gray-200 w-full max-w-md">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Select tag</h3>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">✕</button>
+      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-lg p-0 border border-gray-200 dark:border-gray-700 w-full max-w-md">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Select tag</h3>
+          <button onClick={onClose} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">✕</button>
         </div>
-        <div className="px-6 py-4 space-y-3">
+        <div className="px-6 py-4 space-y-3 text-gray-900 dark:text-gray-100">
           <div className="flex flex-wrap gap-2">
-            {tags.length === 0 && <div className="text-xs text-gray-500">No tags yet</div>}
+            {tags.length === 0 && <div className="text-xs text-gray-500 dark:text-gray-400">No tags yet</div>}
             {tags.map(t => (
               <button key={t.id} onClick={() => onAssign && onAssign(t.id)} className="px-2 py-1 rounded-full border text-xs" style={{ background: `${t.color}22`, borderColor: t.color }}>
                 {t.emoji} {t.label}
               </button>
             ))}
           </div>
-          <div className="pt-2 border-t border-gray-200">
-            <div className="text-xs font-medium text-gray-700 mb-2">Create new</div>
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Create new</div>
             <div className="flex items-center gap-2 text-xs">
-              <input className="p-1 border border-gray-300 rounded" placeholder="Label" value={label} onChange={e => setLabel(e.target.value)} />
-              <input className="p-1 border border-gray-300 rounded w-16" placeholder="😊" value={emoji} onChange={e => setEmoji(e.target.value)} />
-              <input type="color" className="w-10 h-7 p-0 border border-gray-300 rounded" value={color} onChange={e => setColor(e.target.value)} />
+              <input className="p-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="Label" value={label} onChange={e => setLabel(e.target.value)} />
+              <input className="p-1 border border-gray-300 dark:border-gray-600 rounded w-16 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="😊" value={emoji} onChange={e => setEmoji(e.target.value)} />
+              <input type="color" className="w-10 h-7 p-0 border border-gray-300 dark:border-gray-600 rounded" value={color} onChange={e => setColor(e.target.value)} />
               <button className="px-2 py-1 rounded bg-gray-900 text-white" onClick={() => onCreate && onCreate({ label, emoji, color })}>Add</button>
             </div>
           </div>
