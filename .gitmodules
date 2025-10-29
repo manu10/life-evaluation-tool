@@ -1,0 +1,3 @@
+[submodule "reference/journal"]
+	path = reference/journal
+	url = git@github.com:MSTmarco/journal.git
