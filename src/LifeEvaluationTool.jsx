@@ -525,35 +525,36 @@ export default function LifeEvaluationTool() {
   // UI
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
-      {/* Floating Timer */}
-      <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
-        <div className="flex items-center gap-2">
-          <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
-          {!!mindfulnessSettings?.enableSessions && (
+      {/* Floating Timer - Only show on Morning and Evening tabs */}
+      {(activeTab === 'morning' || activeTab === 'evening') && (
+        <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
+          <div className="flex items-center gap-2">
+            <span className={`text-lg font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-gray-800'}`}>{formatTime(timeLeft)}</span>
+            {!!mindfulnessSettings?.enableSessions && (
+              <button
+                onClick={() => {
+                  if (liveSession) { setIsEndSessionOpen(true); } else { setIsStartSessionOpen(true); }
+                }}
+                className={`px-2 py-1 text-xs rounded-lg border ${liveSession ? 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200' : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'}`}
+                title={liveSession ? 'End current session' : 'Start focus session'}
+              >
+                {liveSession ? 'End Session' : 'Start Session'}
+              </button>
+            )}
             <button
-              onClick={() => {
-                if (liveSession) { setIsEndSessionOpen(true); } else { setIsStartSessionOpen(true); }
-              }}
-              className={`px-2 py-1 text-xs rounded-lg border ${liveSession ? 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200' : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'}`}
-              title={liveSession ? 'End current session' : 'Start focus session'}
+              onClick={() => setIsToolkitOpen(true)}
+              className="px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200"
+              title="Open Mindfulness Toolkit"
             >
-              {liveSession ? 'End Session' : 'Start Session'}
+              🧘
             </button>
-          )}
-          <button
-            onClick={() => setIsToolkitOpen(true)}
-            className="px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200"
-            title="Open Mindfulness Toolkit"
-          >
-            🧘
-          </button>
-          <button
-            onClick={() => setIsProtocolOpen(true)}
-            className="px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200"
-            title="Open 5‑Step Protocol"
-          >
-            5️⃣
-          </button>
+            <button
+              onClick={() => setIsProtocolOpen(true)}
+              className="px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200"
+              title="Open 5‑Step Protocol"
+            >
+              5️⃣
+            </button>
           <button
             onClick={() => setIsHelpOpen(true)}
             className="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
@@ -577,7 +578,8 @@ export default function LifeEvaluationTool() {
             </button>
           )}
         </div>
-      </div>
+        </div>
+      )}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
         <p className="text-gray-600">Track your feelings and set intentions</p>
@@ -658,19 +660,21 @@ export default function LifeEvaluationTool() {
         />
         </>
       )}
-      <Timer
-        timeLeft={timeLeft} // pass the raw number
-        isRunning={isRunning}
-        isComplete={isComplete}
-        eveningDone={eveningDone}
-        activeTab={activeTab}
-        onStart={handleStart}
-        onPause={handlePause}
-        onReset={handleReset}
-        onMarkEveningDone={markEveningDone}
-        canResume={!isRunning && timeLeft < 120 && !eveningDone}
-        canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 6}
-      />
+      {(activeTab === 'morning' || activeTab === 'evening') && (
+        <Timer
+          timeLeft={timeLeft} // pass the raw number
+          isRunning={isRunning}
+          isComplete={isComplete}
+          eveningDone={eveningDone}
+          activeTab={activeTab}
+          onStart={handleStart}
+          onPause={handlePause}
+          onReset={handleReset}
+          onMarkEveningDone={markEveningDone}
+          canResume={!isRunning && timeLeft < 120 && !eveningDone}
+          canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 6}
+        />
+      )}
       <div className="text-sm text-gray-600 mb-8">
         {activeTab === 'morning' ? (
           <>Progress: {getMorningCompletionCount()}/{lifeAreas.length + 3} items completed</>
