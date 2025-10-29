@@ -536,8 +536,10 @@ export default function LifeEvaluationTool() {
     <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
       {/* Floating Toolbar - Context-sensitive based on active tab */}
       {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (() => {
-        // Calculate live session elapsed seconds
+        // Calculate live session time left (countdown)
         const liveElapsedSec = liveSession ? Math.max(0, Math.floor((sessionNow - liveSession.startedAt) / 1000)) : 0;
+        const livePlannedSec = (liveSession?.plannedMin || 0) * 60;
+        const liveTimeLeft = Math.max(0, livePlannedSec - liveElapsedSec);
         
         return (
           <FloatingToolbar
@@ -545,8 +547,8 @@ export default function LifeEvaluationTool() {
             timeLeft={timeLeft}
             showTimer={activeTab === 'morning' || activeTab === 'evening'}
             
-            // Session time display (during tab with live session)
-            sessionTimeElapsed={liveElapsedSec}
+            // Session time display (during tab with live session) - show countdown
+            sessionTimeElapsed={liveTimeLeft}
             showSessionTime={activeTab === 'today' && !!liveSession}
           
           // Session controls
