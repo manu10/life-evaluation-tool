@@ -202,6 +202,15 @@ export default function LifeEvaluationTool() {
     }
   }, [theme]);
 
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // App usage tracking (time while tab visible and window focused)
   useEffect(() => {
     function getDateKey(ts) {
