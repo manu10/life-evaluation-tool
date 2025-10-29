@@ -90,9 +90,9 @@ export default function LifeAreasReflection({ lifeAreas = [], reflections = {}, 
   }).length;
 
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-1">Areas Reflection</h2>
-      <p className="text-sm text-gray-600 mb-4">Pick a feeling for each area, then add a gratitude or an improvement for at least {minRequired} areas.</p>
+    <div className="mb-8 text-gray-900 dark:text-gray-100">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">Areas Reflection</h2>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Pick a feeling for each area, then add a gratitude or an improvement for at least {minRequired} areas.</p>
       {style === 'focus' ? (
         <FocusCarousel lifeAreas={lifeAreas} reflections={reflections} setField={setField} />
       ) : (
@@ -102,11 +102,11 @@ export default function LifeAreasReflection({ lifeAreas = [], reflections = {}, 
           const showDetails = style === 'inline' ? true : style === 'unfold' ? !!feeling : true;
           const completed = !!((reflections?.[area]?.grateful && reflections[area].grateful.trim()) || (reflections?.[area]?.improve && reflections[area].improve.trim()));
           return (
-            <div key={area} className={`p-4 bg-white border border-gray-200 rounded-lg transition-all`}>
+            <div key={area} className={`p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all`}>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                   <span>{area}</span>
-                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 transform transition-transform duration-200 ${completed ? 'scale-100' : 'scale-0'}`}>✓</span>
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 transform transition-transform duration-200 ${completed ? 'scale-100' : 'scale-0'}`}>✓</span>
                 </div>
                 <div className="flex items-center gap-1">
                   {FEELINGS.map(f => (
@@ -114,7 +114,7 @@ export default function LifeAreasReflection({ lifeAreas = [], reflections = {}, 
                       key={f.value}
                       type="button"
                       onClick={() => setField(area, 'feeling', f.value)}
-                      className={`w-8 h-8 rounded-md border text-base flex items-center justify-center transition-all ${feeling === f.value ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-200' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+                      className={`w-8 h-8 rounded-md border text-base flex items-center justify-center transition-all ${feeling === f.value ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-200' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       title={f.value}
                     >
                       {f.label}
@@ -123,29 +123,29 @@ export default function LifeAreasReflection({ lifeAreas = [], reflections = {}, 
                 </div>
               </div>
               {style === 'focus' ? (
-                <div className="text-xs text-gray-500">Focus mode will be available in a dedicated carousel view.</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Focus mode will be available in a dedicated carousel view.</div>
               ) : (
                 <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden transition-all duration-200 ${showDetails ? 'opacity-100 max-h-48' : 'opacity-0 max-h-0 pointer-events-none'}`}>
                   {feeling && encByArea[area] && (
-                    <div className="col-span-1 md:col-span-2 text-xs text-indigo-800 bg-indigo-50 border border-indigo-200 rounded px-2 py-1">{encByArea[area]}</div>
+                    <div className="col-span-1 md:col-span-2 text-xs text-indigo-800 dark:text-indigo-200 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded px-2 py-1">{encByArea[area]}</div>
                   )}
-                  <label className={`block text-xs text-gray-700 ${style==='inline' && !feeling ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <label className={`block text-xs text-gray-700 dark:text-gray-300 ${style==='inline' && !feeling ? 'opacity-50 pointer-events-none' : ''}`}>
                     <span className="block mb-1">Grateful for</span>
                     <input
                       type="text"
                       value={reflections?.[area]?.grateful || ''}
                       onChange={(e) => setField(area, 'grateful', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded"
+                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       placeholder="One small thing you appreciate"
                     />
                   </label>
-                  <label className={`block text-xs text-gray-700 ${style==='inline' && !feeling ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <label className={`block text-xs text-gray-700 dark:text-gray-300 ${style==='inline' && !feeling ? 'opacity-50 pointer-events-none' : ''}`}>
                     <span className="block mb-1">One thing to improve</span>
                     <input
                       type="text"
                       value={reflections?.[area]?.improve || ''}
                       onChange={(e) => setField(area, 'improve', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded"
+                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       placeholder="Tiny adjustment you can make"
                     />
                   </label>
@@ -156,7 +156,7 @@ export default function LifeAreasReflection({ lifeAreas = [], reflections = {}, 
         })}
       </div>
       )}
-      <div className="mt-3 text-sm text-gray-700">Completed: {filledCount}/{minRequired} required • Feelings: required for all areas</div>
+      <div className="mt-3 text-sm text-gray-700 dark:text-gray-300">Completed: {filledCount}/{minRequired} required • Feelings: required for all areas</div>
     </div>
   );
 }
