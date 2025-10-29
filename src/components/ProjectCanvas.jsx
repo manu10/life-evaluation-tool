@@ -8,7 +8,7 @@ function TextBlock({ id, value, placeholder, onChange }) {
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full min-h-[100px] p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm"
+      className="w-full min-h-[100px] p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
       spellCheck={true}
     />
   );
@@ -72,8 +72,8 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-gray-600">
+    <div className="space-y-6 text-gray-900 dark:text-gray-100">
+      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
         {statBadge('💡', ideas.length)}
         {statBadge('✅', `${completedActions.length}/${actions.length}`)}
         {statBadge('📊', progress.length)}
@@ -81,13 +81,13 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
       </div>
 
       {/* Actions - Prominent placement */}
-      <section className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-lg p-4">
+      <section className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <div className="text-lg font-bold text-emerald-900 flex items-center gap-2">
+            <div className="text-lg font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
               ✅ Actions & Next Steps
             </div>
-            <p className="text-xs text-emerald-700 mt-1">Break your goal into small, specific tasks (~30 min each)</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Break your goal into small, specific tasks (~30 min each)</p>
           </div>
           <div className="text-sm text-emerald-700 font-semibold">
             {completedActions.length}/{actions.length} done
@@ -107,7 +107,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
             onChange={(e) => setNewActionText(e.target.value)}
             placeholder={canAddAction ? 'Add a specific action (max 5)' : 'Limit reached'}
             disabled={!canAddAction}
-            className="flex-1 p-2 border border-emerald-300 rounded-md text-sm focus:ring-2 focus:ring-emerald-500"
+            className="flex-1 p-2 border border-emerald-300 dark:border-emerald-700 rounded-md text-sm focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
           <button
             type="submit"
@@ -124,7 +124,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
             const realIndex = actions.findIndex(a => a === action);
             const isNext = realIndex === nextActionIndex;
             return (
-              <div key={realIndex} className={`flex items-start gap-3 p-3 bg-white rounded-lg border ${isNext ? 'border-amber-400 ring-2 ring-amber-200' : 'border-emerald-200'}`}>
+              <div key={realIndex} className={`flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border ${isNext ? 'border-amber-400 ring-2 ring-amber-200' : 'border-emerald-200 dark:border-emerald-700'}`}>
                 <input
                   type="checkbox"
                   checked={false}
@@ -132,11 +132,11 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                   className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-900 flex items-center gap-2">
+                  <div className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     {isNext && <span className="text-amber-500">⭐</span>}
                     {action.content}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{formatDateEnglish(action.timestamp).short}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDateEnglish(action.timestamp).short}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -160,7 +160,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
 
         {/* Completed actions - collapsible */}
         {completedActions.length > 0 && (
-          <div className="border-t border-emerald-200 pt-3">
+          <div className="border-t border-emerald-200 dark:border-emerald-700 pt-3">
             <button
               onClick={() => setShowCompleted(!showCompleted)}
               className="text-sm text-emerald-700 hover:text-emerald-900 font-medium flex items-center gap-1"
@@ -172,7 +172,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                 {completedActions.map((action, idx) => {
                   const realIndex = actions.findIndex(a => a === action);
                   return (
-                    <div key={realIndex} className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100 opacity-75">
+                    <div key={realIndex} className="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-700 opacity-75">
                       <input
                         type="checkbox"
                         checked={true}
@@ -180,8 +180,8 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                         className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-700 line-through">{action.content}</div>
-                        <div className="text-xs text-gray-500 mt-1">{formatDateEnglish(action.timestamp).short}</div>
+                        <div className="text-sm text-gray-700 dark:text-gray-300 line-through">{action.content}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDateEnglish(action.timestamp).short}</div>
                       </div>
                       <button
                         onClick={() => deleteAction(realIndex)}

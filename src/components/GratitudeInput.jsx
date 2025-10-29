@@ -50,26 +50,26 @@ export default function GratitudeInput({ gratitude, onGratitudeChange, editable 
   const dailyPhrase = getDailyGratitudePhrase();
 
   return (
-    <div className="bg-yellow-50 border border-gray-200 rounded-lg p-6 shadow-sm mb-8">
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">🙏 Three Things I'm Grateful For</h3>
-      <p className="text-sm text-gray-600 mb-4 italic">
+    <div className="bg-yellow-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm mb-8">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">🙏 Three Things I'm Grateful For</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 italic">
         {dailyPhrase}
       </p>
       {hasYesterdays(yesterdaysGratitude) && (
-        <div className="mb-4 p-3 rounded-md bg-white border border-yellow-200">
-          <div className="text-xs text-gray-700 mb-1">Yesterday you wrote:</div>
+        <div className="mb-4 p-3 rounded-md bg-white dark:bg-gray-800 border border-yellow-200 dark:border-yellow-700">
+          <div className="text-xs text-gray-700 dark:text-gray-300 mb-1">Yesterday you wrote:</div>
           <div className="flex flex-wrap gap-2">
             {Object.values(yesterdaysGratitude || {}).filter(Boolean).map((txt, idx) => (
-              <span key={idx} className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">{txt}</span>
+              <span key={idx} className="px-2 py-1 rounded-full text-xs bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700">{txt}</span>
             ))}
           </div>
-          <div className="text-xs text-gray-600 mt-2">Try choosing something different today to broaden your attention to the good. ✨</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">Try choosing something different today to broaden your attention to the good. ✨</div>
         </div>
       )}
       <div className="space-y-4">
         {[1, 2, 3].map((num) => (
           <div key={num}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Gratitude {num}
             </label>
             <input
@@ -78,8 +78,8 @@ export default function GratitudeInput({ gratitude, onGratitudeChange, editable 
               onChange={(e) => handleChange(num, e.target.value)}
               disabled={!editable}
               placeholder="Something you're thankful for today..."
-              className={`w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                !editable ? 'bg-gray-100 cursor-not-allowed' : ''
+              className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${
+                !editable ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
               }`}
             />
           </div>
