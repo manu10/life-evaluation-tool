@@ -92,6 +92,11 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             value={mindfulnessSettings?.pauseSec ?? 90}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, pauseSec: v })}
           />
+          <NumberField
+            label="Morning check-in threshold (# items)"
+            value={mindfulnessSettings?.morningCheckinThreshold ?? 5}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, morningCheckinThreshold: Math.max(1, Math.min(10, v)) })}
+          />
           <SelectField
             label="Anchor nudge frequency"
             value={mindfulnessSettings?.anchorFrequency ?? 'off'}

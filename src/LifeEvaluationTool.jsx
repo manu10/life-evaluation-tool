@@ -43,6 +43,7 @@ import ProjectsTab from './components/ProjectsTab';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
 import ProjectsSummary from './components/ProjectsSummary';
+import MorningStreak from './components/MorningStreak';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -91,6 +92,7 @@ export default function LifeEvaluationTool() {
   const [onePercentDone, setOnePercentDone] = usePersistentState('onePercentDone', false);
   const [yesterdaysOnePercentPlan, setYesterdaysOnePercentPlan] = usePersistentState('yesterdaysOnePercentPlan', '');
   const [yesterdaysOnePercentDone, setYesterdaysOnePercentDone] = usePersistentState('yesterdaysOnePercentDone', false);
+  const [morningCheckins, setMorningCheckins] = usePersistentState('morningCheckins', []);
   // Mindfulness & ABC (M1)
   const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
     enablePrompts: true,
@@ -159,6 +161,19 @@ export default function LifeEvaluationTool() {
     }, {});
     setMorningResponses(mapped);
   }, [areasReflections, mindfulnessSettings?.morningMode, lifeAreas]);
+
+  // Record morning check-in when threshold reached
+  useEffect(() => {
+    if (activeTab !== 'morning') return;
+    const threshold = Math.max(1, Math.min(10, mindfulnessSettings?.morningCheckinThreshold ?? 5));
+    if (getMorningCompletionCount() >= threshold) {
+      const key = getDateKey(new Date());
+      if (!morningCheckins.includes(key)) {
+        setMorningCheckins(prev => [...prev, key]);
+      }
+    }
+    function getDateKey(d) { const dt = new Date(d); dt.setHours(0,0,0,0); return dt.toISOString().slice(0,10); }
+  }, [activeTab, morningResponses, gratitude, areasReflections]);
 
   // Timer effect
   useEffect(() => {
@@ -512,7 +527,15 @@ export default function LifeEvaluationTool() {
       missedAdjustments
     });
     if (isEvening) markEveningDone();
-    else setMorningCopied(true); // Mark morning content as copied
+    else {
+      setMorningCopied(true); // Mark morning content as copied
+      // Record morning check-in on copy
+      try {
+        const d = new Date(); d.setHours(0,0,0,0);
+        const key = d.toISOString().slice(0,10);
+        setMorningCheckins(prev => (prev.includes(key) ? prev : [...prev, key]));
+      } catch {}
+    }
     try {
       navigator.clipboard.writeText(exportText);
       alert('✅ Summary copied to clipboard! Ready to paste into your Google Doc.');
@@ -697,6 +720,7 @@ export default function LifeEvaluationTool() {
       {/* Morning Tab Content */}
       {activeTab === 'morning' && (
         <>
+          <MorningStreak checkins={morningCheckins} />
           {/* Yesterday's Section - Now Collapsible */}
           <CollapsibleSection
             title="Yesterday's Review"
@@ -882,7 +906,7 @@ export default function LifeEvaluationTool() {
                 yesterdaysOnePercentDone
               })}
               onCopy={() => copyToClipboard(false)}
-              googleDocsUrl="https://docs.google.com/document/u/0/"
+              googleDocsUrl="https://docs.google.com/document/d/1cqfNmX_z6hGggisUOcdN1yp4N7AefFTwtBUF2qCO4lU/edit?tab=t.0#heading=h.o41a0fc0y2vk"
               previewLabel="Preview:"
             />
           )}
@@ -990,7 +1014,7 @@ export default function LifeEvaluationTool() {
                 ,sessions
               })}
               onCopy={() => copyToClipboard(true)}
-              googleDocsUrl="https://docs.google.com/document/u/0/"
+              googleDocsUrl="https://docs.google.com/document/d/1cqfNmX_z6hGggisUOcdN1yp4N7AefFTwtBUF2qCO4lU/edit?tab=t.0#heading=h.o41a0fc0y2vk"
               previewLabel="Preview:"
             />
           )}

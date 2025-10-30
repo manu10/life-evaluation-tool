@@ -8,12 +8,13 @@ export default function SummaryPanel({ title, exportText, onCopy, googleDocsUrl,
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
         <div className="flex gap-2">
-          <button onClick={onCopy} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            📋 Copy for Google Doc
+          <button
+            onClick={() => { if (onCopy) onCopy(); if (googleDocsUrl) { try { window.open(googleDocsUrl, '_blank', 'noopener,noreferrer'); } catch {} } }}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            title="Copy and open Google Docs"
+          >
+            <ExternalLink className="w-4 h-4" /> Copy & Open Google Doc
           </button>
-          <a href={googleDocsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <ExternalLink className="w-4 h-4" />Open Google Docs
-          </a>
         </div>
       </div>
       <Card className="mt-6">
