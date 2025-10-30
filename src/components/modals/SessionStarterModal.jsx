@@ -76,6 +76,15 @@ export default function SessionStarterModal({ isOpen, onClose, hooks = [], onAdd
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-2">
+          <a
+            href="https://open.spotify.com/playlist/37i9dQZF1DX7EF8wVxBVhG?si=435bdf11a2924809"
+            target="_blank"
+            rel="noreferrer"
+            className="px-3 py-2 text-xs rounded-md bg-green-100 text-green-700 border border-green-300 hover:bg-green-200"
+            title="Open Focus Playlist on Spotify"
+          >
+            🎧 Focus playlist
+          </a>
           <button onClick={onClose} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md">Cancel</button>
           <button onClick={handleStart} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Start</button>
         </div>
