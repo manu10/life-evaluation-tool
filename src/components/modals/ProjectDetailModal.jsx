@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import ProjectCanvas from '../ProjectCanvas';
+import Modal from '../ui/Modal';
 
 export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate, onSetNextAction, onDelete }) {
   const [localTitle, setLocalTitle] = useState(project?.title || '');
@@ -19,10 +20,9 @@ export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate,
   }
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Project Detail">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+    <Modal isOpen={isOpen && !!project} onClose={onClose} containerClassName="w-full max-w-3xl p-6" aria-label="Project Detail">
       <div
-        className="relative w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 max-h-[85vh] overflow-y-auto text-gray-900 dark:text-gray-100"
+        className="text-gray-900 dark:text-gray-100"
         dir="ltr"
         style={{ direction: 'ltr', textAlign: 'left' }}
       >
@@ -65,7 +65,7 @@ export default function ProjectDetailModal({ isOpen, onClose, project, onUpdate,
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 

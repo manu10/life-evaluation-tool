@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Modal from './ui/Modal';
 
 export default function ABCLogger({ isOpen, onClose, onSave, initial = {} }) {
   if (!isOpen) return null;
@@ -20,9 +21,8 @@ export default function ABCLogger({ isOpen, onClose, onSave, initial = {} }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+    <Modal isOpen={isOpen} onClose={onClose} containerClassName="w-full max-w-2xl p-6">
+      <div className="text-gray-900 dark:text-gray-100">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">ABC Log (Antecedent • Behavior • Consequence • Effect)</h3>
           <button onClick={onClose} className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100">✕</button>
@@ -41,7 +41,7 @@ export default function ABCLogger({ isOpen, onClose, onSave, initial = {} }) {
           <button onClick={handleSave} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save ABC</button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 

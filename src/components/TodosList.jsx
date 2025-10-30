@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Card from './ui/Card';
 
 export default function TodosList({
   todos = [],
@@ -13,7 +14,7 @@ export default function TodosList({
   const canAddMore = (todos?.length || 0) < 5;
 
   return (
-    <div className={`${colorClass} dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8`}>
+    <Card className={`${colorClass} dark:bg-gray-800 p-6 mb-8`}>
       <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{title}</h3>
       {editable && (
         <form
@@ -74,7 +75,7 @@ export default function TodosList({
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 
