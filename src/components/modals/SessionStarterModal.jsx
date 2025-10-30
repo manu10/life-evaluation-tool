@@ -45,8 +45,8 @@ export default function SessionStarterModal({ isOpen, onClose, hooks = [], onAdd
           <div>
             <label className="block text-sm text-gray-700 mb-1">Hook</label>
             <div className="flex items-center gap-2 mb-2">
-              <button className={`px-2 py-1 text-xs rounded border ${hookMode==='pick'?'bg-blue-600 text-white border-blue-700':'bg-white dark:bg-gray-800 text-blue-700 border-blue-300'}`} onClick={() => setHookMode('pick')}>Pick</button>
-              <button className={`px-2 py-1 text-xs rounded border ${hookMode==='new'?'bg-blue-600 text-white border-blue-700':'bg-white dark:bg-gray-800 text-blue-700 border-blue-300'}`} onClick={() => setHookMode('new')}>New</button>
+              <button className={`px-2 py-1 text-xs rounded border transition-colors ${hookMode==='pick'?'bg-blue-600 text-white border-blue-700 hover:bg-blue-700':'bg-white dark:bg-gray-800 text-blue-700 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-gray-700'}`} onClick={() => setHookMode('pick')}>Pick</button>
+              <button className={`px-2 py-1 text-xs rounded border transition-colors ${hookMode==='new'?'bg-blue-600 text-white border-blue-700 hover:bg-blue-700':'bg-white dark:bg-gray-800 text-blue-700 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-gray-700'}`} onClick={() => setHookMode('new')}>New</button>
             </div>
             {hookMode === 'pick' ? (
               <select value={hookId || ''} onChange={(e) => setHookId(e.target.value)} className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">

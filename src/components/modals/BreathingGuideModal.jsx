@@ -30,17 +30,17 @@ export default function BreathingGuideModal({ onClose, onComplete, totalBreaths 
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="breath-title" onKeyDown={(e) => { if (e.key === 'Escape') onClose && onClose(); }}>
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-200 w-full max-w-sm">
-        <h4 id="breath-title" className="text-base font-semibold text-gray-900 mb-2">Guided breaths</h4>
-        <div className="text-sm text-gray-700 mb-2">Follow the prompts. Inhale and exhale slowly.</div>
-        <div className="flex items-center justify-between text-blue-900 mb-2">
+      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 w-full max-w-sm text-gray-900 dark:text-gray-100">
+        <h4 id="breath-title" className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">Guided breaths</h4>
+        <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">Follow the prompts. Inhale and exhale slowly.</div>
+        <div className="flex items-center justify-between text-blue-900 dark:text-blue-200 mb-2">
           <div className="font-medium">{phaseText}{running && phase !== 'Ready' ? ` — ${secondsLeft}s` : ''}</div>
           <div className="text-sm">{breathCount}/{totalBreaths}</div>
         </div>
         <div className="flex items-center justify-between">
           <button onClick={() => { setRunning(true); setPhase('Ready'); setSecondsLeft(0); setBreathCount(0); }} className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">{running ? 'Restart' : 'Start'}</button>
-          <button disabled={!canConfirm} onClick={() => { onComplete && onComplete(); onClose(); }} className={`px-3 py-2 rounded-md ${canConfirm ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>Confirm done</button>
-          <button onClick={onClose} className="px-3 py-2 text-gray-600 hover:text-gray-800">Close</button>
+          <button disabled={!canConfirm} onClick={() => { onComplete && onComplete(); onClose(); }} className={`px-3 py-2 rounded-md ${canConfirm ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 cursor-not-allowed'}`}>Confirm done</button>
+          <button onClick={onClose} className="px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">Close</button>
         </div>
       </div>
     </div>
