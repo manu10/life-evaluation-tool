@@ -28,7 +28,7 @@ export default function ProjectsTab({ projects = [], onCreate, onOpen }) {
             >
               <div className="flex items-center justify-between">
                 <div className="font-semibold text-gray-800 dark:text-gray-100">{p.title || 'Untitled Project'}</div>
-                <div className={`text-xs px-2 py-0.5 rounded ${p.status === 'solved' ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>{p.status || 'active'}</div>
+                <div className={`text-xs px-2 py-0.5 rounded ${p.status === 'solved' ? 'bg-emerald-100 dark:bg-emerald-900/20 hover:bg-emerald-200 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'}`}>{p.status || 'active'}</div>
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">💡 {ideas}</span>

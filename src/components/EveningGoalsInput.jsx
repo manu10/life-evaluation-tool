@@ -4,7 +4,7 @@ import { AlarmClock } from 'lucide-react';
 export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFirstHourChange, onOnePercentPlanChange, onOnePercentLinkChange, editable = true }) {
   return (
     <div className="bg-purple-50 dark:bg-purple-900/20 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8">
-      <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded flex items-center gap-4">
+      <div className="mb-6 p-4 border-2 border-blue-500 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded flex items-center gap-4">
         <AlarmClock className="w-6 h-6 text-blue-600" />
         <div className="flex-1">
           <label className="block text-base font-semibold text-blue-800 dark:text-blue-300 mb-1">First Hour Activity/Task</label>
