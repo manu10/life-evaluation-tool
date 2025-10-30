@@ -34,15 +34,15 @@ export default function FiveStepProtocol({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 border border-gray-200 z-50">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 z-50 text-gray-900 dark:text-gray-100">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">5‑Step Protocol</h3>
-          <div className="text-sm text-gray-600">Step {step}/5</div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">5‑Step Protocol</h3>
+          <div className="text-sm text-gray-600 dark:text-gray-300">Step {step}/5</div>
         </div>
 
         {step === 1 && (
           <StepCard title="Step 1 — Identify Your Triggers">
-            <p className="text-sm text-gray-700 mb-3">Track what happens right before anxiety hits. Note time, place, people, thoughts.</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">Track what happens right before anxiety hits. Note time, place, people, thoughts.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Field label="Setting" value={abc.setting} onChange={(v) => setAbc({ ...abc, setting: v })} placeholder="e.g., Desk at home" />
               <Field label="Antecedent" value={abc.antecedent} onChange={(v) => setAbc({ ...abc, antecedent: v })} placeholder="What happened right before?" />
@@ -63,7 +63,7 @@ export default function FiveStepProtocol({
 
         {step === 2 && (
           <StepCard title="Step 2 — Break the Chain Early">
-            <p className="text-sm text-gray-700 mb-3">Small interruptions = big changes.</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">Small interruptions = big changes.</p>
             <InterruptConfirm onLogMicro={onLogMicro} />
             <FooterNav onPrev={prev} onNext={next} />
           </StepCard>
@@ -71,7 +71,7 @@ export default function FiveStepProtocol({
 
         {step === 3 && (
           <StepCard title="Step 3 — Replace the behavior">
-            <p className="text-sm text-gray-700 mb-3">Choose an easy replacement and reward after.</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">Choose an easy replacement and reward after.</p>
             <div className="flex flex-wrap gap-2">
               {replacementActions.slice(0, 5).map((a) => (
                 <button
@@ -84,7 +84,7 @@ export default function FiveStepProtocol({
                 </button>
               ))}
             </div>
-            <div className="mt-3 text-xs text-gray-600">
+            <div className="mt-3 text-xs text-gray-600 dark:text-gray-300">
               {replacementActions.length === 0 ? (
                 <span>No replacement actions yet. </span>
               ) : (
@@ -100,9 +100,9 @@ export default function FiveStepProtocol({
 
         {step === 4 && (
           <StepCard title="Step 4 — Engineer your environment">
-            <p className="text-sm text-gray-700 mb-3">Apply a tweak now.</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">Apply a tweak now.</p>
             <EnvironmentConfirm environmentProfile={environmentProfile} onApplyEnvironment={onApplyEnvironment} />
-            <div className="mt-3 text-xs text-gray-600">
+            <div className="mt-3 text-xs text-gray-600 dark:text-gray-300">
               {((environmentProfile?.removals || []).length + (environmentProfile?.additions || []).length) === 0 ? (
                 <span>No environment items yet. </span>
               ) : (
@@ -120,29 +120,29 @@ export default function FiveStepProtocol({
           <StepCard title="Step 5 — Track & Adjust">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <label className="block">
-                <span className="text-sm text-gray-700">Anxiety rating (1–10)</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Anxiety rating (1–10)</span>
                 <input
                   type="number"
                   min={1}
                   max={10}
                   value={anxiety.rating}
                   onChange={(e) => setAnxiety({ ...anxiety, rating: parseInt(e.target.value || '0', 10) })}
-                  className="mt-1 p-2 border border-gray-300 rounded-md w-24"
+                  className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-24 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
               </label>
               <label className="block">
-                <span className="text-sm text-gray-700">What worked / didn’t</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">What worked / didn’t</span>
                 <input
                   type="text"
                   value={anxiety.notes}
                   onChange={(e) => setAnxiety({ ...anxiety, notes: e.target.value })}
                   placeholder="Optional notes"
-                  className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                  className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
               </label>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <button onClick={prev} className="px-3 py-2 border border-gray-300 rounded-md">Back</button>
+              <button onClick={prev} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md">Back</button>
               <button onClick={complete} className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Finish</button>
             </div>
           </StepCard>
@@ -155,7 +155,7 @@ export default function FiveStepProtocol({
 function StepCard({ title, children }) {
   return (
     <div>
-      <h4 className="text-base font-semibold text-gray-900 mb-3">{title}</h4>
+      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">{title}</h4>
       {children}
     </div>
   );
@@ -164,13 +164,13 @@ function StepCard({ title, children }) {
 function Field({ label, value, onChange, placeholder }) {
   return (
     <label className="flex flex-col">
-      <span className="text-sm text-gray-700 mb-1">{label}</span>
+      <span className="text-sm text-gray-700 dark:text-gray-300 mb-1">{label}</span>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="p-2 border border-gray-300 rounded-md"
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
       />
     </label>
   );

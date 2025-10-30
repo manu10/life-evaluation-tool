@@ -37,6 +37,7 @@ export default function DistractionTracker({
 }) {
   const [isAddingDistraction, setIsAddingDistraction] = useState(false);
   const [newDistraction, setNewDistraction] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [customTrigger, setCustomTrigger] = useState('');
   const [breathPrompt, setBreathPrompt] = useState({ isVisible: false, triggerValue: '', triggerLabel: '', topAction: null });
@@ -193,19 +194,34 @@ export default function DistractionTracker({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               What distracted you?
             </label>
+            <div className="relative">
             <input
               type="text"
               value={newDistraction}
-              onChange={(e) => setNewDistraction(e.target.value)}
+              onChange={(e) => { setNewDistraction(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(()=> setShowSuggestions(false), 120)}
               placeholder="e.g., Social Media, YouTube, Crypto prices..."
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              list="common-distractions"
             />
-            <datalist id="common-distractions">
-              {COMMON_DISTRACTIONS.map(distraction => (
-                <option key={distraction} value={distraction} />
-              ))}
-            </datalist>
+            {showSuggestions && (
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-40 overflow-auto">
+                {COMMON_DISTRACTIONS.filter(d => !newDistraction || d.toLowerCase().includes(newDistraction.toLowerCase())).map((d) => (
+                  <button
+                    type="button"
+                    key={d}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onMouseDown={(e) => { e.preventDefault(); setNewDistraction(d); setShowSuggestions(false); }}
+                  >
+                    {d}
+                  </button>
+                ))}
+                {COMMON_DISTRACTIONS.filter(d => !newDistraction || d.toLowerCase().includes(newDistraction.toLowerCase())).length === 0 && (
+                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No matches</div>
+                )}
+              </div>
+            )}
+            </div>
           </div>
 
           <div className="mb-4">

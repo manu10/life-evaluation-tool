@@ -284,7 +284,7 @@ function NumberField({ label, value, onChange }) {
         min={5}
         max={600}
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
-        className="mt-1 p-2 border border-gray-300 rounded-md w-32"
+        className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
       />
     </label>
   );
@@ -297,7 +297,7 @@ function SelectField({ label, value, onChange, options = [] }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 p-2 border border-gray-300 rounded-md w-64"
+        className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
       >
         {options.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
