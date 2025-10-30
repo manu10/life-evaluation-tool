@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import Card from './ui/Card';
 
 export default function SummaryPanel({ title, exportText, onCopy, googleDocsUrl, previewLabel }) {
   return (
@@ -15,12 +16,12 @@ export default function SummaryPanel({ title, exportText, onCopy, googleDocsUrl,
           </a>
         </div>
       </div>
-      <div className="mt-6 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <Card className="mt-6">
         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{previewLabel}</h4>
         <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed max-h-32 overflow-y-auto">
           {exportText}
         </pre>
-      </div>
+      </Card>
     </div>
   );
 } 

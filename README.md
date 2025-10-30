@@ -289,6 +289,16 @@ src/
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
+### Dark Mode Development (Guidelines)
+- Prefer UI primitives in `src/components/ui/` (Button, Card, Input/Select/Textarea, Modal) — they include dark styles by default.
+- If you must use raw elements, pair colors:
+  - bg-white + dark:bg-gray-800 (use 900 for modals)
+  - border-gray-200 + dark:border-gray-700
+  - text-gray-800 + dark:text-gray-100
+- Banners: use 50 in light and 900/20 in dark (e.g., blue-50 + dark:bg-blue-900/20) and match borders.
+- PR checklist: Verified in dark mode; no bare bg-white/border-gray-200/text-gray-800 without dark: variants.
+
+
 ### Development Setup
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
