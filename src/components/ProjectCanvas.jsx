@@ -8,7 +8,7 @@ function TextBlock({ id, value, placeholder, onChange }) {
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full min-h-[100px] p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm"
+      className="w-full min-h-[100px] p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
       spellCheck={true}
     />
   );
@@ -66,14 +66,14 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
   }
 
   const statBadge = (label, value) => (
-    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700 border border-gray-200">
+    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
       {label} {value}
     </span>
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-gray-600">
+    <div className="space-y-6 text-gray-900 dark:text-gray-100">
+      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
         {statBadge('💡', ideas.length)}
         {statBadge('✅', `${completedActions.length}/${actions.length}`)}
         {statBadge('📊', progress.length)}
@@ -81,15 +81,15 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
       </div>
 
       {/* Actions - Prominent placement */}
-      <section className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-lg p-4">
+      <section className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <div className="text-lg font-bold text-emerald-900 flex items-center gap-2">
+            <div className="text-lg font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
               ✅ Actions & Next Steps
             </div>
-            <p className="text-xs text-emerald-700 mt-1">Break your goal into small, specific tasks (~30 min each)</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Break your goal into small, specific tasks (~30 min each)</p>
           </div>
-          <div className="text-sm text-emerald-700 font-semibold">
+          <div className="text-sm text-emerald-700 dark:text-emerald-300 font-semibold">
             {completedActions.length}/{actions.length} done
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
             onChange={(e) => setNewActionText(e.target.value)}
             placeholder={canAddAction ? 'Add a specific action (max 5)' : 'Limit reached'}
             disabled={!canAddAction}
-            className="flex-1 p-2 border border-emerald-300 rounded-md text-sm focus:ring-2 focus:ring-emerald-500"
+            className="flex-1 p-2 border border-emerald-300 dark:border-emerald-700 rounded-md text-sm focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
           <button
             type="submit"
@@ -124,7 +124,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
             const realIndex = actions.findIndex(a => a === action);
             const isNext = realIndex === nextActionIndex;
             return (
-              <div key={realIndex} className={`flex items-start gap-3 p-3 bg-white rounded-lg border ${isNext ? 'border-amber-400 ring-2 ring-amber-200' : 'border-emerald-200'}`}>
+              <div key={realIndex} className={`flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border ${isNext ? 'border-amber-400 dark:border-amber-500 ring-2 ring-amber-200 dark:ring-amber-400' : 'border-emerald-200 dark:border-emerald-700'}`}>
                 <input
                   type="checkbox"
                   checked={false}
@@ -132,11 +132,11 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                   className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-900 flex items-center gap-2">
+                  <div className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     {isNext && <span className="text-amber-500">⭐</span>}
                     {action.content}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{formatDateEnglish(action.timestamp).short}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDateEnglish(action.timestamp).short}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -148,7 +148,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                   </button>
                   <button
                     onClick={() => deleteAction(realIndex)}
-                    className="text-xs text-gray-500 hover:text-red-600"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                   >
                     Remove
                   </button>
@@ -160,10 +160,10 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
 
         {/* Completed actions - collapsible */}
         {completedActions.length > 0 && (
-          <div className="border-t border-emerald-200 pt-3">
+          <div className="border-t border-emerald-200 dark:border-emerald-700 pt-3">
             <button
               onClick={() => setShowCompleted(!showCompleted)}
-              className="text-sm text-emerald-700 hover:text-emerald-900 font-medium flex items-center gap-1"
+              className="text-sm text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 font-medium flex items-center gap-1"
             >
               {showCompleted ? '▼' : '▶'} Completed ({completedActions.length})
             </button>
@@ -172,7 +172,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                 {completedActions.map((action, idx) => {
                   const realIndex = actions.findIndex(a => a === action);
                   return (
-                    <div key={realIndex} className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100 opacity-75">
+                    <div key={realIndex} className="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-700 opacity-75">
                       <input
                         type="checkbox"
                         checked={true}
@@ -180,8 +180,8 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                         className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-700 line-through">{action.content}</div>
-                        <div className="text-xs text-gray-500 mt-1">{formatDateEnglish(action.timestamp).short}</div>
+                        <div className="text-sm text-gray-700 dark:text-gray-300 line-through">{action.content}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDateEnglish(action.timestamp).short}</div>
                       </div>
                       <button
                         onClick={() => deleteAction(realIndex)}
@@ -199,71 +199,71 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
       </section>
 
       <section>
-        <div className="text-sm font-semibold text-gray-800 mb-1">🎯 Goal / Objective</div>
+        <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1">🎯 Goal / Objective</div>
         <TextBlock id="goal" value={p.goal} placeholder="Click to write your goal..." onChange={(val) => updates({ goal: val })} />
       </section>
 
       <section>
-        <div className="text-sm font-semibold text-gray-800 mb-1">🤔 Current Situation</div>
+        <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1">🤔 Current Situation</div>
         <TextBlock id="situation" value={p.situation} placeholder="Describe the current state..." onChange={(val) => updates({ situation: val })} />
       </section>
 
       <section>
-        <div className="text-sm font-semibold text-gray-800 mb-2">💡 Ideas & Options</div>
+        <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">💡 Ideas & Options</div>
         <div className="space-y-2">
           {ideas.map((it, idx) => (
-            <div key={idx} className="p-3 rounded-lg border border-gray-200 bg-white">
+            <div key={idx} className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <textarea
                 value={it.content || ''}
                 onChange={(e) => updateItem('ideas', idx, e.target.value)}
                 placeholder="Idea or option..."
-                className="w-full min-h-[60px] p-2 border-0 outline-none resize-none text-sm"
+                className="w-full min-h-[60px] p-2 border-0 outline-none resize-none text-sm bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 spellCheck={true}
               />
-              <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
+              <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span>{formatDateEnglish(it.timestamp).short}</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => deleteItem('ideas', idx)} className="px-2 py-0.5 border rounded text-xs">Delete</button>
+                  <button onClick={() => deleteItem('ideas', idx)} className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded text-xs bg-white dark:bg-gray-800">Delete</button>
                 </div>
               </div>
             </div>
           ))}
-          <button onClick={() => addItem('ideas')} className="text-sm text-emerald-700 hover:underline">+ Add idea or option</button>
+          <button onClick={() => addItem('ideas')} className="text-sm text-emerald-700 dark:text-emerald-300 hover:underline">+ Add idea or option</button>
         </div>
       </section>
 
 
       <section>
-        <div className="text-sm font-semibold text-gray-800 mb-2">📊 Progress & Updates</div>
+        <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">📊 Progress & Updates</div>
         <div className="space-y-2">
           {[...progress].slice().reverse().map((it, revIdx) => {
             const realIndex = progress.length - 1 - revIdx;
             return (
-              <div key={realIndex} className="p-3 rounded-lg border border-gray-200 bg-white">
+              <div key={realIndex} className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <textarea
                   value={it.content || ''}
                   onChange={(e) => updateItem('progress', realIndex, e.target.value)}
                   placeholder="Progress or update..."
-                  className="w-full min-h-[60px] p-2 border-0 outline-none resize-none text-sm"
+                  className="w-full min-h-[60px] p-2 border-0 outline-none resize-none text-sm bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                   spellCheck={true}
                 />
-                <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
+                <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                   <span>{formatDateEnglish(it.timestamp).short}</span>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => deleteItem('progress', realIndex)} className="px-2 py-0.5 border rounded text-xs">Delete</button>
+                    <button onClick={() => deleteItem('progress', realIndex)} className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded text-xs bg-white dark:bg-gray-800">Delete</button>
                   </div>
                 </div>
               </div>
             );
           })}
-          <button onClick={() => addItem('progress')} className="text-sm text-emerald-700 hover:underline">+ Log progress or update</button>
+          <button onClick={() => addItem('progress')} className="text-sm text-emerald-700 dark:text-emerald-300 hover:underline">+ Log progress or update</button>
         </div>
       </section>
 
       <section>
-        <div className="text-sm font-semibold text-gray-800 mb-1">📝 Notes & Thoughts</div>
+        <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1">📝 Notes & Thoughts</div>
         <TextBlock id="notes" value={p.notes} placeholder="Write freely..." onChange={(val) => updates({ notes: val })} />
-        <div className="mt-1 text-xs text-gray-500 text-right">
+        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
           {(() => {
             const text = (p.notes || '').trim();
             const words = text ? text.split(/\s+/).filter(Boolean).length : 0;

@@ -4,26 +4,26 @@ import ReplacementActions from './ReplacementActions';
 import EnvironmentDesigner from './EnvironmentDesigner';
 import DailyRoutineInput from './DailyRoutineInput';
 
-export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange }) {
+export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange, theme, onThemeChange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center justify-center gap-2">
           <SettingsIcon className="w-6 h-6" />
           Settings & Configuration
         </h2>
-        <p className="text-gray-600">Configure your daily routines and app preferences</p>
+        <p className="text-gray-600 dark:text-gray-400">Configure your daily routines and app preferences</p>
       </div>
 
       {/* Daily Routines Configuration */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-green-600" />
             Daily Routines Configuration
           </h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Set up to 5 daily routines that you want to track each day. These will appear in your morning tab for tracking.
           </p>
         </div>
@@ -40,14 +40,14 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
       </div>
 
       {/* Mindfulness & Protocol Settings */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Mindfulness & Protocol</h3>
-          <p className="text-sm text-gray-600 mt-1">Configure prompts and durations for micro‑interrupts.</p>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Mindfulness & Protocol</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Configure prompts and durations for micro‑interrupts.</p>
         </div>
         <div className="p-4 space-y-4">
           <div className="pt-2 border-t border-gray-200">
-            <h4 className="text-md font-semibold text-gray-800 mb-2">Gratitude/Input Mode</h4>
+            <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">Gratitude/Input Mode</h4>
             <SelectField
               label="Morning reflection mode"
               value={mindfulnessSettings?.morningMode ?? 'classic'}
@@ -103,7 +103,7 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             ]}
           />
           <div className="pt-2 border-t border-gray-200">
-            <p className="text-sm text-gray-700 mb-2">Default tab</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Default tab</p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
@@ -124,16 +124,16 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
                 Open on "Morning" by default
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">This sets your landing tab immediately and on next app load.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">This sets your landing tab immediately and on next app load.</p>
           </div>
         </div>
       </div>
 
       {/* Sessions (Beta) */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Sessions (Beta)</h3>
-          <p className="text-sm text-gray-600 mt-1">Enable lightweight focus sessions with hooks and quests.</p>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Sessions (Beta)</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enable lightweight focus sessions with hooks and quests.</p>
         </div>
         <div className="p-4 space-y-4">
           <Toggle
@@ -144,11 +144,26 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
         </div>
       </div>
 
+      {/* Appearance */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100">Appearance</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-1">Customize the look and feel of the app.</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <Toggle
+            label="Dark Mode"
+            checked={theme === 'dark'}
+            onChange={(v) => onThemeChange(v ? 'dark' : 'light')}
+          />
+        </div>
+      </div>
+
       {/* Tab Visibility */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Tab Visibility</h3>
-          <p className="text-sm text-gray-600 mt-1">Show or hide tabs to customize your workflow.</p>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100">Tab Visibility</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-1">Show or hide tabs to customize your workflow.</p>
         </div>
         <div className="p-4 space-y-4">
           <Toggle
@@ -176,10 +191,10 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
 
       {/* Projects Settings */}
       {featureFlags?.projectsTab && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
           <div className="border-b border-gray-200 p-4">
-            <h3 className="text-lg font-semibold text-gray-800">Projects Settings</h3>
-            <p className="text-sm text-gray-600 mt-1">Configure how you manage your projects.</p>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Projects Settings</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Configure how you manage your projects.</p>
           </div>
           <div className="p-4 space-y-4">
             <NumberField
@@ -187,7 +202,7 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
               value={mindfulnessSettings?.maxActiveProjects ?? 3}
               onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, maxActiveProjects: Math.max(1, Math.min(20, v)) })}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               You'll see a warning when you have more than this many active projects. Recommended: 3-5 to maintain focus.
             </p>
           </div>
@@ -195,10 +210,10 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
       )}
 
       {/* Invest Settings */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Invest Settings</h3>
-          <p className="text-sm text-gray-600 mt-1">Caps reading time to avoid endless research; keep docs as source of truth.</p>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Invest Settings</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Caps reading time to avoid endless research; keep docs as source of truth.</p>
         </div>
         <div className="p-4 space-y-4">
           <NumberField
@@ -224,15 +239,15 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
       />
 
       {/* Future Settings Placeholder */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-3">
           <Info className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Future Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Future Settings</h3>
         </div>
         <p className="text-gray-600 text-sm mb-4">
           This settings area can be expanded to include:
         </p>
-        <ul className="text-sm text-gray-600 space-y-1">
+        <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
           <li>• Custom life areas configuration</li>
           <li>• Notification preferences</li>
           <li>• Theme settings (dark mode)</li>
@@ -248,7 +263,7 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
 function Toggle({ label, checked, onChange }) {
   return (
     <label className="flex items-center justify-between gap-4">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
       <input
         type="checkbox"
         checked={!!checked}
@@ -262,14 +277,14 @@ function Toggle({ label, checked, onChange }) {
 function NumberField({ label, value, onChange }) {
   return (
     <label className="block">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
       <input
         type="number"
         value={value}
         min={5}
         max={600}
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
-        className="mt-1 p-2 border border-gray-300 rounded-md w-32"
+        className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
       />
     </label>
   );
@@ -278,11 +293,11 @@ function NumberField({ label, value, onChange }) {
 function SelectField({ label, value, onChange, options = [] }) {
   return (
     <label className="block">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 p-2 border border-gray-300 rounded-md w-64"
+        className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
       >
         {options.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>

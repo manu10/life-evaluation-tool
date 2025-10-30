@@ -1,1 +1,4 @@
 @import "tailwindcss";
+
+/* Ensure dark: variant uses the .dark class on the root (Tailwind v4) */
+@custom-variant dark (&:where(.dark, .dark *));

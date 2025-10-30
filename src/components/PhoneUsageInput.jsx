@@ -103,42 +103,42 @@ export default function PhoneUsageInput({ value, onChange, editable = true, labe
   };
   
   return (
-    <div className={`${finalColorClass} border ${finalBorderColor} rounded-lg p-6 shadow-sm`}>
-      <h3 className={`text-lg font-semibold ${colorClasses.titleColor} mb-4`}>📱 {label}</h3>
+    <div className={`${finalColorClass} dark:bg-gray-800 border ${finalBorderColor} dark:border-gray-700 rounded-lg p-6 shadow-sm`}>
+      <h3 className={`text-lg font-semibold ${colorClasses.titleColor} dark:text-gray-100 mb-4`}>📱 {label}</h3>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">How much time did you spend on your phone today?</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">How much time did you spend on your phone today?</label>
         <div className="flex items-center gap-3">
-          <Smartphone className="w-5 h-5 text-gray-600" />
+          <Smartphone className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           <div className="flex items-center gap-2">
             <select
               value={hours}
               onChange={e => handleHoursChange(e.target.value)}
               disabled={!editable}
-              className={`p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${!editable ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
             >
               {Array.from({ length: 13 }, (_, i) => (
                 <option key={i} value={i}>{i}</option>
               ))}
             </select>
-            <span className="text-sm text-gray-600">hours</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">hours</span>
             
             <select
               value={minutes}
               onChange={e => handleMinutesChange(e.target.value)}
               disabled={!editable}
-              className={`p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${!editable ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${!editable ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
             >
               {Array.from({ length: 60 }, (_, i) => (
                 <option key={i} value={i}>{i}</option>
               ))}
             </select>
-            <span className="text-sm text-gray-600">minutes</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">minutes</span>
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-1">Select hours and minutes using the dropdowns above</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Select hours and minutes using the dropdowns above</p>
         {isYesterday && colorClasses.message && (
-          <div className={`mt-3 p-3 rounded-lg border ${colorClasses.borderColor} ${colorClasses.bgColor}`}>
-            <p className={`text-sm font-medium ${colorClasses.messageColor}`}>
+          <div className={`mt-3 p-3 rounded-lg border ${colorClasses.borderColor} dark:border-gray-700 ${colorClasses.bgColor} dark:bg-gray-800`}>
+            <p className={`text-sm font-medium ${colorClasses.messageColor} dark:text-gray-200`}>
               {colorClasses.message}
             </p>
           </div>

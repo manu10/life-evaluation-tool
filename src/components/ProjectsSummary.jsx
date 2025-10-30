@@ -41,8 +41,8 @@ export default function ProjectsSummary({ projects = [], maxActiveProjects = 3, 
 
   if (projectsToShow.length === 0 && !hasWarning) {
     return (
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4 mb-6">
-        <div className="text-center text-sm text-emerald-700">
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-4 mb-6">
+        <div className="text-center text-sm text-emerald-700 dark:text-emerald-300">
           <div className="font-semibold mb-1">🎯 No active projects yet</div>
           <p className="text-xs">Create a project and add tasks to get started.</p>
         </div>
@@ -51,15 +51,15 @@ export default function ProjectsSummary({ projects = [], maxActiveProjects = 3, 
   }
 
   return (
-    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-lg p-4 mb-6">
+    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-bold text-emerald-900">🎯 Next Actions</h3>
+        <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-100">🎯 Next Actions</h3>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-emerald-700">{activeProjects.length} active</span>
+          <span className="text-xs text-emerald-700 dark:text-emerald-300">{activeProjects.length} active</span>
           {hasWarning && (
-            <div className="flex items-center gap-1 px-2 py-1 bg-orange-100 border border-orange-300 rounded">
-              <span className="text-orange-600">⚠️</span>
-              <span className="text-xs font-medium text-orange-800">
+            <div className="flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/40 border border-orange-300 dark:border-orange-600 rounded">
+              <span className="text-orange-600 dark:text-orange-400">⚠️</span>
+              <span className="text-xs font-medium text-orange-800 dark:text-orange-200">
                 Too many active projects!
               </span>
             </div>
@@ -70,22 +70,22 @@ export default function ProjectsSummary({ projects = [], maxActiveProjects = 3, 
         {projectsToShow.map(({ project, nextAction, nextActionIndex, isStarred, showWarning }) => {
           if (showWarning) {
             return (
-              <div key={project.id} className="bg-orange-50 rounded-lg border border-orange-300 p-3">
+              <div key={project.id} className="bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-300 dark:border-orange-600 p-3">
                 <div className="flex items-start gap-3">
-                  <span className="text-orange-500 text-lg">⚠️</span>
+                  <span className="text-orange-500 dark:text-orange-400 text-lg">⚠️</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-600 mb-1">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                       <button
                         onClick={() => onOpenProject && onOpenProject(project.id)}
-                        className="font-semibold hover:text-orange-700"
+                        className="font-semibold hover:text-orange-700 dark:hover:text-orange-300"
                       >
                         {project.title || 'Untitled Project'}
                       </button>
                     </div>
-                    <p className="text-sm text-orange-800 font-medium">
+                    <p className="text-sm text-orange-800 dark:text-orange-200 font-medium">
                       No tasks defined for this active project
                     </p>
-                    <p className="text-xs text-orange-600 mt-1">
+                    <p className="text-xs text-orange-600 dark:text-orange-300 mt-1">
                       Add a small 30-min task or mark as complete/paused
                     </p>
                   </div>
@@ -95,26 +95,26 @@ export default function ProjectsSummary({ projects = [], maxActiveProjects = 3, 
           }
           
           return (
-            <div key={project.id} className="bg-white rounded-lg border border-emerald-200 p-3">
+            <div key={project.id} className="bg-white dark:bg-gray-800 rounded-lg border border-emerald-200 dark:border-emerald-700 p-3">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   checked={false}
                   onChange={() => onToggleAction && onToggleAction(project.id, nextActionIndex)}
-                  className="w-5 h-5 mt-0.5 text-emerald-600 rounded focus:ring-emerald-500"
+                  className="w-5 h-5 mt-0.5 text-emerald-600 dark:text-emerald-500 rounded focus:ring-emerald-500"
                   title="Mark as complete"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-600 mb-1">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                     <button
                       onClick={() => onOpenProject && onOpenProject(project.id)}
-                      className="font-semibold hover:text-emerald-700"
+                      className="font-semibold hover:text-emerald-700 dark:hover:text-emerald-300"
                     >
                       {project.title || 'Untitled Project'}
                     </button>
                   </div>
-                  <div className="text-sm text-gray-900 flex items-center gap-2">
-                    {isStarred && <span className="text-amber-500">⭐</span>}
+                  <div className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    {isStarred && <span className="text-amber-500 dark:text-amber-400">⭐</span>}
                     {nextAction.content}
                   </div>
                 </div>
@@ -126,4 +126,3 @@ export default function ProjectsSummary({ projects = [], maxActiveProjects = 3, 
     </div>
   );
 }
-

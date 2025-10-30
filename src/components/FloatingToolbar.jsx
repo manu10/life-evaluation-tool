@@ -43,11 +43,11 @@ export default function FloatingToolbar({
   const isWarning = showTimer && timeLeft <= 30; // Red warning for low timer
 
   return (
-    <div className="fixed top-4 right-4 bg-white border-2 border-gray-300 rounded-full p-3 shadow-lg z-50">
+    <div className="fixed top-4 right-4 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-full p-3 shadow-lg z-50">
       <div className="flex items-center gap-2">
         {/* Time display - either timer countdown or session elapsed */}
         {showTimeDisplay && (
-          <span className={`text-lg font-bold ${isWarning ? 'text-red-600' : 'text-gray-800'}`}>
+          <span className={`text-lg font-bold ${isWarning ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-100'}`}>
             {formatTime(displayTime)}
           </span>
         )}

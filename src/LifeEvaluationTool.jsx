@@ -134,6 +134,8 @@ export default function LifeEvaluationTool() {
     distractionsTab: false, 
     sessionsTab: false 
   });
+  // Theme
+  const [theme, setTheme] = usePersistentState('theme', 'light');
   // Projects store
   const { projects, addProject, updateProject, removeProject, setNextAction } = useProjectsStore();
   const [openProjectId, setOpenProjectId] = useState(null);
@@ -190,6 +192,15 @@ export default function LifeEvaluationTool() {
     const id = setInterval(() => setSessionNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [liveSession]);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   // App usage tracking (time while tab visible and window focused)
   useEffect(() => {
@@ -533,7 +544,7 @@ export default function LifeEvaluationTool() {
 
   // UI
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
       {/* Floating Toolbar - Context-sensitive based on active tab */}
       {(activeTab === 'morning' || activeTab === 'evening' || activeTab === 'today') && (() => {
         // Calculate live session time left (countdown)
@@ -570,8 +581,8 @@ export default function LifeEvaluationTool() {
         );
       })()}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Check-In</h1>
-        <p className="text-gray-600">Track your feelings and set intentions</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Daily Check-In</h1>
+        <p className="text-gray-600 dark:text-gray-400">Track your feelings and set intentions</p>
         <AnchorNudgeBar
           frequency={mindfulnessSettings.anchorFrequency}
           microLogs={microPracticeLogs}
@@ -664,11 +675,11 @@ export default function LifeEvaluationTool() {
           canMarkDone={activeTab === 'evening' && !eveningDone && getEveningCompletionCount() === 6}
         />
       )}
-      <div className="text-sm text-gray-600 mb-8">
+      <div className="text-sm text-gray-600 dark:text-gray-400 mb-8">
         {activeTab === 'morning' ? (
           <>Progress: {getMorningCompletionCount()}/{lifeAreas.length + 3} items completed</>
         ) : (
-          <>Progress: {getEveningCompletionCount()}/6 items completed {eveningDone && <span className="text-green-600 font-semibold">✓ Locked</span>}</>
+          <>Progress: {getEveningCompletionCount()}/6 items completed {eveningDone && <span className="text-green-600 dark:text-green-400 font-semibold">✓ Locked</span>}</>
         )}
       </div>
       {/* Morning Tab Content */}
@@ -683,9 +694,9 @@ export default function LifeEvaluationTool() {
           >
             <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
             {yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim() !== '' && (
-              <div className="mb-4 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50">
-                <div className="text-sm text-emerald-900 font-semibold mb-1">📈 Yesterday's 1% Learning</div>
-                <div className="flex items-center gap-2 text-sm text-emerald-900">
+              <div className="mb-4 p-3 rounded-lg border-2 border-emerald-500 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+                <div className="text-sm text-emerald-900 dark:text-emerald-200 font-semibold mb-1">📈 Yesterday's 1% Learning</div>
+                <div className="flex items-center gap-2 text-sm text-emerald-900 dark:text-emerald-200">
                   <span className="text-base">{yesterdaysOnePercentDone ? '✅' : '⏳'}</span>
                   <span>{yesterdaysOnePercentPlan}</span>
                 </div>
@@ -695,8 +706,8 @@ export default function LifeEvaluationTool() {
               const secs = getUsageSecondsFor(new Date(Date.now() - 24 * 3600 * 1000));
               if (secs <= 0) return null;
               return (
-                <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
-                  <div className="text-sm text-indigo-900">App usage yesterday: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+                <div className="mb-4 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
+                  <div className="text-sm text-indigo-900 dark:text-indigo-200">App usage yesterday: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
                 </div>
               );
             })()}
@@ -729,16 +740,16 @@ export default function LifeEvaluationTool() {
 
           {/* Today's Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b-2 border-blue-200 pb-2">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b-2 border-blue-200 dark:border-blue-700 pb-2">
               🌟 Today's Focus
             </h2>
             {/* First Hour Activity Display */}
             {eveningResponses.firstHour && eveningResponses.firstHour.trim() && (
-              <div className="mb-6 p-4 border-2 border-blue-500 bg-blue-50 rounded-lg flex items-center gap-4">
+              <div className="mb-6 p-4 border-2 border-blue-500 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center gap-4">
                 <AlarmClock className="w-6 h-6 text-blue-600" />
                 <div className="flex-1">
-                  <label className="block text-base font-semibold text-blue-800 mb-1">First Hour Activity/Task</label>
-                  <div className="p-3 border border-blue-300 rounded-lg text-base bg-white">
+                  <label className="block text-base font-semibold text-blue-800 dark:text-blue-300 mb-1">First Hour Activity/Task</label>
+                  <div className="p-3 border border-blue-300 dark:border-blue-700 rounded-lg text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                     {eveningResponses.firstHour}
                   </div>
                 </div>
@@ -814,9 +825,9 @@ export default function LifeEvaluationTool() {
           {/* What worked today */}
           <WhatWorkedToday microLogs={microPracticeLogs} />
           {Array.isArray(missedAdjustments) && missedAdjustments.length > 0 && (
-            <div className="mb-6 p-4 rounded-lg border-2 border-amber-400 bg-amber-50">
-              <h3 className="text-base font-semibold text-amber-900 mb-2">Adjustments from yesterday’s misses</h3>
-              <ul className="list-disc ml-5 space-y-1 text-sm text-amber-900">
+            <div className="mb-6 p-4 rounded-lg border-2 border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20">
+              <h3 className="text-base font-semibold text-amber-900 dark:text-amber-200 mb-2">Adjustments from yesterday’s misses</h3>
+              <ul className="list-disc ml-5 space-y-1 text-sm text-amber-900 dark:text-amber-200">
                 {missedAdjustments.map((it, idx) => (
                   <li key={idx}>
                     <span className="font-medium">{it.text}</span>
@@ -869,17 +880,17 @@ export default function LifeEvaluationTool() {
       {activeTab === 'evening' && (
         <>
           {eveningDone && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-green-800 font-medium">Evening reflection completed and locked. Use Reset to unlock and edit.</span>
+                <span className="text-green-800 dark:text-green-200 font-medium">Evening reflection completed and locked. Use Reset to unlock and edit.</span>
               </div>
             </div>
           )}
           {(() => {
             const secs = getUsageSecondsFor(new Date());
             return (
-              <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
-                <div className="text-sm text-indigo-900">App usage today: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+              <div className="mb-4 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
+                <div className="text-sm text-indigo-900 dark:text-indigo-200">App usage today: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
               </div>
             );
           })()}
@@ -1072,6 +1083,8 @@ export default function LifeEvaluationTool() {
           onEnvironmentProfileChange={setEnvironmentProfile}
           featureFlags={featureFlags}
           onFeatureFlagsChange={setFeatureFlags}
+          theme={theme}
+          onThemeChange={setTheme}
         />
       )}
       <ProjectDetailModal

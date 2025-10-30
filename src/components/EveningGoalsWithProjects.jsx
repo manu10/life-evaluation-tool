@@ -75,27 +75,27 @@ export default function EveningGoalsWithProjects({
     if (nextActions.length === 0) return null;
 
     return (
-      <div className="mb-4 bg-blue-50 border-2 border-blue-200 rounded-lg overflow-hidden">
+      <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg overflow-hidden">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100 transition-colors"
+          className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
         >
-          <span className="text-sm font-semibold text-blue-800">
+          <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">
             📋 {nextActions.length} suggested task{nextActions.length !== 1 ? 's' : ''} from projects
           </span>
-          <span className="text-blue-600">{expanded ? '↑' : '↓'}</span>
+          <span className="text-blue-600 dark:text-blue-300">{expanded ? '↑' : '↓'}</span>
         </button>
         
         {expanded && (
           <div className="px-4 pb-4 space-y-2">
             {nextActions.map((action, idx) => (
-              <div key={idx} className="bg-white rounded p-3 border border-blue-200">
+              <div key={idx} className="bg-white dark:bg-gray-800 rounded p-3 border border-blue-200 dark:border-blue-700">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-block px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">
+                  <span className="inline-block px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded">
                     {action.projectTitle}
                   </span>
                 </div>
-                <div className="text-sm text-gray-900 mb-2">{action.content}</div>
+                <div className="text-sm text-gray-900 dark:text-gray-100 mb-2">{action.content}</div>
                 <div className="flex gap-2 flex-wrap">
                   {[1, 2, 3].map(num => (
                     <button
