@@ -38,6 +38,7 @@ import TodosList from './components/TodosList';
 import SessionStarterModal from './components/modals/SessionStarterModal';
 import SessionEnderModal from './components/modals/SessionEnderModal';
 import SessionsDashboard from './components/SessionsDashboard';
+import ImmersiveSessionOverlay from './components/ImmersiveSessionOverlay';
 import ProjectsTab from './components/ProjectsTab';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
@@ -117,6 +118,8 @@ export default function LifeEvaluationTool() {
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isStartSessionOpen, setIsStartSessionOpen] = useState(false);
   const [isEndSessionOpen, setIsEndSessionOpen] = useState(false);
+  const [showImmersive, setShowImmersive] = useState(false);
+  const [enderPrefillHighlight, setEnderPrefillHighlight] = useState('');
   const [hooks, setHooks] = usePersistentState('hooks', []);
   const [sessions, setSessions] = usePersistentState('sessions', []);
   const [liveSession, setLiveSession] = useState(null);
@@ -192,6 +195,15 @@ export default function LifeEvaluationTool() {
     const id = setInterval(() => setSessionNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [liveSession]);
+
+  // Immersive overlay activation when session starts
+  useEffect(() => {
+    if (liveSession && mindfulnessSettings?.immersiveSessions) {
+      setShowImmersive(true);
+    } else {
+      setShowImmersive(false);
+    }
+  }, [liveSession, mindfulnessSettings?.immersiveSessions]);
 
   // Apply theme to document
   useEffect(() => {
@@ -1127,6 +1139,7 @@ export default function LifeEvaluationTool() {
       />
       <SessionEnderModal
         isOpen={isEndSessionOpen}
+        initialHighlight={enderPrefillHighlight}
         onClose={() => setIsEndSessionOpen(false)}
         onEnd={({ enjoyment, highlight, rewardTaken }) => {
           if (!liveSession) { setIsEndSessionOpen(false); return; }
@@ -1134,6 +1147,8 @@ export default function LifeEvaluationTool() {
           setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
           setLiveSession(null);
           setIsEndSessionOpen(false);
+          setShowImmersive(false);
+          setEnderPrefillHighlight('');
         }}
       />
       <EveningResetConfirm
@@ -1339,6 +1354,22 @@ export default function LifeEvaluationTool() {
         }}
         onOpenSettings={() => setActiveTab('settings')}
       />
+      {showImmersive && liveSession && mindfulnessSettings?.immersiveSessions && (
+        <ImmersiveSessionOverlay
+          session={liveSession}
+          onEnd={({ outcome }) => { setEnderPrefillHighlight(outcome || ''); setIsEndSessionOpen(true); setShowImmersive(false); }}
+          onCancel={({ confirmed } = {}) => {
+            if (confirmed && liveSession) {
+              // Remove session entirely
+              const id = liveSession.id;
+              setSessions(prev => prev.filter(s => s.id !== id));
+              setLiveSession(null);
+            }
+            setShowImmersive(false);
+          }}
+          enableExtend={true}
+        />
+      )}
     </div>
   );
 }
