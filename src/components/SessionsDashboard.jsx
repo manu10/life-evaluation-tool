@@ -36,7 +36,7 @@ export default function SessionsDashboard({ sessions = [], hooks = [], onUpdateH
       {/* Collapsible per hook */}
       <div className="space-y-4">
         {grouped.order.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-600">No sessions yet.</div>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-sm text-gray-600 dark:text-gray-400">No sessions yet.</div>
         ) : (
           grouped.order.map((hookKey) => {
             const items = grouped.byHook[hookKey];
@@ -218,17 +218,17 @@ function HookEditMenu({ hookKey, label, emoji, color, onUpdate }) {
   const [localColor, setLocalColor] = useState(color || 'emerald');
   return (
     <div className="relative">
-      <button onClick={() => setOpen(o => !o)} className="px-2 py-1 text-xs rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50">Edit</button>
+      <button onClick={() => setOpen(o => !o)} className="px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">Edit</button>
       {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow p-3 z-10">
-          <label className="block text-xs text-gray-600 mb-1">Emoji</label>
-          <input value={localEmoji} onChange={(e)=>setLocalEmoji(e.target.value)} className="w-full p-1 border border-gray-300 rounded mb-2" />
-          <label className="block text-xs text-gray-600 mb-1">Color</label>
-          <select value={localColor} onChange={(e)=>setLocalColor(e.target.value)} className="w-full p-1 border border-gray-300 rounded mb-2">
+        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow p-3 z-10">
+          <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Emoji</label>
+          <input value={localEmoji} onChange={(e)=>setLocalEmoji(e.target.value)} className="w-full p-1 border border-gray-300 dark:border-gray-600 rounded mb-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+          <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Color</label>
+          <select value={localColor} onChange={(e)=>setLocalColor(e.target.value)} className="w-full p-1 border border-gray-300 dark:border-gray-600 rounded mb-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
             {HOOK_COLORS.map(c => (<option key={c} value={c}>{c}</option>))}
           </select>
           <div className="flex justify-end gap-2">
-            <button onClick={() => setOpen(false)} className="text-xs text-gray-600">Cancel</button>
+            <button onClick={() => setOpen(false)} className="text-xs text-gray-600 dark:text-gray-300">Cancel</button>
             <button onClick={() => { onUpdate && onUpdate({ emoji: localEmoji, color: localColor }); setOpen(false); }} className="text-xs text-blue-700">Save</button>
           </div>
         </div>
