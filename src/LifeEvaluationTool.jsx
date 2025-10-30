@@ -694,9 +694,9 @@ export default function LifeEvaluationTool() {
           >
             <GoalsList goals={yesterdaysGoals} editable={false} title="Yesterday's Goals" colorClass="bg-gray-50" />
             {yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim() !== '' && (
-              <div className="mb-4 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50">
-                <div className="text-sm text-emerald-900 font-semibold mb-1">📈 Yesterday's 1% Learning</div>
-                <div className="flex items-center gap-2 text-sm text-emerald-900">
+              <div className="mb-4 p-3 rounded-lg border-2 border-emerald-500 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+                <div className="text-sm text-emerald-900 dark:text-emerald-200 font-semibold mb-1">📈 Yesterday's 1% Learning</div>
+                <div className="flex items-center gap-2 text-sm text-emerald-900 dark:text-emerald-200">
                   <span className="text-base">{yesterdaysOnePercentDone ? '✅' : '⏳'}</span>
                   <span>{yesterdaysOnePercentPlan}</span>
                 </div>
@@ -706,8 +706,8 @@ export default function LifeEvaluationTool() {
               const secs = getUsageSecondsFor(new Date(Date.now() - 24 * 3600 * 1000));
               if (secs <= 0) return null;
               return (
-                <div className="mb-4 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
-                  <div className="text-sm text-indigo-900">App usage yesterday: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
+                <div className="mb-4 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
+                  <div className="text-sm text-indigo-900 dark:text-indigo-200">App usage yesterday: <span className="font-semibold">{formatDurationShort(secs)}</span></div>
                 </div>
               );
             })()}

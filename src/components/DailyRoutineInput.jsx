@@ -31,20 +31,20 @@ export default function DailyRoutineInput({
   if (!editable && displayRoutines.length === 0) return null;
 
   return (
-    <div className={`${colorClass} border border-gray-200 rounded-lg p-6 shadow-sm mb-6`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+    <div className={`${colorClass} dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm mb-6`}>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5" />
         {title}
       </h3>
       
       {editable ? (
         <div className="space-y-3">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             Set up to 5 daily routine items that you want to track each day:
           </p>
           {routines.map((routine, index) => (
             <div key={index}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Routine {index + 1} (optional)
               </label>
               <input
@@ -58,7 +58,7 @@ export default function DailyRoutineInput({
                   index === 3 ? 'Exercise or walk' :
                   'Evening reflection'
                 }`}
-                className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
           ))}
@@ -75,18 +75,18 @@ export default function DailyRoutineInput({
                     onChange={() => handleToggle(routines.findIndex(r => r.text === routine.text))}
                     className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <span className={`text-gray-800 ${routine.completed ? 'line-through text-gray-500' : ''}`}>
+                  <span className={`text-gray-800 dark:text-gray-100 ${routine.completed ? 'line-through text-gray-500 dark:text-gray-400' : ''}`}>
                     {routine.text}
                   </span>
                   {routine.completed && <CheckCircle2 className="w-4 h-4 text-green-600" />}
                 </>
               ) : (
-                <span className="text-gray-800">{routine.text}</span>
+                <span className="text-gray-800 dark:text-gray-100">{routine.text}</span>
               )}
             </div>
           ))}
           {displayRoutines.length === 0 && (
-            <p className="text-gray-500 italic">No daily routines set up yet.</p>
+            <p className="text-gray-500 dark:text-gray-400 italic">No daily routines set up yet.</p>
           )}
         </div>
       )}
