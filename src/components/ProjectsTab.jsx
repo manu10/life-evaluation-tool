@@ -31,9 +31,9 @@ export default function ProjectsTab({ projects = [], onCreate, onOpen }) {
                 <div className={`text-xs px-2 py-0.5 rounded ${p.status === 'solved' ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>{p.status || 'active'}</div>
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700">💡 {ideas}</span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700">✅ {actions}</span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700">📊 {progress}</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">💡 {ideas}</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">✅ {actions}</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">📊 {progress}</span>
                 <span className="ml-auto">Updated: {new Date(p.updatedAt || p.createdAt || Date.now()).toLocaleDateString()}</span>
               </div>
             </button>
