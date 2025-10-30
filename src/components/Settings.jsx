@@ -141,6 +141,11 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             checked={!!mindfulnessSettings?.enableSessions}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, enableSessions: v })}
           />
+          <Toggle
+            label="Immersive sessions mode (locks UI during session)"
+            checked={!!mindfulnessSettings?.immersiveSessions}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, immersiveSessions: v })}
+          />
         </div>
       </div>
 

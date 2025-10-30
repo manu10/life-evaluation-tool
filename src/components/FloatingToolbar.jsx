@@ -105,6 +105,17 @@ export default function FloatingToolbar({
             ❓
           </button>
         )}
+
+        {/* Focus Playlist (Spotify) */}
+        <a
+          href="https://open.spotify.com/playlist/37i9dQZF1DX7EF8wVxBVhG?si=435bdf11a2924809"
+          target="_blank"
+          rel="noreferrer"
+          className="px-2 py-1 text-xs rounded-lg bg-green-100 text-green-700 border border-green-300 hover:bg-green-200"
+          title="Open Focus Playlist on Spotify"
+        >
+          🎧
+        </a>
         
         {/* Copy button (morning tab when timer complete) */}
         {showCopyButton && onCopy && (
