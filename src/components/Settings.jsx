@@ -151,12 +151,22 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             checked={!!mindfulnessSettings?.immersiveSessions}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, immersiveSessions: v })}
           />
+          <SelectField
+            label="Alarm sound"
+            value={mindfulnessSettings?.alarmSound ?? 'beep'}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, alarmSound: v })}
+            options={[
+              { value: 'beep', label: 'Beep (sine, 880Hz)' },
+              { value: 'bell', label: 'Bell (triangle, 660Hz)' },
+              { value: 'chime', label: 'Chime (square, 1200Hz)' }
+            ]}
+          />
           <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Alarm sound test (Safari fix)</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={testAlarmSound}
+                onClick={() => testAlarmSound(mindfulnessSettings?.alarmSound ?? 'beep')}
                 className="px-3 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
               >
                 ▶︎ Test alarm sound
