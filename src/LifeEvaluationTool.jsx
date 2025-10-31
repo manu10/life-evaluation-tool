@@ -1392,6 +1392,7 @@ export default function LifeEvaluationTool() {
             setShowImmersive(false);
           }}
           enableExtend={true}
+          soundType={mindfulnessSettings?.alarmSound ?? 'beep'}
         />
       )}
     </div>

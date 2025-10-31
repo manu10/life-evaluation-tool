@@ -6,6 +6,7 @@ export default function ImmersiveSessionOverlay({
   onEnd,
   onCancel,
   enableExtend = true,
+  soundType = 'beep',
 }) {
   const { startedAt, plannedMin, hookLabel, questTitle } = session || {};
   const [now, setNow] = useState(Date.now());
@@ -51,9 +52,9 @@ export default function ImmersiveSessionOverlay({
       stopBeep();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = 880; // A5
-      gain.gain.value = 0.05; // quiet
+      if (soundType === 'bell') { osc.type = 'triangle'; osc.frequency.value = 660; gain.gain.value = 0.06; }
+      else if (soundType === 'chime') { osc.type = 'square'; osc.frequency.value = 1200; gain.gain.value = 0.04; }
+      else { osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.05; }
       osc.connect(gain).connect(ctx.destination);
       osc.start();
       oscRef.current = osc;

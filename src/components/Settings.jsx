@@ -151,6 +151,19 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             checked={!!mindfulnessSettings?.immersiveSessions}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, immersiveSessions: v })}
           />
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Alarm sound test (Safari fix)</p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={testAlarmSound}
+                className="px-3 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                ▶︎ Test alarm sound
+              </button>
+              <span className="text-xs text-gray-600 dark:text-gray-400">Click to enable audio context on Safari and verify sound.</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -315,4 +328,30 @@ function SelectField({ label, value, onChange, options = [] }) {
       </select>
     </label>
   );
+}
+
+// Local helper to play a short beep. Helps Safari initialize/resume AudioContext via user gesture.
+function testAlarmSound(sound = 'beep') {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) { alert('Web Audio not supported in this browser'); return; }
+    const ctx = new AudioCtx();
+    // Some Safari builds require an explicit resume() after user gesture.
+    if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    if (sound === 'bell') {
+      osc.type = 'triangle'; osc.frequency.value = 660; gain.gain.value = 0.1;
+    } else if (sound === 'chime') {
+      osc.type = 'square'; osc.frequency.value = 1200; gain.gain.value = 0.06;
+    } else { osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.08; }
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    setTimeout(() => {
+      try { osc.stop(); osc.disconnect(); gain.disconnect(); ctx.close && ctx.close(); } catch {}
+    }, 600);
+  } catch (e) {
+    console.error(e);
+    alert('Could not play test sound. Check browser permissions.');
+  }
 }
