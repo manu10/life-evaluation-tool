@@ -5,6 +5,7 @@ import EnvironmentDesigner from './EnvironmentDesigner';
 import DailyRoutineInput from './DailyRoutineInput';
 
 export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfulnessSettings, onMindfulnessSettingsChange, replacementActions, onAddReplacementAction, onRemoveReplacementAction, onToggleReplacementEasy, environmentProfile, onEnvironmentProfileChange, featureFlags, onFeatureFlagsChange, theme, onThemeChange }) {
+  const [showShortcutHelp, setShowShortcutHelp] = React.useState(false);
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -195,7 +196,28 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
                   className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   placeholder="Start Focus Timer"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">We will open shortcuts:// to run this Shortcut, passing the planned minutes as input.</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowShortcutHelp(true)}
+                    className="px-3 py-1.5 text-xs rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    How to set up Shortcut
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        const name = encodeURIComponent(mindfulnessSettings?.iosShortcutName || 'Start Focus Timer');
+                        window.location.href = `shortcuts://run-shortcut?name=${name}&input=10`;
+                      } catch {}
+                    }}
+                    className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    Test Shortcut (10 min)
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">We open shortcuts:// to run this Shortcut, passing the planned minutes as input.</p>
               </label>
             )}
             {mindfulnessSettings?.nativeTimerHelper === 'thirdParty' && (
@@ -242,6 +264,49 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
           </div>
         </div>
       </div>
+      {/* iOS Shortcut Help Modal */}
+      {showShortcutHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowShortcutHelp(false)} />
+          <div className="relative w-full max-w-lg mx-4 p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-xl">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-lg font-semibold">Set up the iOS Shortcut</h4>
+              <button onClick={() => setShowShortcutHelp(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">✕</button>
+            </div>
+            <div className="space-y-3 text-sm">
+              <p>Follow these steps once. Then our app can start a native timer automatically:</p>
+              <ol className="list-decimal ml-5 space-y-1">
+                <li>Open <span className="font-medium">Shortcuts</span> → tap <span className="font-medium">+</span> to create a new Shortcut and name it <span className="font-medium">{mindfulnessSettings?.iosShortcutName || 'Start Focus Timer'}</span>.</li>
+                <li>Add action <span className="font-medium">Get Numbers from Input</span> → Source: <span className="font-medium">Shortcut Input</span>.</li>
+                <li>Add action <span className="font-medium">Get Item from List</span> → <span className="font-medium">First Item</span>.</li>
+                <li>Add action <span className="font-medium">If</span> (<span className="font-medium">First Item</span> &gt; 0)
+                  <ul className="list-disc ml-5">
+                    <li>If True: <span className="font-medium">Set Variable</span> → <span className="font-medium">Minutes</span> = <span className="font-medium">First Item</span></li>
+                    <li>Otherwise: <span className="font-medium">Ask for Input</span> (Number) → set <span className="font-medium">Minutes</span></li>
+                  </ul>
+                </li>
+                <li>Add action <span className="font-medium">Start Timer</span> for <span className="font-medium">Minutes</span> <span className="font-medium">minutes</span>.</li>
+                <li>Optional: <span className="font-medium">Show Notification</span> “✅ Timer started for Minutes min”.</li>
+              </ol>
+              <div className="mt-2 p-3 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div className="text-xs text-gray-600 dark:text-gray-300">Quick test link (iOS only):</div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const name = encodeURIComponent(mindfulnessSettings?.iosShortcutName || 'Start Focus Timer');
+                      window.location.href = `shortcuts://run-shortcut?name=${name}&input=10`;
+                    } catch {}
+                  }}
+                  className="mt-2 px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Run “{mindfulnessSettings?.iosShortcutName || 'Start Focus Timer'}” with 10 minutes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Appearance */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
