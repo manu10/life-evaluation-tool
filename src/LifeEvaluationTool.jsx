@@ -44,6 +44,7 @@ import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
 import ProjectsSummary from './components/ProjectsSummary';
 import MorningStreak from './components/MorningStreak';
+import { primeAlarmAudio } from './utils/alarmAudio';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -1155,6 +1156,7 @@ export default function LifeEvaluationTool() {
           return item;
         }}
         onStart={({ hookId, hookLabel, questTitle, plannedMin }) => {
+          try { primeAlarmAudio(); } catch {}
           const session = { id: Date.now().toString(), startedAt: Date.now(), hookId, hookLabel, questTitle, plannedMin };
           setLiveSession(session);
           setSessions(prev => [session, ...prev]);

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import BreathingGuideModal from './modals/BreathingGuideModal';
+import { playAlarmPattern, stopAlarmPattern, primeAlarmAudio } from '../utils/alarmAudio';
 
 export default function ImmersiveSessionOverlay({
   session,
@@ -19,7 +20,7 @@ export default function ImmersiveSessionOverlay({
   const [alarmOn, setAlarmOn] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
   const [soundReady, setSoundReady] = useState(false);
-  const audioCtxRef = useRef(null);
+  const audioCtxRef = useRef(null); // kept for legacy hint state
   const oscRef = useRef(null);
   const notifiedRef = useRef(false);
 
@@ -46,10 +47,14 @@ export default function ImmersiveSessionOverlay({
   useEffect(() => {
     if (!alarmOn) {
       stopBeep();
+      stopAlarmPattern();
       return;
     }
+    // Try shared alarm pattern (works if primed earlier by user gesture on Start)
+    try { playAlarmPattern(soundType); } catch {}
+    // Fallback legacy oscillator
     startBeep();
-    return () => stopBeep();
+    return () => { stopBeep(); stopAlarmPattern(); };
   }, [alarmOn]);
 
   // Fire a system notification when the alarm starts (best-effort background sound via OS)
@@ -76,11 +81,13 @@ export default function ImmersiveSessionOverlay({
   useEffect(() => {
     function onVis() {
       if (document.visibilityState === 'visible' && alarmOn) {
-        // attempt to resume audio context and restart beep
-        try { if (audioCtxRef.current && audioCtxRef.current.resume) audioCtxRef.current.resume(); } catch {}
+        // attempt to resume audio context and restart pattern
+        try { primeAlarmAudio(); } catch {}
+        try { playAlarmPattern(soundType); } catch {}
         startBeep();
       } else if (document.visibilityState === 'hidden') {
         stopBeep();
+        stopAlarmPattern();
       }
     }
     document.addEventListener('visibilitychange', onVis);
@@ -89,8 +96,7 @@ export default function ImmersiveSessionOverlay({
 
   function primeAudio() {
     try {
-      if (!audioCtxRef.current) audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtxRef.current.state === 'suspended' && audioCtxRef.current.resume) audioCtxRef.current.resume();
+      primeAlarmAudio();
       setSoundReady(true);
     } catch {}
   }
