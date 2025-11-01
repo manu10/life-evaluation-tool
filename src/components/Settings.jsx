@@ -152,6 +152,16 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, immersiveSessions: v })}
           />
           <Toggle
+            label="Notification alarm (experimental)"
+            checked={!!mindfulnessSettings?.enableAlarmNotification}
+            onChange={async (v) => {
+              if (v && 'Notification' in window) {
+                try { await Notification.requestPermission(); } catch {}
+              }
+              onMindfulnessSettingsChange({ ...mindfulnessSettings, enableAlarmNotification: v });
+            }}
+          />
+          <Toggle
             label="Session testing mode (15s timer)"
             checked={!!mindfulnessSettings?.sessionTestMode}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, sessionTestMode: v })}

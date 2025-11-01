@@ -8,6 +8,7 @@ export default function ImmersiveSessionOverlay({
   enableExtend = true,
   soundType = 'beep',
   testMode = false,
+  notifyEnabled = false,
 }) {
   const { startedAt, plannedMin, hookLabel, questTitle } = session || {};
   const [now, setNow] = useState(Date.now());
@@ -20,6 +21,7 @@ export default function ImmersiveSessionOverlay({
   const [soundReady, setSoundReady] = useState(false);
   const audioCtxRef = useRef(null);
   const oscRef = useRef(null);
+  const notifiedRef = useRef(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -49,6 +51,26 @@ export default function ImmersiveSessionOverlay({
     startBeep();
     return () => stopBeep();
   }, [alarmOn]);
+
+  // Fire a system notification when the alarm starts (best-effort background sound via OS)
+  useEffect(() => {
+    if (alarmOn && notifyEnabled && !notifiedRef.current) {
+      notifiedRef.current = true;
+      try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then((reg) => {
+              if (reg && reg.active) {
+                reg.active.postMessage({ type: 'show-alarm', title: 'Focus session finished', body: 'Time is up. Start typing your outcome.' });
+              } else if (reg && reg.showNotification) {
+                reg.showNotification('Focus session finished', { body: 'Time is up. Start typing your outcome.', tag: 'focus-session-alarm', renotify: true, requireInteraction: true });
+              }
+            }).catch(() => {});
+          }
+        }
+      } catch {}
+    }
+  }, [alarmOn, notifyEnabled]);
 
   // Visibility handling: restart alarm when app comes to foreground
   useEffect(() => {
