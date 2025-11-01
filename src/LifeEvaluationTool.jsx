@@ -1397,6 +1397,7 @@ export default function LifeEvaluationTool() {
           soundType={mindfulnessSettings?.alarmSound ?? 'beep'}
           testMode={!!mindfulnessSettings?.sessionTestMode}
           notifyEnabled={!!mindfulnessSettings?.enableAlarmNotification}
+          keepAwakeEnabled={!!mindfulnessSettings?.keepScreenAwake}
         />
       )}
     </div>

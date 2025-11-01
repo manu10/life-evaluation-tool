@@ -10,6 +10,7 @@ export default function ImmersiveSessionOverlay({
   soundType = 'beep',
   testMode = false,
   notifyEnabled = false,
+  keepAwakeEnabled = false,
 }) {
   const { startedAt, plannedMin, hookLabel, questTitle } = session || {};
   const [now, setNow] = useState(Date.now());
@@ -23,11 +24,36 @@ export default function ImmersiveSessionOverlay({
   const audioCtxRef = useRef(null); // kept for legacy hint state
   const oscRef = useRef(null);
   const notifiedRef = useRef(false);
+  const wakeLockRef = useRef(null);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Screen Wake Lock: keep the screen on if enabled
+  useEffect(() => {
+    async function requestLock() {
+      try {
+        if (!keepAwakeEnabled) return;
+        if ('wakeLock' in navigator && !wakeLockRef.current) {
+          wakeLockRef.current = await navigator.wakeLock.request('screen');
+          wakeLockRef.current.addEventListener('release', () => {});
+        }
+      } catch {}
+    }
+    requestLock();
+    function onVis() {
+      if (document.visibilityState === 'visible' && keepAwakeEnabled && wakeLockRef.current == null) {
+        requestLock();
+      }
+    }
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      try { if (wakeLockRef.current) { wakeLockRef.current.release(); wakeLockRef.current = null; } } catch {}
+    };
+  }, [keepAwakeEnabled]);
 
   const totalPlannedSec = useMemo(() => {
     const base = testMode ? 15 : Math.max(0, (plannedMin || 0) * 60);

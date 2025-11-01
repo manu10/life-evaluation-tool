@@ -18,6 +18,7 @@ self.addEventListener('message', async (event) => {
         badge: '/vite.svg',
         icon: '/vite.svg',
         requireInteraction: true,
+        vibrate: [200, 100, 200, 100, 400, 100, 400],
       });
     } catch (e) {
       // no-op
