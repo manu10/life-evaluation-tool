@@ -166,6 +166,52 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
               onMindfulnessSettingsChange({ ...mindfulnessSettings, enableAlarmNotification: v });
             }}
           />
+          {/* Native timer helper */}
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">Native timer helper</h4>
+            <SelectField
+              label="Helper type"
+              value={mindfulnessSettings?.nativeTimerHelper ?? 'off'}
+              onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, nativeTimerHelper: v })}
+              options={[
+                { value: 'off', label: 'Off' },
+                { value: 'iosShortcut', label: 'iOS Shortcut' },
+                { value: 'androidClock', label: 'Android Clock' },
+                { value: 'thirdParty', label: 'Third‑party app (custom URL)' }
+              ]}
+            />
+            <Toggle
+              label="Auto-open native timer at session start"
+              checked={!!mindfulnessSettings?.nativeTimerAutoOpen}
+              onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, nativeTimerAutoOpen: v })}
+            />
+            {mindfulnessSettings?.nativeTimerHelper === 'iosShortcut' && (
+              <label className="block mt-2">
+                <span className="text-sm text-gray-700 dark:text-gray-300">iOS Shortcut name</span>
+                <input
+                  type="text"
+                  value={mindfulnessSettings?.iosShortcutName ?? 'Start Focus Timer'}
+                  onChange={(e) => onMindfulnessSettingsChange({ ...mindfulnessSettings, iosShortcutName: e.target.value })}
+                  className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="Start Focus Timer"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">We will open shortcuts:// to run this Shortcut, passing the planned minutes as input.</p>
+              </label>
+            )}
+            {mindfulnessSettings?.nativeTimerHelper === 'thirdParty' && (
+              <label className="block mt-2">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Third‑party URL template</span>
+                <input
+                  type="text"
+                  value={mindfulnessSettings?.thirdPartyUrlTemplate ?? ''}
+                  onChange={(e) => onMindfulnessSettingsChange({ ...mindfulnessSettings, thirdPartyUrlTemplate: e.target.value })}
+                  className="mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="due://x-callback-url/add?title=Focus&minutes={minutes}"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Use placeholders {"{minutes}"} and/or {"{seconds}"}. We’ll substitute based on your session length.</p>
+              </label>
+            )}
+          </div>
           <Toggle
             label="Session testing mode (15s timer)"
             checked={!!mindfulnessSettings?.sessionTestMode}
