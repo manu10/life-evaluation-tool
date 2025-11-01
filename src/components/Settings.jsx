@@ -151,6 +151,11 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
             checked={!!mindfulnessSettings?.immersiveSessions}
             onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, immersiveSessions: v })}
           />
+          <Toggle
+            label="Session testing mode (15s timer)"
+            checked={!!mindfulnessSettings?.sessionTestMode}
+            onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, sessionTestMode: v })}
+          />
           <SelectField
             label="Alarm sound"
             value={mindfulnessSettings?.alarmSound ?? 'beep'}

@@ -1393,6 +1393,7 @@ export default function LifeEvaluationTool() {
           }}
           enableExtend={true}
           soundType={mindfulnessSettings?.alarmSound ?? 'beep'}
+          testMode={!!mindfulnessSettings?.sessionTestMode}
         />
       )}
     </div>

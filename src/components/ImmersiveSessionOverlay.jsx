@@ -7,6 +7,7 @@ export default function ImmersiveSessionOverlay({
   onCancel,
   enableExtend = true,
   soundType = 'beep',
+  testMode = false,
 }) {
   const { startedAt, plannedMin, hookLabel, questTitle } = session || {};
   const [now, setNow] = useState(Date.now());
@@ -16,6 +17,7 @@ export default function ImmersiveSessionOverlay({
   const [outcome, setOutcome] = useState('');
   const [alarmOn, setAlarmOn] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
+  const [soundReady, setSoundReady] = useState(false);
   const audioCtxRef = useRef(null);
   const oscRef = useRef(null);
 
@@ -24,7 +26,10 @@ export default function ImmersiveSessionOverlay({
     return () => clearInterval(id);
   }, []);
 
-  const totalPlannedSec = useMemo(() => Math.max(0, (plannedMin || 0) * 60 + extendedSec), [plannedMin, extendedSec]);
+  const totalPlannedSec = useMemo(() => {
+    const base = testMode ? 15 : Math.max(0, (plannedMin || 0) * 60);
+    return base + extendedSec;
+  }, [plannedMin, extendedSec, testMode]);
   const elapsedSec = useMemo(() => Math.max(0, Math.floor((now - startedAt) / 1000)), [now, startedAt]);
   const remainingSec = Math.max(0, totalPlannedSec - elapsedSec);
 
@@ -44,6 +49,29 @@ export default function ImmersiveSessionOverlay({
     startBeep();
     return () => stopBeep();
   }, [alarmOn]);
+
+  // Visibility handling: restart alarm when app comes to foreground
+  useEffect(() => {
+    function onVis() {
+      if (document.visibilityState === 'visible' && alarmOn) {
+        // attempt to resume audio context and restart beep
+        try { if (audioCtxRef.current && audioCtxRef.current.resume) audioCtxRef.current.resume(); } catch {}
+        startBeep();
+      } else if (document.visibilityState === 'hidden') {
+        stopBeep();
+      }
+    }
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [alarmOn]);
+
+  function primeAudio() {
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtxRef.current.state === 'suspended' && audioCtxRef.current.resume) audioCtxRef.current.resume();
+      setSoundReady(true);
+    } catch {}
+  }
 
   function startBeep() {
     try {
@@ -93,9 +121,9 @@ export default function ImmersiveSessionOverlay({
 
         <div className="mt-6 flex items-center gap-2">
           {!hasExtended && remainingSec > 0 && (
-            <button onClick={handleExtend} className="px-3 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700">+5 minutes</button>
+            <button onClick={() => { primeAudio(); handleExtend(); }} className="px-3 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700">+5 minutes</button>
           )}
-          <button onClick={() => setShowBreaths(true)} className="px-3 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">Start 3 breaths</button>
+          <button onClick={() => { primeAudio(); setShowBreaths(true); }} className="px-3 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">Start 3 breaths</button>
           <a
             href="https://open.spotify.com/playlist/37i9dQZF1DX7EF8wVxBVhG?si=435bdf11a2924809"
             target="_blank"
@@ -104,7 +132,7 @@ export default function ImmersiveSessionOverlay({
           >
             🎧 Focus playlist
           </a>
-          <button onClick={() => setConfirmExit(true)} className="ml-auto px-3 py-2 text-sm rounded-md border border-gray-600 hover:bg-gray-800">Exit</button>
+          <button onClick={() => { primeAudio(); setConfirmExit(true); }} className="ml-auto px-3 py-2 text-sm rounded-md border border-gray-600 hover:bg-gray-800">Exit</button>
         </div>
 
         <div className="mt-6">
@@ -118,6 +146,9 @@ export default function ImmersiveSessionOverlay({
           />
           {alarmOn && (
             <div className="mt-2 text-xs text-red-300">⏰ Time is up — start writing to stop the alarm.</div>
+          )}
+          {!soundReady && (
+            <div className="mt-2 text-xs text-amber-300">Tap any control or “Enable sound” so we can play the alarm on iOS/Safari.</div>
           )}
         </div>
 
@@ -140,7 +171,7 @@ export default function ImmersiveSessionOverlay({
               Cancelling now will remove this session.
             </p>
             <div className="flex items-center justify-end gap-2">
-              <button onClick={() => setConfirmExit(false)} className="px-3 py-2 text-sm rounded-md border border-gray-600 hover:bg-gray-800">Continue focus</button>
+              <button onClick={() => { primeAudio(); setConfirmExit(false); }} className="px-3 py-2 text-sm rounded-md border border-gray-600 hover:bg-gray-800">Continue focus</button>
               <button
                 onClick={() => { setConfirmExit(false); if (typeof onCancel === 'function') onCancel({ confirmed: true }); }}
                 className="px-3 py-2 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
