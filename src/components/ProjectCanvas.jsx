@@ -18,6 +18,9 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
   const p = project || {};
   const [newActionText, setNewActionText] = React.useState('');
   const [showCompleted, setShowCompleted] = React.useState(false);
+  const [newUpdateText, setNewUpdateText] = React.useState('');
+  const [editingUpdateIndex, setEditingUpdateIndex] = React.useState(null);
+  const [editingUpdateText, setEditingUpdateText] = React.useState('');
   const ideas = Array.isArray(p.ideas) ? p.ideas : [];
   const actions = Array.isArray(p.actions) ? p.actions : [];
   const progress = Array.isArray(p.progress) ? p.progress : [];
@@ -63,6 +66,31 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
     const list = actions.slice();
     list.splice(index, 1);
     updates({ actions: list });
+  }
+
+  function addProgressUpdate(text) {
+    const content = (text || '').trim();
+    if (!content) return;
+    const list = Array.isArray(p.progress) ? p.progress.slice() : [];
+    list.push({ content, timestamp: new Date().toISOString() });
+    updates({ progress: list });
+    setNewUpdateText('');
+  }
+  function startEditProgress(realIndex) {
+    const item = (Array.isArray(p.progress) ? p.progress : [])[realIndex];
+    if (!item) return;
+    setEditingUpdateIndex(realIndex);
+    setEditingUpdateText(item.content || '');
+  }
+  function saveEditProgress() {
+    if (editingUpdateIndex == null) return;
+    updateItem('progress', editingUpdateIndex, editingUpdateText.trim());
+    setEditingUpdateIndex(null);
+    setEditingUpdateText('');
+  }
+  function cancelEditProgress() {
+    setEditingUpdateIndex(null);
+    setEditingUpdateText('');
   }
 
   const statBadge = (label, value) => (
@@ -235,28 +263,64 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
 
       <section>
         <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">📊 Progress & Updates</div>
-        <div className="space-y-2">
+        {/* Quick add (single line) */}
+        <form
+          onSubmit={(e) => { e.preventDefault(); addProgressUpdate(newUpdateText); }}
+          className="flex items-center gap-2 mb-3"
+        >
+          <input
+            type="text"
+            value={newUpdateText}
+            onChange={(e) => setNewUpdateText(e.target.value)}
+            placeholder="Add a quick progress note… (one line)"
+            className="flex-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            maxLength={200}
+          />
+          <button type="submit" className="px-3 py-2 rounded-md text-sm font-medium bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-900 hover:opacity-90">Add</button>
+        </form>
+
+        {/* List (newest first) */}
+        <div className="divide-y divide-gray-200 dark:divide-gray-700 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           {[...progress].slice().reverse().map((it, revIdx) => {
             const realIndex = progress.length - 1 - revIdx;
+            const isEditing = editingUpdateIndex === realIndex;
             return (
-              <div key={realIndex} className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <textarea
-                  value={it.content || ''}
-                  onChange={(e) => updateItem('progress', realIndex, e.target.value)}
-                  placeholder="Progress or update..."
-                  className="w-full min-h-[60px] p-2 border-0 outline-none resize-none text-sm bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
-                  spellCheck={true}
-                />
-                <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>{formatDateEnglish(it.timestamp).short}</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => deleteItem('progress', realIndex)} className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded text-xs bg-white dark:bg-gray-800">Delete</button>
-                  </div>
+              <div key={realIndex} className="flex items-center gap-3 px-3 py-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{formatDateEnglish(it.timestamp).short}</div>
+                <div className="flex-1 min-w-0">
+                  {isEditing ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      value={editingUpdateText}
+                      onChange={(e) => setEditingUpdateText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveEditProgress(); } if (e.key === 'Escape') { cancelEditProgress(); } }}
+                      className="w-full p-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                      maxLength={200}
+                    />
+                  ) : (
+                    <div className="text-sm text-gray-900 dark:text-gray-100 truncate" title={it.content}>{it.content}</div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {isEditing ? (
+                    <>
+                      <button onClick={saveEditProgress} className="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-700">Save</button>
+                      <button onClick={cancelEditProgress} className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600">Cancel</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => startEditProgress(realIndex)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Edit</button>
+                      <button onClick={() => deleteItem('progress', realIndex)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">Delete</button>
+                    </>
+                  )}
                 </div>
               </div>
             );
           })}
-          <button onClick={() => addItem('progress')} className="text-sm text-emerald-700 dark:text-emerald-300 hover:underline">+ Log progress or update</button>
+          {progress.length === 0 && (
+            <div className="px-3 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Capture wins, progress, or decisions here. Keep it brief.</div>
+          )}
         </div>
       </section>
 
