@@ -32,19 +32,24 @@ export default function SurfStretchStarter() {
   }, [completed]);
 
   return (
-    <div className="mb-4 p-3 rounded-lg border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 flex items-center justify-between">
-      <div className="mr-3">
-        <div className="text-sm font-semibold text-blue-900 dark:text-blue-200">🏄‍♂️ Surf Stretch (5m)</div>
-        <div className="text-xs text-blue-900/80 dark:text-blue-200/80">Decompress spine, open hips and shoulders.</div>
+    <div className="mb-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 shadow-sm">
+      <div className="px-4 py-3 flex items-center justify-between gap-4">
+        <div className="min-w-0 flex items-center gap-2 text-blue-900 dark:text-blue-100">
+          <span className="text-sm font-semibold shrink-0">🏄‍♂️ Surf Stretch</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white shrink-0">5m</span>
+          <span className="text-xs text-blue-900/80 dark:text-blue-200/80 truncate whitespace-nowrap">
+            — Decompress spine, open hips and shoulders.
+          </span>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <label className="flex items-center gap-1 text-xs text-blue-900 dark:text-blue-200">
+            <input type="checkbox" checked={completed} onChange={(e) => setCompleted(e.target.checked)} className="w-4 h-4" />
+            Completed
+          </label>
+          <button onClick={() => setIsOpen(true)} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700 shadow">Start</button>
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <label className="flex items-center gap-1 text-xs text-blue-900 dark:text-blue-200">
-          <input type="checkbox" checked={completed} onChange={(e) => setCompleted(e.target.checked)} className="w-4 h-4" />
-          Completed today
-        </label>
-        <button onClick={() => setIsOpen(true)} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
-      </div>
-      <div className="w-full mt-2">
+      <div className="px-4 pb-3">
         <SurfStretchHistory />
       </div>
       <SurfStretchOverlay

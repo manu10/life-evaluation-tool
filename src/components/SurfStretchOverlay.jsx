@@ -119,13 +119,16 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} containerClassName="w-full max-w-xl p-4">
+    <Modal isOpen={isOpen} onClose={onClose} containerClassName="w-full max-w-2xl p-5">
       <div className="text-gray-900 dark:text-gray-100">
-        <div className="h-1.5 w-full bg-blue-100 dark:bg-blue-900/40 rounded">
-          <div className="h-1.5 bg-blue-500 dark:bg-blue-400 rounded" style={{ width: `${progressPct}%` }} />
+        <div className="h-1.5 w-full bg-blue-100 dark:bg-blue-900/40 rounded overflow-hidden">
+          <div className="h-full bg-blue-500 dark:bg-blue-400" style={{ width: `${progressPct}%` }} />
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <div className="text-base font-semibold">🏄‍♂️ Surf Stretch</div>
+          <div className="text-base font-semibold flex items-center gap-2">
+            <span>🏄‍♂️ Surf Stretch</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">5m</span>
+          </div>
           <div className="flex items-center gap-2">
             <label className="mr-2 text-xs flex items-center gap-1">
               <input type="checkbox" checked={usePhotos} onChange={(e) => setUsePhotos(e.target.checked)} />
@@ -141,15 +144,15 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
         </div>
         <div className="mt-3">
           <div className="text-sm font-medium mb-2">Now: {step.label}</div>
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800 flex items-center justify-center">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
             <img
               src={usePhotos && step.photo ? step.photo : step.img}
               alt={step.label}
-              className="w-full max-w-sm rounded-md border border-gray-200 dark:border-gray-700"
+              className="w-full max-w-md md:max-w-lg rounded-md border border-gray-200 dark:border-gray-700"
               onError={(e) => { try { e.currentTarget.src = step.img; } catch {} }}
             />
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+          <div className="text-xs text-gray-600 dark:text-gray-400 mt-3">
             {step.how}
             {step.url && (
               <>
@@ -166,15 +169,15 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
             )}
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-1">
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             {STEPS.map((s, i) => (
-              <span key={s.key} className={`h-2 w-2 rounded-full ${i < idx ? 'bg-blue-500' : i === idx ? 'bg-blue-400' : 'bg-gray-300 dark:bg-gray-600'}`} />
+              <span key={s.key} className={`h-2.5 w-2.5 rounded-full ${i < idx ? 'bg-blue-500' : i === idx ? 'bg-blue-400' : 'bg-gray-300 dark:bg-gray-600'}`} />
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={handleBack} className="px-2 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-700">Back</button>
-            <button onClick={handleNext} className="px-2 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-700">Next</button>
+            <button onClick={handleBack} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Back</button>
+            <button onClick={handleNext} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Next</button>
           </div>
         </div>
       </div>

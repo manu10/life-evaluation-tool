@@ -27,14 +27,14 @@ export default function SurfStretchHistory() {
   const palette = ['bg-emerald-500','bg-blue-500','bg-amber-500','bg-fuchsia-500','bg-purple-500'];
 
   return (
-    <div className="mt-2">
-      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Last 30 days</div>
-      <div className="grid grid-cols-15 gap-1">
+    <div className="flex items-center gap-2 overflow-hidden">
+      <span className="text-xs text-blue-900/80 dark:text-blue-200/80 shrink-0">Last 30 days</span>
+      <div className="flex flex-nowrap gap-1 overflow-hidden">
         {days.map((d, idx) => (
           <div
             key={d.key}
             title={`${d.key}${d.done ? ' — done' : ''}`}
-            className={`h-3 w-3 rounded-sm ${d.done ? palette[idx % palette.length] : 'bg-gray-300 dark:bg-gray-600'} border border-white/20`}
+            className={`h-2.5 w-2.5 rounded-[3px] ${d.done ? palette[idx % palette.length] : 'bg-gray-300 dark:bg-gray-600'} border border-white/20 flex-none`}
           />
         ))}
       </div>
