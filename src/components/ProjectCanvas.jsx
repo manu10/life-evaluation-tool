@@ -21,6 +21,7 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
   const [newUpdateText, setNewUpdateText] = React.useState('');
   const [editingUpdateIndex, setEditingUpdateIndex] = React.useState(null);
   const [editingUpdateText, setEditingUpdateText] = React.useState('');
+  const [showAllUpdates, setShowAllUpdates] = React.useState(false);
   const ideas = Array.isArray(p.ideas) ? p.ideas : [];
   const actions = Array.isArray(p.actions) ? p.actions : [];
   const progress = Array.isArray(p.progress) ? p.progress : [];
@@ -279,10 +280,35 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
           <button type="submit" className="px-3 py-2 rounded-md text-sm font-medium bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-900 hover:opacity-90">Add</button>
         </form>
 
+        {/* Quick chips */}
+        <div className="flex items-center gap-2 mb-3">
+          {[
+            { label: 'Win', prefix: 'Win: ' },
+            { label: 'Unblocked', prefix: 'Unblocked: ' },
+            { label: 'Note', prefix: 'Note: ' },
+          ].map(chip => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={() => {
+                const t = (newUpdateText || '').trim();
+                if (!t) setNewUpdateText(chip.prefix);
+                else if (!t.startsWith(chip.prefix)) setNewUpdateText(chip.prefix + t);
+              }}
+              className="px-2.5 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
         {/* List (newest first) */}
         <div className="divide-y divide-gray-200 dark:divide-gray-700 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          {[...progress].slice().reverse().map((it, revIdx) => {
-            const realIndex = progress.length - 1 - revIdx;
+          {(() => {
+            const reversed = [...progress].reverse();
+            const visible = showAllUpdates ? reversed : reversed.slice(0, 5);
+            return visible.map((it, revIdx) => {
+              const realIndex = progress.length - 1 - revIdx;
             const isEditing = editingUpdateIndex === realIndex;
             return (
               <div key={realIndex} className="flex items-center gap-3 px-3 py-2">
@@ -316,12 +342,25 @@ export default function ProjectCanvas({ project, onUpdate, onSetNextAction }) {
                   )}
                 </div>
               </div>
-            );
-          })}
+              );
+            });
+          })()}
           {progress.length === 0 && (
             <div className="px-3 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Capture wins, progress, or decisions here. Keep it brief.</div>
           )}
         </div>
+
+        {progress.length > 5 && (
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => setShowAllUpdates(s => !s)}
+              className="text-sm text-emerald-700 dark:text-emerald-300 hover:underline"
+            >
+              {showAllUpdates ? 'Hide older' : `Show older (${progress.length - 5})`}
+            </button>
+          </div>
+        )}
       </section>
 
       <section>
