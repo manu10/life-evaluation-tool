@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96">
+  <rect width="128" height="96" rx="12" fill="#111827" />
+  <g stroke="#A7F3D0" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- legs -->
+    <path d="M44 70 L56 54" />
+    <path d="M84 70 L72 54" />
+    <!-- hips -->
+    <path d="M56 54 L72 54" />
+    <!-- torso up -->
+    <path d="M64 54 L64 40" />
+    <!-- elbows pushed into knees -->
+    <path d="M58 48 L50 56" />
+    <path d="M70 48 L78 56" />
+    <!-- head -->
+    <circle cx="64" cy="36" r="6" fill="#A7F3D0" stroke="none" />
+  </g>
+  <text x="64" y="88" fill="#A7F3D0" font-size="10" text-anchor="middle" font-family="ui-sans-serif, system-ui">Deep Squat</text>
+</svg>
+

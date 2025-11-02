@@ -46,6 +46,7 @@ import ProjectsSummary from './components/ProjectsSummary';
 import MorningStreak from './components/MorningStreak';
 import { primeAlarmAudio } from './utils/alarmAudio';
 import { openNativeTimer } from './utils/nativeTimer';
+import SurfStretchStarter from './components/SurfStretchStarter';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -723,6 +724,7 @@ export default function LifeEvaluationTool() {
       {activeTab === 'morning' && (
         <>
           <MorningStreak checkins={morningCheckins} />
+          <SurfStretchStarter />
           {/* Yesterday's Section - Now Collapsible */}
           <CollapsibleSection
             title="Yesterday's Review"

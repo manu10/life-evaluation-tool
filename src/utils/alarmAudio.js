@@ -74,4 +74,21 @@ export function stopAlarmPattern() {
   } catch {}
 }
 
+// Short, attention‑friendly chime (about 300ms), independent of pattern
+export function playChime(soundType = 'beep', durationMs = 300) {
+  try {
+    const ctx = ensureContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    const localGain = ctx.createGain();
+    const localOsc = buildOscillator(ctx, soundType);
+    localGain.gain.value = 0.08;
+    localOsc.connect(localGain).connect(ctx.destination);
+    localOsc.start();
+    setTimeout(() => {
+      try { localOsc.stop(); localOsc.disconnect(); localGain.disconnect(); } catch {}
+    }, Math.max(120, durationMs|0));
+  } catch {}
+}
+
 
