@@ -9,7 +9,9 @@ const STEPS = [
     seconds: 60,
     img: '/src/assets/stretch/childs-pose.svg',
     photo: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTp6hlyki5bJdnOs95Wo1zcw4wm1NhBTejJaVfAPHY_OjM5ZHpvLpDc6cLhLhvi',
-    how: 'Walk hands to each side, breathe into the ribs.',
+    how: 'On all fours, sit back to heels, forehead down. Walk hands right 30s, center, then left 30s; breathe into side ribs.',
+    why: 'Decompresses spine; stretches lats and shoulders used in paddling.',
+    splitMid: true,
     url: 'https://www.yogajournal.com/poses/childs-pose/',
   },
   {
@@ -18,7 +20,8 @@ const STEPS = [
     seconds: 60,
     img: '/src/assets/stretch/cat-cow.svg',
     photo: 'https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSBg7YpSDeb9ERDKQXJ7nPXr7KX9GWKbSWGhDgKZ805yxSxQe6hdPXWSWIdYj7WlOgxYEHA6w2rPygoIQg1Kr6t8uT1nrzJoqu9w7SK73eDOl2GF3c',
-    how: 'Inhale open chest, exhale round spine.',
+    how: 'Hands under shoulders, knees under hips. Inhale: open chest; Exhale: round spine. Flow with breath for 60s.',
+    why: 'Warms up and decompresses the entire spine.',
     url: 'https://www.yogajournal.com/poses/cat-cow-pose/',
   },
   {
@@ -27,7 +30,9 @@ const STEPS = [
     seconds: 90,
     img: '/src/assets/stretch/supine-twist.svg',
     photo: 'https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSPb-oBpDPHky5GmPl2B8-mKsV_SQiUESO3ZGGy5st3C1A2VHiMkX4nlQgvMHM7_JTUpsEfV33NId7SENsGHcTfgJDr3XgauLGIyosKbEd0GDyJVW0',
-    how: 'Knee across body, shoulders heavy, breathe deep.',
+    how: 'On back, knee to chest then across body; arm out, head turns away. Keep both shoulders down. 45s each side.',
+    why: 'Decompresses lumbar and thoracic spine; eases rotation tension.',
+    splitMid: true,
     url: 'https://www.yogajournal.com/poses/supine-spinal-twist/',
   },
   {
@@ -36,7 +41,8 @@ const STEPS = [
     seconds: 60,
     img: '/src/assets/stretch/glute-bridge.svg',
     photo: 'https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcT2PWFUReg1pu7TvzFVZfBms71lgBTiOBURNi7nRzzQXJvE54i52_QzKt2IEKiSKr6oDFYTcwrUXVCVqWriPGULf6X2k4pbqplYFWDZxowhV_Sywq4',
-    how: 'Squeeze glutes, lift, lower slow and controlled.',
+    how: 'Heels under knees. Exhale lift by squeezing glutes; hold 3–5s; lower slowly. Repeat for 60s.',
+    why: 'Activates glutes/core and opens tight hip flexors.',
     url: 'https://www.healthline.com/health/fitness-exercise/bridge-exercise',
   },
   {
@@ -45,7 +51,8 @@ const STEPS = [
     seconds: 90,
     img: '/src/assets/stretch/deep-squat.svg',
     photo: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRVD1LQsMFtTXwmDNWHMbQxW8z239oIzRA1MBt3_J92soAfygOcRdwaG3zcfzW4',
-    how: 'Elbows press knees out, chest tall, breathe.',
+    how: 'Feet a bit wider than shoulders, toes out. Sink hips; elbows press knees out; chest tall. Sway gently if helpful.',
+    why: 'All‑in‑one decompression for ankles, knees, hips, and low back.',
     url: 'https://www.yogajournal.com/poses/garland-pose/',
   },
 ];
@@ -55,8 +62,18 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   const [idx, setIdx] = React.useState(0);
   const [remaining, setRemaining] = React.useState(STEPS[0].seconds);
   const [usePhotos, setUsePhotos] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem('surfStretch.usePhotos') || 'false'); } catch { return false; }
+    try {
+      if (localStorage.getItem('surfStretch.usePhotos') != null) return JSON.parse(localStorage.getItem('surfStretch.usePhotos'));
+    } catch {}
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    return isIOS;
   });
+  const [keepAwake, setKeepAwake] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('surfStretch.keepAwake') || 'true'); } catch { return true; }
+  });
+  const wakeRef = React.useRef(null);
+  const midFiredRef = React.useRef(false);
 
   const totalSec = React.useMemo(() => STEPS.reduce((a, s) => a + s.seconds, 0), []);
   const doneSec = React.useMemo(() => STEPS.slice(0, idx).reduce((a, s) => a + s.seconds, 0) + (STEPS[idx] ? (STEPS[idx].seconds - remaining) : 0), [idx, remaining]);
@@ -72,21 +89,61 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
     try { localStorage.setItem('surfStretch.usePhotos', JSON.stringify(!!usePhotos)); } catch {}
   }, [usePhotos]);
 
+  // Persist keepAwake toggle
+  React.useEffect(() => {
+    try { localStorage.setItem('surfStretch.keepAwake', JSON.stringify(!!keepAwake)); } catch {}
+  }, [keepAwake]);
+
+  // Keep screen awake where supported; re-acquire on visibility
+  React.useEffect(() => {
+    async function acquire() {
+      try {
+        if (!isOpen || !keepAwake) return;
+        if ('wakeLock' in navigator && !wakeRef.current) {
+          wakeRef.current = await navigator.wakeLock.request('screen');
+          wakeRef.current.addEventListener('release', () => {});
+        }
+      } catch {}
+    }
+    acquire();
+    function onVis() { if (document.visibilityState === 'visible') acquire(); }
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      try { if (wakeRef.current) { wakeRef.current.release(); wakeRef.current = null; } } catch {}
+    };
+  }, [isOpen, keepAwake]);
+
   React.useEffect(() => {
     if (!running || !isOpen) return;
     const id = setInterval(() => {
       setRemaining((r) => {
+        const current = STEPS[idx];
+        // Mid-step side change chime for split steps
+        if (current?.splitMid && !midFiredRef.current && r === Math.ceil(current.seconds / 2)) {
+          try { playChime('beep', 200); } catch {}
+          midFiredRef.current = true;
+        }
         if (r > 1) return r - 1;
-        try { playChime('bell', 220); } catch {}
+        // Double chime on step transition or triple on finish
         setIdx((i) => {
           const next = i + 1;
           if (next >= STEPS.length) {
             setRunning(false);
-            try { playChime('chime', 260); } catch {}
+            try {
+              playChime('chime', 200);
+              setTimeout(() => playChime('chime', 200), 250);
+              setTimeout(() => playChime('chime', 200), 500);
+            } catch {}
             if (typeof onFinish === 'function') onFinish();
             return i;
           }
+          try {
+            playChime('bell', 200);
+            setTimeout(() => playChime('bell', 200), 180);
+          } catch {}
           setRemaining(STEPS[next].seconds);
+          midFiredRef.current = false;
           return next;
         });
         return 0;
@@ -129,10 +186,14 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
             <span>🏄‍♂️ Surf Stretch</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">5m</span>
           </div>
-          <div className="flex items-center gap-2">
-            <label className="mr-2 text-xs flex items-center gap-1">
+          <div className="flex items-center gap-3">
+            <label className="text-xs flex items-center gap-1">
               <input type="checkbox" checked={usePhotos} onChange={(e) => setUsePhotos(e.target.checked)} />
               Photos
+            </label>
+            <label className="text-xs flex items-center gap-1">
+              <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} />
+              Keep awake
             </label>
             {!running ? (
               <button onClick={handleStart} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
@@ -152,8 +213,10 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
               onError={(e) => { try { e.currentTarget.src = step.img; } catch {} }}
             />
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mt-3">
-            {step.how}
+          <div className="text-xs text-gray-600 dark:text-gray-400 mt-3 space-y-1">
+            <div><span className="font-semibold text-gray-700 dark:text-gray-300">Duration:</span> {step.seconds}s{step.splitMid ? ' (split evenly left/right)' : ''}</div>
+            {step.why && <div><span className="font-semibold text-gray-700 dark:text-gray-300">Why:</span> {step.why}</div>}
+            <div><span className="font-semibold text-gray-700 dark:text-gray-300">How:</span> {step.how}</div>
             {step.url && (
               <>
                 {' '}
