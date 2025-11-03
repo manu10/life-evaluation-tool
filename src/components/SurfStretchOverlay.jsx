@@ -1,66 +1,22 @@
 import React from 'react';
 import Modal from './ui/Modal';
+import SurfExerciseLibraryModal from './SurfExerciseLibraryModal';
+import SurfRoutinePickerModal from './SurfRoutinePickerModal';
+import { LIBRARY, DEFAULT_ROUTINE_KEYS } from './surfLibrary';
 import { primeAlarmAudio, playChime } from '../utils/alarmAudio';
 
-const STEPS = [
-  {
-    key: 'childs',
-    label: "Child's Pose with Side Reach",
-    seconds: 60,
-    img: '/src/assets/stretch/childs-pose.svg',
-    photo: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTp6hlyki5bJdnOs95Wo1zcw4wm1NhBTejJaVfAPHY_OjM5ZHpvLpDc6cLhLhvi',
-    how: 'On all fours, sit back to heels, forehead down. Walk hands right 30s, center, then left 30s; breathe into side ribs.',
-    why: 'Decompresses spine; stretches lats and shoulders used in paddling.',
-    splitMid: true,
-    url: 'https://www.yogajournal.com/poses/childs-pose/',
-  },
-  {
-    key: 'catcow',
-    label: 'Cat–Cow',
-    seconds: 60,
-    img: '/src/assets/stretch/cat-cow.svg',
-    photo: 'https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSBg7YpSDeb9ERDKQXJ7nPXr7KX9GWKbSWGhDgKZ805yxSxQe6hdPXWSWIdYj7WlOgxYEHA6w2rPygoIQg1Kr6t8uT1nrzJoqu9w7SK73eDOl2GF3c',
-    how: 'Hands under shoulders, knees under hips. Inhale: open chest; Exhale: round spine. Flow with breath for 60s.',
-    why: 'Warms up and decompresses the entire spine.',
-    url: 'https://www.yogajournal.com/poses/cat-cow-pose/',
-  },
-  {
-    key: 'twist',
-    label: 'Supine Spinal Twist',
-    seconds: 90,
-    img: '/src/assets/stretch/supine-twist.svg',
-    photo: 'https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSPb-oBpDPHky5GmPl2B8-mKsV_SQiUESO3ZGGy5st3C1A2VHiMkX4nlQgvMHM7_JTUpsEfV33NId7SENsGHcTfgJDr3XgauLGIyosKbEd0GDyJVW0',
-    how: 'On back, knee to chest then across body; arm out, head turns away. Keep both shoulders down. 45s each side.',
-    why: 'Decompresses lumbar and thoracic spine; eases rotation tension.',
-    splitMid: true,
-    url: 'https://www.yogajournal.com/poses/supine-spinal-twist/',
-  },
-  {
-    key: 'bridge',
-    label: 'Glute Bridge',
-    seconds: 60,
-    img: '/src/assets/stretch/glute-bridge.svg',
-    photo: 'https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcT2PWFUReg1pu7TvzFVZfBms71lgBTiOBURNi7nRzzQXJvE54i52_QzKt2IEKiSKr6oDFYTcwrUXVCVqWriPGULf6X2k4pbqplYFWDZxowhV_Sywq4',
-    how: 'Heels under knees. Exhale lift by squeezing glutes; hold 3–5s; lower slowly. Repeat for 60s.',
-    why: 'Activates glutes/core and opens tight hip flexors.',
-    url: 'https://www.healthline.com/health/fitness-exercise/bridge-exercise',
-  },
-  {
-    key: 'squat',
-    label: 'Deep Squat (Malasana)',
-    seconds: 90,
-    img: '/src/assets/stretch/deep-squat.svg',
-    photo: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRVD1LQsMFtTXwmDNWHMbQxW8z239oIzRA1MBt3_J92soAfygOcRdwaG3zcfzW4',
-    how: 'Feet a bit wider than shoulders, toes out. Sink hips; elbows press knees out; chest tall. Sway gently if helpful.',
-    why: 'All‑in‑one decompression for ankles, knees, hips, and low back.',
-    url: 'https://www.yogajournal.com/poses/garland-pose/',
-  },
-];
+// Routine persistence helpers
+function getDateKey() { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+function loadRoutine(dateKey) { try { return JSON.parse(localStorage.getItem(`surfRoutine.v1:${dateKey}`) || 'null'); } catch { return null; } }
+function saveRoutine(dateKey, keys) { try { localStorage.setItem(`surfRoutine.v1:${dateKey}`, JSON.stringify(keys)); } catch {} }
+function mapKeys(keys) { return keys.map(k => LIBRARY.find(e => e.key === k)).filter(Boolean); }
 
 export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   const [running, setRunning] = React.useState(false);
   const [idx, setIdx] = React.useState(0);
-  const [remaining, setRemaining] = React.useState(STEPS[0].seconds);
+  const [routineKeys, setRoutineKeys] = React.useState(() => loadRoutine(getDateKey()) || DEFAULT_ROUTINE_KEYS);
+  const STEPS = React.useMemo(() => mapKeys(routineKeys), [routineKeys]);
+  const [remaining, setRemaining] = React.useState(() => (STEPS[0]?.seconds || 60));
   const [usePhotos, setUsePhotos] = React.useState(() => {
     try {
       if (localStorage.getItem('surfStretch.usePhotos') != null) return JSON.parse(localStorage.getItem('surfStretch.usePhotos'));
@@ -74,9 +30,11 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   });
   const wakeRef = React.useRef(null);
   const midFiredRef = React.useRef(false);
+  const [showLibrary, setShowLibrary] = React.useState(false);
+  const [showPicker, setShowPicker] = React.useState(false);
 
-  const totalSec = React.useMemo(() => STEPS.reduce((a, s) => a + s.seconds, 0), []);
-  const doneSec = React.useMemo(() => STEPS.slice(0, idx).reduce((a, s) => a + s.seconds, 0) + (STEPS[idx] ? (STEPS[idx].seconds - remaining) : 0), [idx, remaining]);
+  const totalSec = React.useMemo(() => STEPS.reduce((a, s) => a + s.seconds, 0), [STEPS]);
+  const doneSec = React.useMemo(() => STEPS.slice(0, idx).reduce((a, s) => a + s.seconds, 0) + (STEPS[idx] ? (STEPS[idx].seconds - remaining) : 0), [idx, remaining, STEPS]);
   const progressPct = Math.min(100, Math.round((doneSec / totalSec) * 100));
   const step = STEPS[idx] || STEPS[STEPS.length - 1];
 
@@ -150,7 +108,7 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [running, isOpen]);
+  }, [running, isOpen, STEPS, idx]);
 
   function handleStart() { setRunning(true); }
   function handlePause() { setRunning(false); }
@@ -162,7 +120,7 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
     setRunning(false);
     setIdx((i) => {
       const prev = Math.max(0, i - 1);
-      setRemaining(STEPS[prev].seconds);
+      setRemaining(STEPS[prev]?.seconds || 60);
       return prev;
     });
   }
@@ -170,9 +128,29 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
     setRunning(false);
     setIdx((i) => {
       const next = Math.min(STEPS.length - 1, i + 1);
-      setRemaining(STEPS[next].seconds);
+      setRemaining(STEPS[next]?.seconds || 60);
       return next;
     });
+  }
+
+  function saveToday(keys) {
+    const dateKey = getDateKey();
+    saveRoutine(dateKey, keys);
+    setRoutineKeys(keys);
+    setRunning(false);
+    setIdx(0);
+    const steps = mapKeys(keys);
+    setRemaining(steps[0]?.seconds || 60);
+  }
+  function shuffleAll() {
+    const pool = [...LIBRARY];
+    const picks = [];
+    while (picks.length < 5 && pool.length) {
+      const i = Math.floor(Math.random() * pool.length);
+      const [ex] = pool.splice(i, 1);
+      picks.push(ex.key);
+    }
+    saveToday(picks);
   }
 
   return (
@@ -187,14 +165,9 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">5m</span>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-xs flex items-center gap-1">
-              <input type="checkbox" checked={usePhotos} onChange={(e) => setUsePhotos(e.target.checked)} />
-              Photos
-            </label>
-            <label className="text-xs flex items-center gap-1">
-              <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} />
-              Keep awake
-            </label>
+            <button onClick={() => setShowLibrary(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Library</button>
+            <button onClick={shuffleAll} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Shuffle all</button>
+            <button onClick={() => setShowPicker(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Customize</button>
             {!running ? (
               <button onClick={handleStart} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
             ) : (
@@ -244,6 +217,13 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
           </div>
         </div>
       </div>
+      <SurfExerciseLibraryModal isOpen={showLibrary} onClose={() => setShowLibrary(false)} />
+      <SurfRoutinePickerModal
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        initialKeys={routineKeys}
+        onSave={(keys) => saveToday(keys)}
+      />
     </Modal>
   );
 }
