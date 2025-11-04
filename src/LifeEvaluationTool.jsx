@@ -30,6 +30,7 @@ import EnvironmentDesigner from './components/EnvironmentDesigner';
 import EnvironmentChecklist from './components/EnvironmentChecklist';
 import FiveStepProtocol from './components/FiveStepProtocol';
 import WhatWorkedToday from './components/WhatWorkedToday';
+import DuringNotes from './components/DuringNotes';
 import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
 import TodayActionHub from './components/TodayActionHub';
@@ -89,6 +90,7 @@ export default function LifeEvaluationTool() {
   const [dailyRoutines, setDailyRoutines] = usePersistentState('dailyRoutines', defaultDailyRoutines);
   const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
   const [distractions, setDistractions] = usePersistentState('distractions', []);
+  const [duringNotesByDate, setDuringNotesByDate] = usePersistentState('duringNotesByDate', {});
   const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
   const [gratitude, setGratitude] = usePersistentState('gratitude', defaultGratitude);
   const [yesterdaysGratitude, setYesterdaysGratitude] = usePersistentState('yesterdaysGratitude', defaultGratitude);
@@ -696,6 +698,23 @@ export default function LifeEvaluationTool() {
           liveSession={liveSession}
           onEndSession={() => setIsEndSessionOpen(true)}
         />
+          {(() => {
+            const d = new Date();
+            const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
+            function addNote(text) {
+              const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
+              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
+            }
+            function removeNote(id) {
+              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
+            }
+            return (
+              <div className="mt-6">
+                <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={!eveningDone} />
+              </div>
+            );
+          })()}
         </>
       )}
       {(activeTab === 'morning' || activeTab === 'evening') && (
@@ -971,6 +990,17 @@ export default function LifeEvaluationTool() {
             placeholder="Reflect on your day... wins, challenges, insights, or anything on your mind"
             onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }}
           />
+          {(() => {
+            const d = new Date();
+            const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
+            if (!notes.length) return null;
+            return (
+              <div className="mt-6">
+                <DuringNotes notes={notes} editable={false} />
+              </div>
+            );
+          })()}
           {/* ABC Highlights (today) */}
           <ABCHighlights logs={abcLogs} onAddABC={() => { setAbcInitial({}); setIsABCOpen(true); }} />
           
