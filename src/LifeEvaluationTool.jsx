@@ -653,6 +653,23 @@ export default function LifeEvaluationTool() {
       )}
       {activeTab === 'today' && (
         <>
+          {(() => {
+            const d = new Date();
+            const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
+            function addNote(text) {
+              const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
+              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
+            }
+            function removeNote(id) {
+              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
+            }
+            return (
+              <div className="mb-6">
+                <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={true} />
+              </div>
+            );
+          })()}
           {!!featureFlags?.projectsTab && (
             <ProjectsSummary
               projects={projects}
@@ -698,23 +715,6 @@ export default function LifeEvaluationTool() {
           liveSession={liveSession}
           onEndSession={() => setIsEndSessionOpen(true)}
         />
-          {(() => {
-            const d = new Date();
-            const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
-            const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
-            function addNote(text) {
-              const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
-              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
-            }
-            function removeNote(id) {
-              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
-            }
-            return (
-              <div className="mt-6">
-                <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={!eveningDone} />
-              </div>
-            );
-          })()}
         </>
       )}
       {(activeTab === 'morning' || activeTab === 'evening') && (
