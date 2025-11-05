@@ -43,6 +43,8 @@ export default function TodayActionHub({
   onRemoveTodo,
   liveSession,
   onEndSession,
+  whyText,
+  onReReadWhy,
 }) {
   const [newDistraction, setNewDistraction] = useState('');
   const [trigger, setTrigger] = useState('');
@@ -54,6 +56,7 @@ export default function TodayActionHub({
   const [showEnv, setShowEnv] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [sessionNow, setSessionNow] = useState(Date.now());
+  const [showWhy, setShowWhy] = useState(false);
 
   function handleQuickLog(e) {
     e.preventDefault();
@@ -106,8 +109,20 @@ export default function TodayActionHub({
           <button onClick={onStartProtocol} className="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">Start 5‑Step</button>
           <button onClick={() => setShowReplace(true)} className="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">Choose replacement…</button>
           <button onClick={() => setShowEnv(true)} className="px-3 py-2 bg-amber-600 text-white rounded-md text-sm hover:bg-amber-700">Choose environment tweak…</button>
+          {!!whyText && (
+            <button onClick={() => setShowWhy((v) => !v)} className="px-3 py-2 bg-emerald-600 text-white rounded-md text-sm hover:bg-emerald-700">Re‑read WHY</button>
+          )}
         </div>
         <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">Manage lists in Settings.</div>
+        {showWhy && (
+          <div className="mt-3 p-3 rounded-md border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+            <div className="text-sm text-emerald-900 dark:text-emerald-200">{whyText}</div>
+            <div className="mt-2 flex gap-2">
+              <button onClick={() => { onReReadWhy && onReReadWhy(); setShowWhy(false); }} className="px-2.5 py-1.5 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700">Mark read</button>
+              <button onClick={() => setShowWhy(false)} className="px-2.5 py-1.5 text-xs rounded-md border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-900/30">Close</button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Live Session (if any) */}

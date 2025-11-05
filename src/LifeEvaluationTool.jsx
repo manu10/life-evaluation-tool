@@ -30,6 +30,7 @@ import EnvironmentDesigner from './components/EnvironmentDesigner';
 import EnvironmentChecklist from './components/EnvironmentChecklist';
 import FiveStepProtocol from './components/FiveStepProtocol';
 import WhatWorkedToday from './components/WhatWorkedToday';
+import WhyBanner from './components/WhyBanner';
 import DuringNotes from './components/DuringNotes';
 import HelpModal from './components/HelpModal';
 import EveningResetConfirm from './components/EveningResetConfirm';
@@ -91,6 +92,9 @@ export default function LifeEvaluationTool() {
   const [yesterdaysRoutines, setYesterdaysRoutines] = usePersistentState('yesterdaysRoutines', defaultDailyRoutines);
   const [distractions, setDistractions] = usePersistentState('distractions', []);
   const [duringNotesByDate, setDuringNotesByDate] = usePersistentState('duringNotesByDate', {});
+  const [whyText, setWhyText] = usePersistentState('whyText', '');
+  const [whyReadByDate, setWhyReadByDate] = usePersistentState('whyReadByDate', {});
+  const [whyAlignByDate, setWhyAlignByDate] = usePersistentState('whyAlignByDate', {});
   const [yesterdaysDistractions, setYesterdaysDistractions] = usePersistentState('yesterdaysDistractions', []);
   const [gratitude, setGratitude] = usePersistentState('gratitude', defaultGratitude);
   const [yesterdaysGratitude, setYesterdaysGratitude] = usePersistentState('yesterdaysGratitude', defaultGratitude);
@@ -504,6 +508,9 @@ export default function LifeEvaluationTool() {
   function copyToClipboard(isEvening = false) {
     const exportText = generateExportText({
       isEvening,
+      whyText,
+      whyReadToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return !!whyReadByDate?.[iso]; })(),
+      whyAlignToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return (whyAlignByDate?.[iso]?.align)||''; })(),
       eveningResponses,
       yesterdaysGoals,
       yesterdaysDayThoughts,
@@ -714,6 +721,12 @@ export default function LifeEvaluationTool() {
           onRemoveTodo={handleRemoveTodo}
           liveSession={liveSession}
           onEndSession={() => setIsEndSessionOpen(true)}
+          whyText={whyText}
+          onReReadWhy={() => {
+            const d = new Date();
+            const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
+          }}
         />
         </>
       )}
@@ -742,6 +755,16 @@ export default function LifeEvaluationTool() {
       {/* Morning Tab Content */}
       {activeTab === 'morning' && (
         <>
+          <WhyBanner
+            whyText={whyText}
+            onChangeWhy={(t) => setWhyText(t)}
+            readByDate={whyReadByDate}
+            onMarkRead={() => {
+              const d = new Date();
+              const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+              setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
+            }}
+          />
           <MorningStreak checkins={morningCheckins} />
           <SurfStretchStarter />
           {/* Yesterday's Section - Now Collapsible */}
@@ -903,6 +926,8 @@ export default function LifeEvaluationTool() {
               title="Morning Summary"
               exportText={generateExportText({
                 isEvening: false,
+                whyText,
+                whyReadToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return !!whyReadByDate?.[iso]; })(),
                 eveningResponses,
                 yesterdaysGoals,
                 yesterdaysDayThoughts,
@@ -992,6 +1017,38 @@ export default function LifeEvaluationTool() {
           />
           {(() => {
             const d = new Date();
+            const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            const align = whyAlignByDate?.[iso]?.align || '';
+            const note = whyAlignByDate?.[iso]?.note || '';
+            function setAlign(val) {
+              setWhyAlignByDate(prev => ({ ...prev, [iso]: { ...(prev?.[iso]||{}), align: val } }));
+            }
+            function setNote(val) {
+              setWhyAlignByDate(prev => ({ ...prev, [iso]: { ...(prev?.[iso]||{}), note: val } }));
+            }
+            return (
+              <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                <div className="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-2">Did today align with your WHY?</div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setAlign('yes')} disabled={eveningDone} className={`px-3 py-1.5 text-xs rounded-md border ${align==='yes' ? 'bg-emerald-600 text-white border-emerald-600' : 'border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30'}`}>Yes</button>
+                  <button onClick={() => setAlign('no')} disabled={eveningDone} className={`px-3 py-1.5 text-xs rounded-md border ${align==='no' ? 'bg-red-600 text-white border-red-600' : 'border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 hover:bg-red-50 dark:hover:bg-red-900/30'}`}>No</button>
+                </div>
+                {align==='no' && (
+                  <div className="mt-2">
+                    <input
+                      value={note}
+                      disabled={eveningDone}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="Optional: one reason or adjustment for tomorrow"
+                      className="w-full p-2 border border-amber-300 dark:border-amber-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+          {(() => {
+            const d = new Date();
             const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
             const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
             if (!notes.length) return null;
@@ -1024,6 +1081,8 @@ export default function LifeEvaluationTool() {
               title="Evening Summary"
               exportText={generateExportText({
                 isEvening: true,
+                whyText,
+                whyAlignToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return (whyAlignByDate?.[iso]?.align)||''; })(),
                 eveningResponses,
                 yesterdaysGoals,
                 yesterdaysDayThoughts,

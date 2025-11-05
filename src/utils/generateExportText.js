@@ -69,6 +69,9 @@ function getPhoneUsageFeedback(timeStr) {
  */
 export function generateExportText({
   isEvening = false,
+  whyText = '',
+  whyReadToday = false,
+  whyAlignToday = '',
   eveningResponses = {},
   yesterdaysGoals = {},
   yesterdaysDayThoughts = '',
@@ -103,6 +106,19 @@ export function generateExportText({
   let exportText = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
   exportText += `${isEvening ? '🌙 EVENING REFLECTION' : '🌅 MORNING CHECK-IN'} - ${dateStr}\n`;
   exportText += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  if (!isEvening) {
+    if (whyText && whyText.trim()) {
+      exportText += `🎯 WHY: ${whyText}${whyReadToday ? ' (re‑read today ✓)' : ''}\n\n`;
+    }
+  } else {
+    if (whyText && whyText.trim()) {
+      exportText += `🎯 WHY: ${whyText}\n`;
+      if (whyAlignToday === 'yes') exportText += `   Alignment today: ✅ Yes\n\n`;
+      else if (whyAlignToday === 'no') exportText += `   Alignment today: ❌ No\n\n`;
+      else exportText += `\n`;
+    }
+  }
 
   if (isEvening) {
     exportText += `🎯 Tomorrow's Goals:\n`;
