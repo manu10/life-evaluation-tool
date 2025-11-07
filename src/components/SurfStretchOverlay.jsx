@@ -33,6 +33,7 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   const midFiredRef = React.useRef(false);
   const [showLibrary, setShowLibrary] = React.useState(false);
   const [showPicker, setShowPicker] = React.useState(false);
+  const [showMenu, setShowMenu] = React.useState(false);
   const [showDrill, setShowDrill] = React.useState(false);
   const [drillHideForever, setDrillHideForever] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('surfDrill.hideForever') || 'false'); } catch { return false; }
@@ -171,22 +172,30 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
         <div className="h-1.5 w-full bg-blue-100 dark:bg-blue-900/40 rounded overflow-hidden">
           <div className="h-full bg-blue-500 dark:bg-blue-400" style={{ width: `${progressPct}%` }} />
         </div>
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between relative">
           <div className="text-base font-semibold flex items-center gap-2">
             <span>🏄‍♂️ Surf Stretch</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">5m</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setShowLibrary(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Library</button>
-            <button onClick={shuffleAll} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Shuffle all</button>
-            <button onClick={() => setShowPicker(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Customize</button>
-            <button onClick={() => setShowDrill(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200">Práctica en tierra</button>
+            <button onClick={() => setShowMenu((v) => !v)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">More …</button>
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-2 w-44 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg p-1 z-10">
+                {!running && (
+                  <>
+                    <button onClick={() => { setShowLibrary(true); setShowMenu(false); }} className="block w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700">Library</button>
+                    <button onClick={() => { shuffleAll(); setShowMenu(false); }} className="block w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700">Shuffle all</button>
+                    <button onClick={() => { setShowPicker(true); setShowMenu(false); }} className="block w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700">Customize</button>
+                  </>
+                )}
+                <button onClick={() => { setShowDrill(true); setShowMenu(false); }} className="block w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700">Práctica en tierra</button>
+              </div>
+            )}
             {!running ? (
               <button onClick={handleStart} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
             ) : (
               <button onClick={handlePause} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Pause</button>
             )}
-            <button onClick={handleEnd} className="px-3 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">End</button>
           </div>
         </div>
         <div className="mt-3">
@@ -226,7 +235,11 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={handleBack} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Back</button>
-            <button onClick={handleNext} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Next</button>
+            {idx < STEPS.length - 1 ? (
+              <button onClick={handleNext} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Next</button>
+            ) : (
+              <button onClick={handleEnd} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">End</button>
+            )}
           </div>
         </div>
       </div>
