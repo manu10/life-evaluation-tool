@@ -3,6 +3,7 @@ import Modal from './ui/Modal';
 import SurfExerciseLibraryModal from './SurfExerciseLibraryModal';
 import SurfRoutinePickerModal from './SurfRoutinePickerModal';
 import { LIBRARY, DEFAULT_ROUTINE_KEYS } from './surfLibrary';
+import SurfLandDrillModal from './SurfLandDrillModal';
 import { primeAlarmAudio, playChime } from '../utils/alarmAudio';
 
 // Routine persistence helpers
@@ -32,6 +33,13 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
   const midFiredRef = React.useRef(false);
   const [showLibrary, setShowLibrary] = React.useState(false);
   const [showPicker, setShowPicker] = React.useState(false);
+  const [showDrill, setShowDrill] = React.useState(false);
+  const [drillHideForever, setDrillHideForever] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('surfDrill.hideForever') || 'false'); } catch { return false; }
+  });
+  const [drillDoneByDate, setDrillDoneByDate] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('surfDrill.doneByDate') || '{}'); } catch { return {}; }
+  });
 
   const totalSec = React.useMemo(() => STEPS.reduce((a, s) => a + s.seconds, 0), [STEPS]);
   const doneSec = React.useMemo(() => STEPS.slice(0, idx).reduce((a, s) => a + s.seconds, 0) + (STEPS[idx] ? (STEPS[idx].seconds - remaining) : 0), [idx, remaining, STEPS]);
@@ -93,7 +101,11 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
               setTimeout(() => playChime('chime', 200), 250);
               setTimeout(() => playChime('chime', 200), 500);
             } catch {}
-            if (typeof onFinish === 'function') onFinish();
+            if (!drillHideForever) {
+              setShowDrill(true);
+            } else {
+              if (typeof onFinish === 'function') onFinish();
+            }
             return i;
           }
           try {
@@ -168,6 +180,7 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
             <button onClick={() => setShowLibrary(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Library</button>
             <button onClick={shuffleAll} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Shuffle all</button>
             <button onClick={() => setShowPicker(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-700">Customize</button>
+            <button onClick={() => setShowDrill(true)} className="px-2.5 py-1.5 text-xs rounded-md border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200">Práctica en tierra</button>
             {!running ? (
               <button onClick={handleStart} className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
             ) : (
@@ -223,6 +236,37 @@ export default function SurfStretchOverlay({ isOpen, onClose, onFinish }) {
         onClose={() => setShowPicker(false)}
         initialKeys={routineKeys}
         onSave={(keys) => saveToday(keys)}
+      />
+      <SurfLandDrillModal
+        isOpen={showDrill}
+        onClose={() => { setShowDrill(false); if (typeof onFinish === 'function') onFinish(); }}
+        items={[
+          { id: 'mirada', text: 'Remada y puesta en Pie con mirada hacia adelante (parte alta, NO abajo)' },
+          { id: 'pie_atras', text: 'Pie de atrás al taco de la tabla' },
+          { id: 'pie_adelante_45', text: 'Pie adelante a 45° (NO completamente perpendicular)' },
+          { id: 'deslizando', text: 'Deslizando: hombros y caderas hacia adelante; peso adelante' },
+          { id: 'inclinacion_antebrazo', text: 'Inclinación con el antebrazo + mirada a donde voy (parte alta)' },
+          { id: 'punta_pies', text: 'Sentir peso en la punta de los pies' },
+          { id: 'brazo_muere', text: 'Brazo de adelante “muere” al costado' },
+          { id: 'hombro_adelante', text: 'Hombro de adelante inicia hacia adelante para rotar arriba' },
+          { id: 'rotar_transferir', text: 'Empezar rotación, transferir peso atrás; se libera el pie adelante' },
+        ]}
+        doneByDate={drillDoneByDate}
+        onMarkDone={(iso) => {
+          setDrillDoneByDate(prev => {
+            const next = { ...prev, [iso]: true };
+            try { localStorage.setItem('surfDrill.doneByDate', JSON.stringify(next)); } catch {}
+            return next;
+          });
+          setShowDrill(false);
+          if (typeof onFinish === 'function') onFinish();
+        }}
+        onHideForever={() => {
+          setDrillHideForever(true);
+          try { localStorage.setItem('surfDrill.hideForever', 'true'); } catch {}
+          setShowDrill(false);
+          if (typeof onFinish === 'function') onFinish();
+        }}
       />
     </Modal>
   );
