@@ -68,21 +68,21 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
 
   function MissPanel({ title, causesPath, countersPath, notePath, carryPath }) {
     return (
-      <div className="mt-2 p-3 rounded-md border border-amber-200 bg-amber-50" onClick={(e)=>e.stopPropagation()} onMouseDown={(e)=>e.stopPropagation()} onTouchStart={(e)=>e.stopPropagation()}>
-        <div className="text-xs font-semibold text-amber-900 mb-1">{title}</div>
+      <div className="mt-2 p-3 rounded-md border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20" onClick={(e)=>e.stopPropagation()} onMouseDown={(e)=>e.stopPropagation()} onTouchStart={(e)=>e.stopPropagation()}>
+        <div className="text-xs font-semibold text-amber-900 dark:text-amber-200 mb-1">{title}</div>
         <div className="mb-2">
-          <div className="text-xs text-amber-900 mb-1">Why did it miss? (pick 1+)</div>
+          <div className="text-xs text-amber-900 dark:text-amber-200 mb-1">Why did it miss? (pick 1+)</div>
           <div className="flex flex-wrap gap-2">
             {CAUSES.map(c => (
-              <button type="button" key={c} onClick={() => toggleInArray(causesPath, c)} className={`px-2 py-1 text-xs rounded border ${((causesPath.split('.').reduce((o,k)=>o?.[k], local))||[]).includes(c) ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-amber-900 border-amber-300'}`}>{c}</button>
+              <button type="button" key={c} onClick={() => toggleInArray(causesPath, c)} className={`px-2 py-1 text-xs rounded border ${((causesPath.split('.').reduce((o,k)=>o?.[k], local))||[]).includes(c) ? 'bg-amber-600 text-white border-amber-600' : 'bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-700'}`}>{c}</button>
             ))}
           </div>
         </div>
         <div className="mb-2">
-          <div className="text-xs text-amber-900 mb-1">Counter‑action (pick 1+)</div>
+          <div className="text-xs text-amber-900 dark:text-amber-200 mb-1">Counter‑action (pick 1+)</div>
           <div className="flex flex-wrap gap-2">
             {COUNTERS.map(c => (
-              <button type="button" key={c} onClick={() => toggleInArray(countersPath, c)} className={`px-2 py-1 text-xs rounded border ${((countersPath.split('.').reduce((o,k)=>o?.[k], local))||[]).includes(c) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-emerald-900 border-emerald-300'}`}>{c}</button>
+              <button type="button" key={c} onClick={() => toggleInArray(countersPath, c)} className={`px-2 py-1 text-xs rounded border ${((countersPath.split('.').reduce((o,k)=>o?.[k], local))||[]).includes(c) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-gray-800 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700'}`}>{c}</button>
             ))}
           </div>
         </div>
@@ -97,9 +97,9 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
           onMouseDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
-          className="w-full p-2 border border-gray-300 rounded text-xs resize-none"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-xs resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
         />
-        <label className="mt-2 flex items-center gap-2 text-xs text-gray-700">
+        <label className="mt-2 flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
           <input type="checkbox" checked={!!(carryPath.split('.').reduce((o,k)=>o?.[k], local))} onChange={() => setValue(carryPath, !(carryPath.split('.').reduce((o,k)=>o?.[k], local)))} />
           Convert to tomorrow (add as a todo)
         </label>
@@ -133,21 +133,21 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
   return (
     <div className="fixed inset-0 z-70 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-lg max-h-[85vh] flex flex-col">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Reset evening reflection</h3>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">✕</button>
+      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 w-full max-w-lg max-h-[85vh] flex flex-col">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Reset evening reflection</h3>
+          <button onClick={onClose} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">✕</button>
         </div>
         <div className="px-6 py-4 overflow-y-auto space-y-4">
-          <p className="text-sm text-gray-700">Before resetting, confirm the status of today's 3 main goals. For any missed item, select a cause and a counter‑action.</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300">Before resetting, confirm the status of today's 3 main goals. For any missed item, select a cause and a counter‑action.</p>
           <div className="space-y-2">
             {[1,2,3].map(n => {
               const key = `goal${n}`;
               const label = todaysGoals?.[key]?.text || `Goal ${n}`;
               return (
-                <label key={key} className="flex items-center justify-between p-3 rounded-md border border-gray-200 bg-gray-50">
-                  <span className="text-sm text-gray-800 truncate mr-3">{label || `Goal ${n}`}</span>
-                  <span className="flex items-center gap-2 text-sm">
+                <label key={key} className="flex items-center justify-between p-3 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60">
+                  <span className="text-sm text-gray-800 dark:text-gray-200 truncate mr-3">{label || `Goal ${n}`}</span>
+                  <span className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200">
                     <input type="checkbox" checked={!!local[key]} onChange={() => toggle(key)} />
                     Completed
                   </span>
@@ -171,9 +171,9 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
           })}
           {onePercentPlan && onePercentPlan.trim() && (
             <div className="mt-2">
-              <label className="flex items-center justify-between p-3 rounded-md border border-emerald-200 bg-emerald-50">
-                <span className="text-sm text-emerald-900 truncate mr-3">📈 1% Better: {onePercentPlan}</span>
-                <span className="flex items-center gap-2 text-sm">
+              <label className="flex items-center justify-between p-3 rounded-md border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+                <span className="text-sm text-emerald-900 dark:text-emerald-200 truncate mr-3">📈 1% Better: {onePercentPlan}</span>
+                <span className="flex items-center gap-2 text-sm text-emerald-900 dark:text-emerald-200">
                   <input type="checkbox" checked={!!local.onePercentDone} onChange={() => toggle('onePercentDone')} />
                   Done
                 </span>
@@ -191,12 +191,12 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
           )}
           {todaysTodos && todaysTodos.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-800 mb-2">Today's Todos</h4>
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Today's Todos</h4>
               <div className="space-y-2">
                 {todaysTodos.map((t, idx) => (
-                  <label key={t.id} className="flex items-center justify-between p-2 rounded-md border border-gray-200 bg-white">
-                    <span className="text-sm text-gray-800 truncate mr-3">{t.text}</span>
-                    <span className="flex items-center gap-2 text-sm">
+                  <label key={t.id} className="flex items-center justify-between p-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <span className="text-sm text-gray-800 dark:text-gray-200 truncate mr-3">{t.text}</span>
+                    <span className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200">
                       <input
                         type="checkbox"
                         checked={!!(local.todos?.[idx]?.completed)}
@@ -224,13 +224,13 @@ export default function EveningResetConfirm({ isOpen, onClose, todaysGoals, toda
             </div>
           )}
 
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-gray-600 dark:text-gray-400">
             This will reset evening responses and clear all tracked distractions for today. You can always set tomorrow's goals again.
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-2 text-gray-700 hover:text-gray-900">Cancel</button>
-          <button onClick={() => onConfirm && onConfirm(local)} disabled={!isValid()} className={`px-4 py-2 rounded-md ${isValid() ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}>Confirm & Reset</button>
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-2">
+          <button onClick={onClose} className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">Cancel</button>
+          <button onClick={() => onConfirm && onConfirm(local)} disabled={!isValid()} className={`px-4 py-2 rounded-md ${isValid() ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 cursor-not-allowed'}`}>Confirm & Reset</button>
         </div>
       </div>
     </div>
