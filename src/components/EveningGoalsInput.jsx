@@ -40,7 +40,7 @@ export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFi
             />
             <p className="mt-2 text-xs text-emerald-900">Keep it specific and short. Something you can finish over breakfast or on the bus.</p>
             {!!(onePercentNoteText && onePercentNoteText.trim()) && (
-              <div className="mt-3 text-sm text-emerald-900 dark:text-emerald-200">{onePercentNoteText}</div>
+              <div className="mt-3 text-sm text-emerald-900 dark:text-emerald-200 break-words line-clamp-3">{onePercentNoteText}</div>
             )}
           </div>
         </div>
