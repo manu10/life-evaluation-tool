@@ -72,6 +72,7 @@ export function generateExportText({
   whyText = '',
   whyReadToday = false,
   whyAlignToday = '',
+  yesterdaysOnePercentNote = '',
   eveningResponses = {},
   yesterdaysGoals = {},
   yesterdaysDayThoughts = '',
@@ -294,7 +295,11 @@ export function generateExportText({
 
     if (yesterdaysOnePercentPlan && yesterdaysOnePercentPlan.trim()) {
       const status = yesterdaysOnePercentDone ? '✅' : '⏳';
-      exportText += `📈 Yesterday's 1% Learning: ${status} ${yesterdaysOnePercentPlan}\n\n`;
+      exportText += `📈 Yesterday's 1% Learning: ${status} ${yesterdaysOnePercentPlan}\n`;
+      if (yesterdaysOnePercentNote && yesterdaysOnePercentNote.trim()) {
+        exportText += `   Note: ${yesterdaysOnePercentNote}\n`;
+      }
+      exportText += `\n`;
     }
 
     if (Array.isArray(missedAdjustments) && missedAdjustments.length > 0) {

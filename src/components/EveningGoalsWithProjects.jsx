@@ -16,7 +16,8 @@ export default function EveningGoalsWithProjects({
   onOnePercentLinkChange,
   editable,
   projects = [],
-  onAddTodo
+  onAddTodo,
+  onePercentNoteText
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -133,6 +134,7 @@ export default function EveningGoalsWithProjects({
         onOnePercentPlanChange={onOnePercentPlanChange}
         onOnePercentLinkChange={onOnePercentLinkChange}
         editable={editable}
+        onePercentNoteText={onePercentNoteText}
       />
     </div>
   );

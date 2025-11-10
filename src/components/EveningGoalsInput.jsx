@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlarmClock } from 'lucide-react';
 
-export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFirstHourChange, onOnePercentPlanChange, onOnePercentLinkChange, editable = true }) {
+export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFirstHourChange, onOnePercentPlanChange, onOnePercentLinkChange, editable = true, onePercentNoteText }) {
   return (
     <div className="bg-purple-50 dark:bg-purple-900/20 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8">
       <div className="mb-6 p-4 border-2 border-blue-500 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded flex items-center gap-4">
@@ -39,6 +39,9 @@ export default function EveningGoalsInput({ eveningResponses, onGoalChange, onFi
               className={`mt-2 w-full p-3 border border-emerald-300 dark:border-emerald-700 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${!editable ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
             />
             <p className="mt-2 text-xs text-emerald-900">Keep it specific and short. Something you can finish over breakfast or on the bus.</p>
+            {!!(onePercentNoteText && onePercentNoteText.trim()) && (
+              <div className="mt-3 text-sm text-emerald-900 dark:text-emerald-200">{onePercentNoteText}</div>
+            )}
           </div>
         </div>
       </div>

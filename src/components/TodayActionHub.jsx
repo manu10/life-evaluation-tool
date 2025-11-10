@@ -7,6 +7,7 @@ import EnvironmentConfirmModal from './modals/EnvironmentConfirmModal';
 import ABCHighlights from './ABCHighlights';
 import EnvironmentChecklist from './EnvironmentChecklist';
 import WhatWorkedToday from './WhatWorkedToday';
+import OnePercentNoteModal from './modals/OnePercentNoteModal';
 import GoalsList from './GoalsList';
 import TodosList from './TodosList';
 
@@ -35,6 +36,8 @@ export default function TodayActionHub({
   onePercentLink,
   onePercentDone,
   onToggleOnePercentDone,
+  onePercentNote,
+  onOnePercentNoteChange,
   goals,
   onToggleGoal,
   todaysTodos = [],
@@ -57,6 +60,8 @@ export default function TodayActionHub({
   const [savedFlash, setSavedFlash] = useState(false);
   const [sessionNow, setSessionNow] = useState(Date.now());
   const [showWhy, setShowWhy] = useState(false);
+  const [onePercentError, setOnePercentError] = useState('');
+  const [showOnePercentModal, setShowOnePercentModal] = useState(false);
 
   function handleQuickLog(e) {
     e.preventDefault();
@@ -209,13 +214,49 @@ export default function TodayActionHub({
                 )}
               </div>
               <div className="mt-2 text-xs text-emerald-900 dark:text-emerald-300">Aim to be 1% better than yesterday. Quick, specific, and doable.</div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="text-xs text-emerald-900 dark:text-emerald-300 truncate">
+                  {onePercentNote && onePercentNote.trim() ? <>Nota: <span className="font-medium">{onePercentNote}</span></> : <span className="italic opacity-80">Sin nota aún</span>}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowOnePercentModal(true)}
+                  className="px-2.5 py-1.5 text-xs rounded-md border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                >
+                  {onePercentNote && onePercentNote.trim() ? 'Editar nota' : 'Añadir nota'}
+                </button>
+              </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-emerald-900 dark:text-emerald-300">
-              <input type="checkbox" checked={!!onePercentDone} onChange={onToggleOnePercentDone} />
+              <input
+                type="checkbox"
+                checked={!!onePercentDone}
+                onChange={(e) => {
+                  if (!onePercentDone && ((onePercentNote || '').trim().length < 15)) {
+                    setOnePercentError('Por favor escribe una nota de al menos 15 caracteres.');
+                    setShowOnePercentModal(true);
+                    e.preventDefault(); return;
+                  }
+                  onToggleOnePercentDone && onToggleOnePercentDone();
+                }}
+              />
               Done
             </label>
           </div>
         </div>
+      )}
+      {showOnePercentModal && (
+        <OnePercentNoteModal
+          initialValue={onePercentNote || ''}
+          onClose={() => { setShowOnePercentModal(false); setOnePercentError(''); }}
+          onSave={(val) => {
+            const v = String(val || '').trim();
+            if (v.length < 15) { setOnePercentError('Por favor escribe una nota de al menos 15 caracteres.'); return; }
+            onOnePercentNoteChange && onOnePercentNoteChange(v);
+            setShowOnePercentModal(false);
+            if (!onePercentDone) onToggleOnePercentDone && onToggleOnePercentDone();
+          }}
+        />
       )}
 
       {/* Today's Goals */}

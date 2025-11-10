@@ -101,6 +101,8 @@ export default function LifeEvaluationTool() {
   const [onePercentDone, setOnePercentDone] = usePersistentState('onePercentDone', false);
   const [yesterdaysOnePercentPlan, setYesterdaysOnePercentPlan] = usePersistentState('yesterdaysOnePercentPlan', '');
   const [yesterdaysOnePercentDone, setYesterdaysOnePercentDone] = usePersistentState('yesterdaysOnePercentDone', false);
+  const [onePercentNote, setOnePercentNote] = usePersistentState('onePercentNote', '');
+  const [yesterdaysOnePercentNote, setYesterdaysOnePercentNote] = usePersistentState('yesterdaysOnePercentNote', '');
   const [morningCheckins, setMorningCheckins] = usePersistentState('morningCheckins', []);
   // Mindfulness & ABC (M1)
   const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
@@ -511,6 +513,7 @@ export default function LifeEvaluationTool() {
       whyText,
       whyReadToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return !!whyReadByDate?.[iso]; })(),
       whyAlignToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return (whyAlignByDate?.[iso]?.align)||''; })(),
+      yesterdaysOnePercentNote,
       eveningResponses,
       yesterdaysGoals,
       yesterdaysDayThoughts,
@@ -713,6 +716,8 @@ export default function LifeEvaluationTool() {
           onePercentLink={eveningResponses.onePercentLink}
           onePercentDone={onePercentDone}
           onToggleOnePercentDone={() => setOnePercentDone(prev => !prev)}
+          onePercentNote={onePercentNote}
+          onOnePercentNoteChange={setOnePercentNote}
           goals={todaysGoals}
           onToggleGoal={handleGoalToggle}
           todaysTodos={todaysTodos}
@@ -928,6 +933,7 @@ export default function LifeEvaluationTool() {
                 isEvening: false,
                 whyText,
                 whyReadToday: (() => { const d=new Date(); const iso=new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10); return !!whyReadByDate?.[iso]; })(),
+                yesterdaysOnePercentNote,
                 eveningResponses,
                 yesterdaysGoals,
                 yesterdaysDayThoughts,
@@ -995,6 +1001,7 @@ export default function LifeEvaluationTool() {
             projects={projects}
             todaysTodos={todaysTodos}
             onAddTodo={handleAddTodo}
+            onePercentNoteText={onePercentNote}
           />
           {/* Tomorrow's Todos (Evening planning) — uses the same list, only cleared by evening reset */}
           <TodosList
@@ -1282,6 +1289,11 @@ export default function LifeEvaluationTool() {
         onePercentPlan={eveningResponses.onePercentPlan}
         onePercentDone={onePercentDone}
         onConfirm={(localStatuses) => {
+          // Enforce 1% note before allowing reset if marked done
+          if (localStatuses?.onePercentDone && ((onePercentNote || '').trim().length < 15)) {
+            alert('Por favor añade una nota (≥15 caracteres) para tu 1% Better antes de finalizar el día.');
+            return;
+          }
           setIsResetConfirmOpen(false);
           // apply completion statuses before reset
           const updatedGoals = {
@@ -1298,6 +1310,8 @@ export default function LifeEvaluationTool() {
           setOnePercentDone(!!localStatuses.onePercentDone);
           setYesterdaysOnePercentPlan(eveningResponses.onePercentPlan || '');
           setYesterdaysOnePercentDone(!!localStatuses.onePercentDone);
+          setYesterdaysOnePercentNote(onePercentNote || '');
+          setOnePercentNote('');
           // also set today's goals state so UI reflects prior to reset
           setTodaysGoals(updatedGoals);
           // collect missed adjustments
@@ -1340,6 +1354,7 @@ export default function LifeEvaluationTool() {
             setEveningResponses(defaultEveningResponses);
             setEveningDone(false);
             setDistractions([]);
+            setOnePercentDone(false);
           } catch (e) {
             setIsRunning(false);
             setTimeLeft(120);
@@ -1347,6 +1362,7 @@ export default function LifeEvaluationTool() {
             setHasUsedExtraTime(false);
             setEveningDone(false);
             setDistractions([]);
+            setOnePercentDone(false);
           }
         }}
       />
