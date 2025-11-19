@@ -19,7 +19,7 @@ export default function SummaryPanel({ title, exportText, onCopy, googleDocsUrl,
       </div>
       <Card className="mt-6">
         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{previewLabel}</h4>
-        <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed max-h-32 overflow-y-auto">
+        <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap break-words font-mono leading-relaxed max-h-32 overflow-y-auto">
           {exportText}
         </pre>
       </Card>

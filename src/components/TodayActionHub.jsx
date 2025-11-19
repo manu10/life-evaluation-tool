@@ -7,6 +7,7 @@ import EnvironmentConfirmModal from './modals/EnvironmentConfirmModal';
 import ABCHighlights from './ABCHighlights';
 import EnvironmentChecklist from './EnvironmentChecklist';
 import WhatWorkedToday from './WhatWorkedToday';
+import SelfTalkCoach from './SelfTalkCoach';
 import OnePercentNoteModal from './modals/OnePercentNoteModal';
 import GoalsList from './GoalsList';
 import TodosList from './TodosList';
@@ -103,6 +104,9 @@ export default function TodayActionHub({
 
   return (
     <div className="space-y-6 text-gray-900 dark:text-gray-100">
+      {/* Self‑Talk Coach (3-day protocol) */}
+      <SelfTalkCoach />
+
       {/* Quick Actions */}
       <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
         <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Quick actions</h3>
@@ -215,7 +219,7 @@ export default function TodayActionHub({
               </div>
               <div className="mt-2 text-xs text-emerald-900 dark:text-emerald-300">Aim to be 1% better than yesterday. Quick, specific, and doable.</div>
               <div className="mt-2 flex items-center justify-between gap-3">
-                <div className="text-xs text-emerald-900 dark:text-emerald-300 truncate">
+                <div className="text-xs text-emerald-900 dark:text-emerald-300 break-words line-clamp-3">
                   {onePercentNote && onePercentNote.trim() ? <>Nota: <span className="font-medium">{onePercentNote}</span></> : <span className="italic opacity-80">Sin nota aún</span>}
                 </div>
                 <button

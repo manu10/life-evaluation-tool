@@ -42,6 +42,7 @@ import SessionEnderModal from './components/modals/SessionEnderModal';
 import SessionsDashboard from './components/SessionsDashboard';
 import ImmersiveSessionOverlay from './components/ImmersiveSessionOverlay';
 import ProjectsTab from './components/ProjectsTab';
+import SelfTalkCoach from './components/SelfTalkCoach';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
 import ProjectsSummary from './components/ProjectsSummary';
@@ -152,6 +153,9 @@ export default function LifeEvaluationTool() {
   });
   // Theme
   const [theme, setTheme] = usePersistentState('theme', 'light');
+  // Self-Talk Coach morning nudge tracking (per-day)
+  const [selfTalkNudgedByDate, setSelfTalkNudgedByDate] = usePersistentState('selfTalk.nudgedDates', {});
+  const [showSelfTalkNudge, setShowSelfTalkNudge] = useState(false);
   // Projects store
   const { projects, addProject, updateProject, removeProject, setNextAction } = useProjectsStore();
   const [openProjectId, setOpenProjectId] = useState(null);
@@ -185,6 +189,17 @@ export default function LifeEvaluationTool() {
     }
     function getDateKey(d) { const dt = new Date(d); dt.setHours(0,0,0,0); return dt.toISOString().slice(0,10); }
   }, [activeTab, morningResponses, gratitude, areasReflections]);
+
+  // Show Self-Talk nudge when opening Morning tab (once per day)
+  useEffect(() => {
+    if (activeTab === 'morning') {
+      const iso = getTodayISO();
+      if (!selfTalkNudgedByDate?.[iso]) {
+        setShowSelfTalkNudge(true);
+        setSelfTalkNudgedByDate(prev => ({ ...prev, [iso]: true }));
+      }
+    }
+  }, [activeTab]);
 
   // Timer effect
   useEffect(() => {
@@ -411,6 +426,11 @@ export default function LifeEvaluationTool() {
   function handleDailyRoutineChange(newRoutines) {
     if (eveningDone) return;
     setDailyRoutines(newRoutines);
+  }
+  function getTodayISO() {
+    const d = new Date();
+    const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+    return iso;
   }
   function handleYesterdaysRoutineToggle(index) {
     setYesterdaysRoutines(prev => {
@@ -770,8 +790,34 @@ export default function LifeEvaluationTool() {
               setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
             }}
           />
+          <div className="mb-4">
+            <SelfTalkCoach />
+          </div>
           <MorningStreak checkins={morningCheckins} />
           <SurfStretchStarter />
+          {showSelfTalkNudge && (
+            <div className="mb-4 p-3 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-sm text-emerald-900 dark:text-emerald-200">
+                  Quick reminder: try the Self‑Talk Coach — identity (“You are…”), a second‑person cue (“You can handle this”), and label one thought (“That’s a thought, not a fact.”)
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => { setShowSelfTalkNudge(false); }}
+                    className="px-2.5 py-1.5 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+                  >
+                    Go to coach
+                  </button>
+                  <button
+                    onClick={() => setShowSelfTalkNudge(false)}
+                    className="px-2.5 py-1.5 text-xs rounded-md border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Yesterday's Section - Now Collapsible */}
           <CollapsibleSection
             title="Yesterday's Review"
