@@ -43,6 +43,7 @@ import SessionsDashboard from './components/SessionsDashboard';
 import ImmersiveSessionOverlay from './components/ImmersiveSessionOverlay';
 import ProjectsTab from './components/ProjectsTab';
 import SelfTalkCoach from './components/SelfTalkCoach';
+import NoGoTrainer from './components/nogo/NoGoTrainer';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
 import ProjectsSummary from './components/ProjectsSummary';
@@ -683,6 +684,10 @@ export default function LifeEvaluationTool() {
       )}
       {activeTab === 'today' && (
         <>
+          {/* No‑Go Trainer at the very top (above During Notes) */}
+          <div className="mb-6">
+            <NoGoTrainer onLog={(ok, meta) => handleLogMicroPractice('no-go', 'manual', undefined, { ok, ...meta })} />
+          </div>
           {(() => {
             const d = new Date();
             const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
@@ -793,6 +798,33 @@ export default function LifeEvaluationTool() {
           <div className="mb-4">
             <SelfTalkCoach />
           </div>
+          {(() => {
+            // Morning No-Go nudge (simple, once per day)
+            const d = new Date();
+            const todayISO = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+            const yISO = new Date(d.getFullYear(), d.getMonth(), d.getDate()-1).toISOString().slice(0,10);
+            // read once (no state persisted for nudge beyond day)
+            let yCount = 0;
+            try {
+              const map = JSON.parse(localStorage.getItem('noGo.byDate') || '{}');
+              yCount = Math.max(0, map?.[yISO]?.count || 0);
+            } catch {}
+            return (
+              <div className="mb-4 p-3 rounded-lg border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="text-sm text-purple-900 dark:text-purple-200">
+                    Yesterday’s No‑Go wins: <span className="font-semibold">{yCount}</span>. Bank a quick win early today — one hold or a 30s surf.
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('today')}
+                    className="px-2.5 py-1.5 text-xs rounded-md bg-purple-600 text-white hover:bg-purple-700"
+                  >
+                    Open No‑Go
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
           <MorningStreak checkins={morningCheckins} />
           <SurfStretchStarter />
           {showSelfTalkNudge && (
@@ -1003,7 +1035,8 @@ export default function LifeEvaluationTool() {
                 anxietyRatings
                 ,sessions,
                 yesterdaysOnePercentPlan,
-                yesterdaysOnePercentDone
+                yesterdaysOnePercentDone,
+                noGoByDate: (() => { try { return JSON.parse(localStorage.getItem('noGo.byDate')||'{}'); } catch { return {}; } })()
               })}
               onCopy={() => copyToClipboard(false)}
               googleDocsUrl="https://docs.google.com/document/d/1cqfNmX_z6hGggisUOcdN1yp4N7AefFTwtBUF2qCO4lU/edit?tab=t.0#heading=h.o41a0fc0y2vk"
@@ -1015,6 +1048,27 @@ export default function LifeEvaluationTool() {
       {/* Evening Tab Content */}
       {activeTab === 'evening' && (
         <>
+          {(() => {
+            // Evening pride panel for No-Go
+            let todayCount = 0;
+            let bank = 0;
+            try {
+              const d = new Date();
+              const todayISO = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+              const map = JSON.parse(localStorage.getItem('noGo.byDate') || '{}');
+              todayCount = Math.max(0, map?.[todayISO]?.count || 0);
+              bank = Math.max(0, parseInt(localStorage.getItem('noGo.bank.balance') || '0', 10) || 0);
+            } catch {}
+            return (
+              <div className="mb-4 p-4 rounded-lg border-2 border-purple-400 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20">
+                <div className="text-sm text-purple-900 dark:text-purple-200 font-semibold mb-1">🏆 No‑Go Wins Today</div>
+                <div className="text-sm text-purple-900 dark:text-purple-200">
+                  You logged <span className="font-bold">{todayCount}</span> no‑go win{todayCount===1?'':'s'} today{todayCount>0? ' — nice control under pressure!':''}
+                </div>
+                <div className="mt-1 text-xs text-purple-800 dark:text-purple-300">Bank balance: {bank} coin{bank===1?'':'s'} • Tomorrow: aim for 1 win early.</div>
+              </div>
+            );
+          })()}
           {eveningDone && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2">

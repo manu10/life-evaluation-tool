@@ -99,7 +99,8 @@ export function generateExportText({
   sessions = [],
   yesterdaysOnePercentPlan = '',
   yesterdaysOnePercentDone = false,
-  missedAdjustments = []
+  missedAdjustments = [],
+  noGoByDate = {}
 }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -216,6 +217,15 @@ export function generateExportText({
         exportText += `🧩 Protocol Activity: ${parts.join(', ')}\n\n`;
       }
     }
+    // No-Go yesterday count (morning)
+    try {
+      const d = new Date();
+      const yISO = new Date(d.getFullYear(), d.getMonth(), d.getDate()-1).toISOString().slice(0,10);
+      const yNoGo = Math.max(0, noGoByDate?.[yISO]?.count || 0);
+      if (yNoGo > 0) {
+        exportText += `🚫 No‑Go Yesterday: ${yNoGo}\n\n`;
+      }
+    } catch {}
 
     // ABC highlights (show last up to 3 entries compact)
     if (abcLogs && abcLogs.length > 0) {
