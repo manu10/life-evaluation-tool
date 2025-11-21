@@ -44,6 +44,8 @@ import ImmersiveSessionOverlay from './components/ImmersiveSessionOverlay';
 import ProjectsTab from './components/ProjectsTab';
 import SelfTalkCoach from './components/SelfTalkCoach';
 import NoGoTrainer from './components/nogo/NoGoTrainer';
+import AnchorModal from './components/modals/AnchorModal';
+import QuickDistractionLog from './components/QuickDistractionLog';
 import { useProjectsStore } from './hooks/useProjectsStore';
 import ProjectDetailModal from './components/modals/ProjectDetailModal';
 import ProjectsSummary from './components/ProjectsSummary';
@@ -112,7 +114,10 @@ export default function LifeEvaluationTool() {
     anchorSec: 30,
     pauseSec: 90,
     enableFiveStep: true,
-    anchorFrequency: 'off'
+    anchorFrequency: 'off',
+    duringLayout: 'v2',
+    duringHeader: { showWhy: true, showRoutines: true, showGoals: true, showNextActions: true },
+    duringTiles: { notes: true, nogo: true, selftalk: true, quicklog: true, todos: true, breaths: false, anchor: false }
   });
   const [microPracticeLogs, setMicroPracticeLogs] = usePersistentState('microPracticeLogs', []);
   const [abcLogs, setAbcLogs] = usePersistentState('abcLogs', []);
@@ -139,6 +144,13 @@ export default function LifeEvaluationTool() {
   const [sessions, setSessions] = usePersistentState('sessions', []);
   const [liveSession, setLiveSession] = useState(null);
   const [sessionNow, setSessionNow] = useState(Date.now());
+  const [duringOpenTile, setDuringOpenTile] = useState(null);
+  const [duringQuickLogText, setDuringQuickLogText] = useState('');
+  const [duringHeaderExpanded, setDuringHeaderExpanded] = useState(false);
+  const [showAnchorTile, setShowAnchorTile] = useState(false);
+  const [showRoutinesDetail, setShowRoutinesDetail] = useState(false);
+  const [showGoalsDetail, setShowGoalsDetail] = useState(false);
+  const [showTodosDetail, setShowTodosDetail] = useState(false);
 
   // Invest: Opportunities, Sprints, Decisions, Reading usage
   const [investOpportunities, setInvestOpportunities] = usePersistentState('investOpportunities', []);
@@ -684,80 +696,401 @@ export default function LifeEvaluationTool() {
       )}
       {activeTab === 'today' && (
         <>
-          {/* No‑Go Trainer at the very top (above During Notes) */}
-          <div className="mb-6">
-            <NoGoTrainer onLog={(ok, meta) => handleLogMicroPractice('no-go', 'manual', undefined, { ok, ...meta })} />
-          </div>
-          {(() => {
-            const d = new Date();
-            const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
-            const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
-            function addNote(text) {
-              const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
-              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
-            }
-            function removeNote(id) {
-              setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
-            }
-            return (
+          {mindfulnessSettings?.duringLayout === 'v2' ? (
+            (() => {
+              // WHY always visible if set
+              const whyVisible = (whyText || '').trim().length > 0;
+              // Header toggles
+              const hdr = mindfulnessSettings?.duringHeader || {};
+              // Next actions (top 3)
+              const nextActions = (() => {
+                try {
+                  const items = [];
+                  (projects || []).filter(p => (p.status || 'active') === 'active').forEach(p => {
+                    const acts = Array.isArray(p.actions) ? p.actions : [];
+                    const firstIdx = acts.findIndex(a => !a.done && String(a.content || '').trim().length > 0);
+                    if (firstIdx >= 0) {
+                      const a = acts[firstIdx];
+                      items.push({ type: 'action', projectId: p.id, projectTitle: p.title, content: a.content, idx: firstIdx, priority: a.priority || 0 });
+                    } else {
+                      // fallback placeholder for active projects with no tasks defined
+                      items.push({ type: 'empty', projectId: p.id, projectTitle: p.title });
+                    }
+                  });
+                  // Prefer real actions first, then empties; sort actions by (priority desc)
+                  items.sort((a, b) => {
+                    if (a.type !== b.type) return a.type === 'action' ? -1 : 1;
+                    return (b.priority || 0) - (a.priority || 0);
+                  });
+                  return items.slice(0, 3);
+                } catch { return []; }
+              })();
+              // Notes helpers
+              const d = new Date();
+              const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+              const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
+              function addNote(text) {
+                const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
+                setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
+              }
+              function removeNote(id) {
+                setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
+              }
+              // Tiles vis
+              const tiles = mindfulnessSettings?.duringTiles || {};
+              return (
+                <div className="mb-12 space-y-6">
+                  {/* Focus header (WHY always visible if set) with expand/collapse */}
+                  <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">Focus</h2>
+                      <button
+                        onClick={() => setDuringHeaderExpanded(v => !v)}
+                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        {duringHeaderExpanded ? 'Collapse' : 'Expand'}
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {whyVisible && (
+                        <div className="p-3 rounded border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 text-sm text-emerald-900 dark:text-emerald-200">
+                          <span className="font-medium">WHY:</span> <span className="line-clamp-2">{whyText}</span>
+                        </div>
+                      )}
+                      {!duringHeaderExpanded && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          {hdr.showRoutines && (dailyRoutines || []).some(r => (r.text||'').trim()) && (
+                            <div>Routines: {(dailyRoutines||[]).filter(r => (r.text||'').trim()).filter(r => r.completed).length}/{(dailyRoutines||[]).filter(r => (r.text||'').trim()).length}</div>
+                          )}
+                          {hdr.showGoals && Object.values(todaysGoals||{}).some(g => (g.text||'').trim()) && (
+                            <div>Goals: {Object.values(todaysGoals||{}).filter(g => g.completed).length}/{Object.values(todaysGoals||{}).filter(g => (g.text||'').trim()).length}</div>
+                          )}
+                          {hdr.showNextActions && nextActions.length > 0 && (
+                            <div>Next: {nextActions[0]?.title || ''}</div>
+                          )}
+                        </div>
+                      )}
+                      {duringHeaderExpanded && (
+                        <div className="space-y-4">
+                          {hdr.showRoutines && (() => {
+                            const configured = (dailyRoutines||[]).filter(r => (r.text||'').trim()).length;
+                            const done = (dailyRoutines||[]).filter(r => (r.text||'').trim() && r.completed).length;
+                            const allDone = configured > 0 && done === configured;
+                            if (allDone && !showRoutinesDetail) {
+                              return (
+                                <div className="p-3 rounded-md border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-200 text-sm flex items-center justify-between">
+                                  <div>Today's Daily Routines: {done}/{configured} ✓ Completed</div>
+                                  <button
+                                    onClick={() => setShowRoutinesDetail(true)}
+                                    className="text-xs px-2 py-1 rounded border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                  >
+                                    Expand
+                                  </button>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div className="border border-gray-200 dark:border-gray-700 rounded-md">
+                                <DailyRoutineInput
+                                  routines={dailyRoutines}
+                                  onRoutineToggle={(index) => {
+                                    const newRoutines = [...dailyRoutines];
+                                    newRoutines[index] = { ...newRoutines[index], completed: !newRoutines[index].completed };
+                                    setDailyRoutines(newRoutines);
+                                  }}
+                                  editable={false}
+                                  showCheckboxes={true}
+                                  title="Today's Daily Routines"
+                                  colorClass="bg-transparent"
+                                />
+                                {allDone && (
+                                  <div className="px-3 pb-3">
+                                    <button
+                                      onClick={() => setShowRoutinesDetail(false)}
+                                      className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    >
+                                      Collapse
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {hdr.showGoals && (() => {
+                              const goalsArr = Object.values(todaysGoals || {});
+                              const configured = goalsArr.filter(g => (g.text || '').trim()).length;
+                              const done = goalsArr.filter(g => g.completed && (g.text || '').trim()).length;
+                              const allDone = configured > 0 && done === configured;
+                              if (allDone && !showGoalsDetail) {
+                                return (
+                                  <div className="p-3 rounded-md border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-200 text-sm flex items-center justify-between">
+                                    <div>Today's Goals: {done}/{configured} ✓ Completed</div>
+                                    <button
+                                      onClick={() => setShowGoalsDetail(true)}
+                                      className="text-xs px-2 py-1 rounded border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                    >
+                                      Expand
+                                    </button>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="border border-gray-200 dark:border-gray-700 rounded-md p-3">
+                                  <GoalsList goals={todaysGoals} onToggle={handleGoalToggle} editable={true} title="Today's Goals" colorClass="bg-transparent" />
+                                  {allDone && (
+                                    <div className="mt-2">
+                                      <button
+                                        onClick={() => setShowGoalsDetail(false)}
+                                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                      >
+                                        Collapse
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {/* Always allow showing Todos in header when expanded */}
+                            {(() => {
+                              const configured = (todaysTodos || []).length;
+                              const done = (todaysTodos || []).filter(t => t.completed).length;
+                              const allDone = configured > 0 && done === configured;
+                              if (allDone && !showTodosDetail) {
+                                return (
+                                  <div className="p-3 rounded-md border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-200 text-sm flex items-center justify-between">
+                                    <div>Today's Todos: {done}/{configured} ✓ Completed</div>
+                                    <button
+                                      onClick={() => setShowTodosDetail(true)}
+                                      className="text-xs px-2 py-1 rounded border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                    >
+                                      Expand
+                                    </button>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="border border-gray-200 dark:border-gray-700 rounded-md p-3">
+                                  <TodosList
+                                    todos={todaysTodos}
+                                    onAdd={handleAddTodo}
+                                    onToggle={handleToggleTodo}
+                                    onRemove={handleRemoveTodo}
+                                    editable={true}
+                                    title="Today's Todos (optional)"
+                                    colorClass="bg-transparent"
+                                  />
+                                  {allDone && (
+                                    <div className="mt-2">
+                                      <button
+                                        onClick={() => setShowTodosDetail(false)}
+                                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                      >
+                                        Collapse
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                          <div className="border border-gray-200 dark:border-gray-700 rounded-md p-3">
+                            <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">🎯 Next Actions</div>
+                            {nextActions.length > 0 ? (
+                              <ul className="space-y-1">
+                                {nextActions.map((a, idx) => (
+                                  <li key={idx} className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-100">
+                                    {a.type === 'action' ? (
+                                      <>
+                                        <input
+                                          type="checkbox"
+                                          onChange={() => {
+                                            const proj = projects.find(p => p.id === a.projectId);
+                                            if (!proj) return;
+                                            const actions = Array.isArray(proj.actions) ? proj.actions.slice() : [];
+                                            if (!actions[a.idx]) return;
+                                            actions[a.idx] = { ...actions[a.idx], done: !actions[a.idx].done };
+                                            updateProject(a.projectId, { actions });
+                                          }}
+                                          className="w-4 h-4"
+                                        />
+                                        <span>{a.content} <span className="opacity-70">({a.projectTitle||'Project'})</span></span>
+                                      </>
+                                    ) : (
+                                      <div className="flex items-center justify-between w-full">
+                                        <span className="opacity-80">{a.projectTitle || 'Project'} — No tasks defined</span>
+                                        <button
+                                          onClick={() => setActiveTab('projects')}
+                                          className="text-xs px-2 py-1 rounded border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                                        >
+                                          Add task
+                                        </button>
+                                      </div>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="text-xs text-gray-600 dark:text-gray-400">No next actions.</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Tiles */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {tiles.notes && (
+                      <button onClick={() => setDuringOpenTile(duringOpenTile === 'notes' ? null : 'notes')} className="p-4 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-200 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/30">
+                        During Notes
+                      </button>
+                    )}
+                    {tiles.nogo && (
+                      <button onClick={() => setDuringOpenTile(duringOpenTile === 'nogo' ? null : 'nogo')} className="p-4 rounded-lg border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20 text-purple-900 dark:text-purple-200 text-sm font-medium hover:bg-purple-100 dark:hover:bg-purple-900/30">
+                        No‑Go Trainer
+                      </button>
+                    )}
+                    {tiles.selftalk && (
+                      <button onClick={() => setDuringOpenTile(duringOpenTile === 'selftalk' ? null : 'selftalk')} className="p-4 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-200 text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/30">
+                        3‑Day Self‑Talk Coach
+                      </button>
+                    )}
+                    {tiles.quicklog && (
+                      <button onClick={() => setDuringOpenTile(duringOpenTile === 'quicklog' ? null : 'quicklog')} className="p-4 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30">
+                        Quick distraction log
+                      </button>
+                    )}
+                    {tiles.breaths && (
+                      <button onClick={() => setIsToolkitOpen(true)} className="p-4 rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-200 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                        Start 3 breaths
+                      </button>
+                    )}
+                    {tiles.anchor && (
+                      <button onClick={() => setShowAnchorTile(true)} className="p-4 rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-200 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                        Start Anchor
+                      </button>
+                    )}
+                    {tiles.todos && (
+                      <button onClick={() => setDuringOpenTile(duringOpenTile === 'todos' ? null : 'todos')} className="p-4 rounded-lg border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-200 text-sm font-medium hover:bg-green-100 dark:hover:bg-green-900/30">
+                        Today's Todos
+                      </button>
+                    )}
+                  </div>
+                  {/* Panels */}
+                  {duringOpenTile === 'notes' && (
+                    <div className="p-4 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-gray-800">
+                      <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={true} />
+                    </div>
+                  )}
+                  {duringOpenTile === 'nogo' && (
+                    <div className="p-4 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800">
+                      <NoGoTrainer onLog={(ok, meta) => handleLogMicroPractice('no-go', 'manual', undefined, { ok, ...meta })} />
+                    </div>
+                  )}
+                  {duringOpenTile === 'selftalk' && (
+                    <div className="p-4 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-gray-800">
+                      <SelfTalkCoach />
+                    </div>
+                  )}
+                  {duringOpenTile === 'quicklog' && (
+                    <div className="p-4 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800">
+                      <QuickDistractionLog onAddDistraction={handleAddDistraction} />
+                    </div>
+                  )}
+                  {duringOpenTile === 'todos' && (
+                    <div className="p-4 rounded-lg border border-green-300 dark:border-green-700 bg-white dark:bg-gray-800">
+                      <TodosList
+                        todos={todaysTodos}
+                        onAdd={handleAddTodo}
+                        onToggle={handleToggleTodo}
+                        onRemove={handleRemoveTodo}
+                        editable={true}
+                        title="Today's Todos"
+                        colorClass="bg-transparent"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })()
+          ) : (
+            <>
+              {/* No‑Go Trainer at the very top (above During Notes) */}
               <div className="mb-6">
-                <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={true} />
+                <NoGoTrainer onLog={(ok, meta) => handleLogMicroPractice('no-go', 'manual', undefined, { ok, ...meta })} />
               </div>
-            );
-          })()}
-          {!!featureFlags?.projectsTab && (
-            <ProjectsSummary
-              projects={projects}
-              maxActiveProjects={mindfulnessSettings?.maxActiveProjects ?? 3}
-              onToggleAction={(projectId, actionIndex) => {
-                const proj = projects.find(p => p.id === projectId);
-                if (!proj) return;
-                const actions = Array.isArray(proj.actions) ? proj.actions.slice() : [];
-                if (!actions[actionIndex]) return;
-                actions[actionIndex] = { ...actions[actionIndex], done: !actions[actionIndex].done };
-                updateProject(projectId, { actions });
-              }}
-              onOpenProject={(id) => setOpenProjectId(id)}
-            />
+              {(() => {
+                const d = new Date();
+                const todayKey = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+                const notes = Array.isArray(duringNotesByDate?.[todayKey]) ? duringNotesByDate[todayKey] : [];
+                function addNote(text) {
+                  const item = { id: Date.now() + Math.random(), text, createdAt: Date.now() };
+                  setDuringNotesByDate(prev => ({ ...prev, [todayKey]: [item, ...(prev?.[todayKey] || [])] }));
+                }
+                function removeNote(id) {
+                  setDuringNotesByDate(prev => ({ ...prev, [todayKey]: (prev?.[todayKey] || []).filter(n => n.id !== id) }));
+                }
+                return (
+                  <div className="mb-6">
+                    <DuringNotes notes={notes} onAdd={addNote} onRemove={removeNote} editable={true} />
+                  </div>
+                );
+              })()}
+              {!!featureFlags?.projectsTab && (
+                <ProjectsSummary
+                  projects={projects}
+                  maxActiveProjects={mindfulnessSettings?.maxActiveProjects ?? 3}
+                  onToggleAction={(projectId, actionIndex) => {
+                    const proj = projects.find(p => p.id === projectId);
+                    if (!proj) return;
+                    const actions = Array.isArray(proj.actions) ? proj.actions.slice() : [];
+                    if (!actions[actionIndex]) return;
+                    actions[actionIndex] = { ...actions[actionIndex], done: !actions[actionIndex].done };
+                    updateProject(projectId, { actions });
+                  }}
+                  onOpenProject={(id) => setOpenProjectId(id)}
+                />
+              )}
+              <TodayActionHub
+                onAddDistraction={handleAddDistraction}
+                onOpenSettings={() => setActiveTab('settings')}
+                onStartProtocol={() => setIsProtocolOpen(true)}
+                onOpenABC={() => { setAbcInitial({}); setIsABCOpen(true); }}
+                onLogMicro={(type) => handleLogMicroPractice(type)}
+                replacementActions={replacementActions}
+                onStartReplacement={(a) => setAttemptAction(a)}
+                environmentProfile={environmentProfile}
+                onApplyEnvironment={handleApplyEnvironment}
+                microLogs={microPracticeLogs}
+                abcLogs={abcLogs}
+                environmentApplications={environmentApplications}
+                anchorSeconds={mindfulnessSettings.anchorSec}
+                pauseSeconds={mindfulnessSettings.pauseSec}
+                distractions={distractions}
+                firstHour={eveningResponses.firstHour}
+                onePercentPlan={eveningResponses.onePercentPlan}
+                onePercentLink={eveningResponses.onePercentLink}
+                onePercentDone={onePercentDone}
+                onToggleOnePercentDone={() => setOnePercentDone(prev => !prev)}
+                onePercentNote={onePercentNote}
+                onOnePercentNoteChange={setOnePercentNote}
+                goals={todaysGoals}
+                onToggleGoal={handleGoalToggle}
+                todaysTodos={todaysTodos}
+                onAddTodo={handleAddTodo}
+                onToggleTodo={handleToggleTodo}
+                onRemoveTodo={handleRemoveTodo}
+                liveSession={liveSession}
+                onEndSession={() => setIsEndSessionOpen(true)}
+                whyText={whyText}
+                onReReadWhy={() => {
+                  const d = new Date();
+                  const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
+                  setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
+                }}
+              />
+            </>
           )}
-          <TodayActionHub
-          onAddDistraction={handleAddDistraction}
-          onOpenSettings={() => setActiveTab('settings')}
-          onStartProtocol={() => setIsProtocolOpen(true)}
-          onOpenABC={() => { setAbcInitial({}); setIsABCOpen(true); }}
-          onLogMicro={(type) => handleLogMicroPractice(type)}
-          replacementActions={replacementActions}
-          onStartReplacement={(a) => setAttemptAction(a)}
-          environmentProfile={environmentProfile}
-          onApplyEnvironment={handleApplyEnvironment}
-          microLogs={microPracticeLogs}
-          abcLogs={abcLogs}
-          environmentApplications={environmentApplications}
-          anchorSeconds={mindfulnessSettings.anchorSec}
-          pauseSeconds={mindfulnessSettings.pauseSec}
-          distractions={distractions}
-          firstHour={eveningResponses.firstHour}
-          onePercentPlan={eveningResponses.onePercentPlan}
-          onePercentLink={eveningResponses.onePercentLink}
-          onePercentDone={onePercentDone}
-          onToggleOnePercentDone={() => setOnePercentDone(prev => !prev)}
-          onePercentNote={onePercentNote}
-          onOnePercentNoteChange={setOnePercentNote}
-          goals={todaysGoals}
-          onToggleGoal={handleGoalToggle}
-          todaysTodos={todaysTodos}
-          onAddTodo={handleAddTodo}
-          onToggleTodo={handleToggleTodo}
-          onRemoveTodo={handleRemoveTodo}
-          liveSession={liveSession}
-          onEndSession={() => setIsEndSessionOpen(true)}
-          whyText={whyText}
-          onReReadWhy={() => {
-            const d = new Date();
-            const iso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10);
-            setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
-          }}
-        />
         </>
       )}
       {(activeTab === 'morning' || activeTab === 'evening') && (
@@ -795,8 +1128,22 @@ export default function LifeEvaluationTool() {
               setWhyReadByDate(prev => ({ ...prev, [iso]: true }));
             }}
           />
-          <div className="mb-4">
-            <SelfTalkCoach />
+          {/* Compact Self‑Talk Coach nudge (opens full section in During) */}
+          <div className="mb-4 p-3 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-sm text-emerald-900 dark:text-emerald-200">
+                3‑Day Self‑Talk Coach: identity (“You are…”), a second‑person cue (“You can handle this”), and label one thought (“That’s a thought, not a fact.”)
+              </div>
+              <button
+                onClick={() => {
+                  setActiveTab('today');
+                  if ((mindfulnessSettings?.duringLayout ?? 'v2') === 'v2') setDuringOpenTile('selftalk');
+                }}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                Open coach
+              </button>
+            </div>
           </div>
           {(() => {
             // Morning No-Go nudge (simple, once per day)
@@ -1219,6 +1566,14 @@ export default function LifeEvaluationTool() {
             />
           )}
         </>
+      )}
+      {/* v2 Anchor Modal from tile */}
+      {showAnchorTile && (
+        <AnchorModal
+          seconds={mindfulnessSettings?.anchorSec ?? 30}
+          onClose={() => setShowAnchorTile(false)}
+          onConfirm={() => handleLogMicroPractice('anchor')}
+        />
       )}
       {activeTab === 'sessions' && featureFlags?.sessionsTab !== false && !!mindfulnessSettings?.enableSessions && (
         <div className="mb-12">

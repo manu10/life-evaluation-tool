@@ -47,6 +47,72 @@ export default function Settings({ dailyRoutines, onDailyRoutineChange, mindfuln
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Configure prompts and durations for micro‑interrupts.</p>
         </div>
         <div className="p-4 space-y-4">
+          {/* During Layout */}
+          <div className="pt-2 border-t border-gray-200">
+            <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">During Tab Layout</h4>
+            <SelectField
+              label="Layout"
+              value={mindfulnessSettings?.duringLayout ?? 'v2'}
+              onChange={(v) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringLayout: v })}
+              options={[
+                { value: 'v1', label: 'Classic (v1)' },
+                { value: 'v2', label: 'Focused (v2)' },
+              ]}
+            />
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Toggle
+                label="Show Daily Routines in header"
+                checked={!!mindfulnessSettings?.duringHeader?.showRoutines}
+                onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringHeader: { ...(mindfulnessSettings?.duringHeader||{}), showRoutines: val } })}
+              />
+              <Toggle
+                label="Show Today's Goals in header"
+                checked={!!mindfulnessSettings?.duringHeader?.showGoals}
+                onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringHeader: { ...(mindfulnessSettings?.duringHeader||{}), showGoals: val } })}
+              />
+              <Toggle
+                label="Show Next Actions in header"
+                checked={!!mindfulnessSettings?.duringHeader?.showNextActions}
+                onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringHeader: { ...(mindfulnessSettings?.duringHeader||{}), showNextActions: val } })}
+              />
+            </div>
+            <div className="mt-4">
+              <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Action Tiles</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Toggle
+                  label="During Notes"
+                  checked={!!mindfulnessSettings?.duringTiles?.notes}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), notes: val } })}
+                />
+                <Toggle
+                  label="No‑Go Trainer"
+                  checked={!!mindfulnessSettings?.duringTiles?.nogo}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), nogo: val } })}
+                />
+                <Toggle
+                  label="3‑Day Self‑Talk Coach"
+                  checked={!!mindfulnessSettings?.duringTiles?.selftalk}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), selftalk: val } })}
+                />
+                <Toggle
+                  label="Quick distraction log"
+                  checked={!!mindfulnessSettings?.duringTiles?.quicklog}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), quicklog: val } })}
+                />
+                <Toggle
+                  label="Start 3 breaths"
+                  checked={!!mindfulnessSettings?.duringTiles?.breaths}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), breaths: val } })}
+                />
+                <Toggle
+                  label="Start Anchor"
+                  checked={!!mindfulnessSettings?.duringTiles?.anchor}
+                  onChange={(val) => onMindfulnessSettingsChange({ ...mindfulnessSettings, duringTiles: { ...(mindfulnessSettings?.duringTiles||{}), anchor: val } })}
+                />
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">WHY is always shown if set.</p>
+            </div>
+          </div>
           <div className="pt-2 border-t border-gray-200">
             <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">Gratitude/Input Mode</h4>
             <SelectField
