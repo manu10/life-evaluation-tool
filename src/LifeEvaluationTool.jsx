@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { usePersistentState } from './hooks/usePersistentState';
 import { formatTime } from './utils/formatTime';
 import { generateExportText } from './utils/generateExportText';
-import { AlarmClock } from 'lucide-react';
+import { AlarmClock, Info } from 'lucide-react';
 import Timer from './components/Timer';
 import FloatingToolbar from './components/FloatingToolbar';
 import Tabs from './components/Tabs';
@@ -53,6 +53,7 @@ import MorningStreak from './components/MorningStreak';
 import { primeAlarmAudio } from './utils/alarmAudio';
 import { openNativeTimer } from './utils/nativeTimer';
 import SurfStretchStarter from './components/SurfStretchStarter';
+import OnePercentNoteModal from './components/modals/OnePercentNoteModal';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -108,6 +109,9 @@ export default function LifeEvaluationTool() {
   const [onePercentNote, setOnePercentNote] = usePersistentState('onePercentNote', '');
   const [yesterdaysOnePercentNote, setYesterdaysOnePercentNote] = usePersistentState('yesterdaysOnePercentNote', '');
   const [morningCheckins, setMorningCheckins] = usePersistentState('morningCheckins', []);
+  const [showOnePercentModal, setShowOnePercentModal] = useState(false);
+  const [showFirstHourInfo, setShowFirstHourInfo] = useState(false);
+  const [showOnePercentInfo, setShowOnePercentInfo] = useState(false);
   // Mindfulness & ABC (M1)
   const [mindfulnessSettings, setMindfulnessSettings] = usePersistentState('mindfulnessSettings', {
     enablePrompts: true,
@@ -772,6 +776,85 @@ export default function LifeEvaluationTool() {
                       )}
                       {duringHeaderExpanded && (
                         <div className="space-y-4">
+                          {(eveningResponses.firstHour || '').trim() !== '' && (
+                            <div className="p-2 rounded-md border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="text-xs font-semibold text-blue-800 dark:text-blue-300 shrink-0">First Hour</span>
+                                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">{eveningResponses.firstHour}</span>
+                                <button
+                                  type="button"
+                                  title="Why plan your first hour?"
+                                  aria-label="Why plan your first hour?"
+                                  onClick={() => setShowFirstHourInfo(v => !v)}
+                                  className="shrink-0 p-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40"
+                                >
+                                  <Info className="w-4 h-4 text-blue-700 dark:text-blue-300" />
+                                </button>
+                              </div>
+                              {showFirstHourInfo && (
+                                <div className="mt-2 p-2 rounded-md border border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300">
+                                  Planning your first hour reduces decision fatigue and creates momentum for the day.
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {(eveningResponses.onePercentPlan || '').trim() !== '' && (
+                            <div className="p-2 rounded-md border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 shrink-0">📈 1% Better</span>
+                                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
+                                  {eveningResponses.onePercentPlan}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowOnePercentModal(true)}
+                                  className="shrink-0 text-xs px-2 py-1 rounded border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                  title={onePercentNote && onePercentNote.trim() ? onePercentNote : 'Add a brief note'}
+                                  aria-label="Open 1% Better note"
+                                >
+                                  Note
+                                </button>
+                                {(eveningResponses.onePercentLink || '').trim() !== '' && (
+                                  <a
+                                    href={eveningResponses.onePercentLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="shrink-0 text-xs px-2 py-1 rounded border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                  >
+                                    Open link
+                                  </a>
+                                )}
+                                <button
+                                  type="button"
+                                  title="Why 1% Better?"
+                                  aria-label="Why 1% Better?"
+                                  onClick={() => setShowOnePercentInfo(v => !v)}
+                                  className="shrink-0 p-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                >
+                                  <Info className="w-4 h-4 text-emerald-700 dark:text-emerald-300" />
+                                </button>
+                                <label className="shrink-0 flex items-center gap-1 text-xs text-emerald-900 dark:text-emerald-300">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!onePercentDone}
+                                    onChange={(e) => {
+                                      if (!onePercentDone && ((onePercentNote || '').trim().length < 15)) {
+                                        setShowOnePercentModal(true);
+                                        e.preventDefault(); return;
+                                      }
+                                      setOnePercentDone(prev => !prev);
+                                    }}
+                                  />
+                                  Done
+                                </label>
+                              </div>
+                              {showOnePercentInfo && (
+                                <div className="mt-2 p-2 rounded-md border border-emerald-200 dark:border-emerald-700 bg-white dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300">
+                                  A small, consistent learning habit compounds quickly. Keep it specific and doable.
+                                </div>
+                              )}
+                            </div>
+                          )}
                           {hdr.showRoutines && (() => {
                             const configured = (dailyRoutines||[]).filter(r => (r.text||'').trim()).length;
                             const done = (dailyRoutines||[]).filter(r => (r.text||'').trim() && r.completed).length;
@@ -1700,6 +1783,19 @@ export default function LifeEvaluationTool() {
         }}
       />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      {showOnePercentModal && (
+        <OnePercentNoteModal
+          initialValue={onePercentNote || ''}
+          onClose={() => setShowOnePercentModal(false)}
+          onSave={(val) => {
+            const v = String(val || '').trim();
+            if (v.length < 15) return;
+            setOnePercentNote(v);
+            setShowOnePercentModal(false);
+            if (!onePercentDone) setOnePercentDone(true);
+          }}
+        />
+      )}
       <SessionStarterModal
         isOpen={isStartSessionOpen}
         onClose={() => setIsStartSessionOpen(false)}
