@@ -803,6 +803,15 @@ export default function LifeEvaluationTool() {
                                 <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 shrink-0">📈 1% Better</span>
                                 <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
                                   {eveningResponses.onePercentPlan}
+                                  {(() => {
+                                    const t = (onePercentNote || '').trim();
+                                    if (!t) return null;
+                                    const max = 40;
+                                    const pv = t.length > max ? (t.slice(0, max) + '...') : t;
+                                    return (
+                                      <span className="font-normal opacity-80"> · Nota: <span className="italic not-italic">{pv}</span></span>
+                                    );
+                                  })()}
                                 </span>
                                 <button
                                   type="button"
