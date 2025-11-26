@@ -441,7 +441,6 @@ export default function LifeEvaluationTool() {
     setEveningResponses(prev => ({ ...prev, phoneUsage: value }));
   }
   function handleDailyRoutineChange(newRoutines) {
-    if (eveningDone) return;
     setDailyRoutines(newRoutines);
   }
   function getTodayISO() {
