@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isSafeHttpUrl } from '../utils/safeUrl';
 
 export default function DuringNotes({ notes = [], onAdd, onRemove, editable = true }) {
   const [text, setText] = useState('');
@@ -12,13 +13,11 @@ export default function DuringNotes({ notes = [], onAdd, onRemove, editable = tr
   }
 
   function renderNoteText(t) {
-    // Auto-link simple URLs
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const parts = String(t).split(urlRegex);
+    const parts = String(t).split(/(https?:\/\/[^\s]+)/);
     return parts.map((part, idx) => {
-      if (urlRegex.test(part)) {
+      if (isSafeHttpUrl(part)) {
         return (
-          <a key={idx} href={part} target="_blank" rel="noreferrer" className="text-blue-700 dark:text-blue-300 underline break-all">{part}</a>
+          <a key={idx} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300 underline break-all">{part}</a>
         );
       }
       return <span key={idx}>{part}</span>;

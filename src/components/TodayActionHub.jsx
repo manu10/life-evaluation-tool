@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import SafeExternalLink from './SafeExternalLink';
+import { toSafeHttpUrl } from '../utils/safeUrl';
 import BreathingGuideModal from './modals/BreathingGuideModal';
 import AnchorModal from './modals/AnchorModal';
 import PostureConfirmModal from './modals/PostureConfirmModal';
@@ -211,9 +213,9 @@ export default function TodayActionHub({
               <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-1">📈 1% Better Today (15–30 min)</h3>
               <div className="p-3 bg-white dark:bg-gray-800 border border-emerald-300 dark:border-emerald-700 rounded text-sm">
                 {onePercentPlan}
-                {onePercentLink && (
+                {toSafeHttpUrl(onePercentLink) && (
                   <div className="mt-2">
-                    <a href={onePercentLink} target="_blank" rel="noreferrer" className="text-emerald-700 dark:text-emerald-300 underline">Open link</a>
+                    <SafeExternalLink href={onePercentLink} className="text-emerald-700 dark:text-emerald-300 underline">Open link</SafeExternalLink>
                   </div>
                 )}
               </div>

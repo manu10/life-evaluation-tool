@@ -1,4 +1,6 @@
 import React from 'react';
+import SafeExternalLink from './SafeExternalLink';
+import { toSafeHttpUrl } from '../utils/safeUrl';
 
 export default function InvestTab({
   opportunities = [],
@@ -160,7 +162,7 @@ export default function InvestTab({
                     <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate" title={opp?.title || ''}>{emoji} {kind.toUpperCase()} • {opp?.title || '—'}</div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-700 dark:text-gray-300">
                       <span>{new Date(d.decidedAt).toLocaleString()}</span>
-                      {opp?.docUrl && <a href={opp.docUrl} target="_blank" rel="noreferrer" className="underline">Doc</a>}
+                      {toSafeHttpUrl(opp?.docUrl) && <SafeExternalLink href={opp.docUrl} className="underline">Doc</SafeExternalLink>}
                     </div>
                   </div>
                   <div className="shrink-0">
@@ -224,7 +226,7 @@ function OppCard({ o, column = 'Backlog', collapsed = false, tags = [], onAssign
                   ))}
                 </span>
               </span>
-              {o.docUrl && <a href={o.docUrl} target="_blank" rel="noreferrer" className="underline break-all">Open Doc</a>}
+              {toSafeHttpUrl(o.docUrl) && <SafeExternalLink href={o.docUrl} className="underline break-all">Open Doc</SafeExternalLink>}
             </div>
             {o.nextAction && (
               <div className="mt-1 text-xs text-gray-800 dark:text-gray-100 truncate" title={o.nextAction}>Next: {o.nextAction}</div>
@@ -283,7 +285,7 @@ function OppCard({ o, column = 'Backlog', collapsed = false, tags = [], onAssign
 
       {/* Meta */}
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
-        {o.docUrl && <a href={o.docUrl} target="_blank" rel="noreferrer" className="underline break-all">Open Doc</a>}
+        {toSafeHttpUrl(o.docUrl) && <SafeExternalLink href={o.docUrl} className="underline break-all">Open Doc</SafeExternalLink>}
         {o.deadline && <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">Due {new Date(o.deadline).toLocaleDateString()}</span>}
         {renderTagPill(tags, o, true)}
       </div>

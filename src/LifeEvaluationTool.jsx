@@ -54,6 +54,7 @@ import { primeAlarmAudio } from './utils/alarmAudio';
 import { openNativeTimer } from './utils/nativeTimer';
 import SurfStretchStarter from './components/SurfStretchStarter';
 import OnePercentNoteModal from './components/modals/OnePercentNoteModal';
+import { toSafeHttpUrl } from './utils/safeUrl';
 
 const lifeAreas = [
   'Health & Energy', 'Relationships', 'Work & Career', 'Personal Growth',
@@ -1715,11 +1716,14 @@ export default function LifeEvaluationTool() {
             try { navigator.clipboard.writeText(snippet); alert('Copied decision snippet'); } catch {}
           }}
           onAddOpportunity={({ title, docUrl, tagId }) => {
-            const item = { id: Date.now().toString(), title, docUrl, tagId: tagId || null, status: 'Backlog', createdAt: Date.now(), timeSpentSec: 0 };
+            const item = { id: Date.now().toString(), title, docUrl: toSafeHttpUrl(docUrl) || '', tagId: tagId || null, status: 'Backlog', createdAt: Date.now(), timeSpentSec: 0 };
             setInvestOpportunities(prev => [item, ...prev]);
           }}
           onUpdateOpportunity={(id, partial) => {
-            setInvestOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...partial } : o));
+            const sanitized = partial.docUrl !== undefined
+              ? { ...partial, docUrl: toSafeHttpUrl(partial.docUrl) || '' }
+              : partial;
+            setInvestOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...sanitized } : o));
           }}
           onDeleteOpportunity={(id) => {
             setInvestOpportunities(prev => prev.filter(o => o.id !== id));
